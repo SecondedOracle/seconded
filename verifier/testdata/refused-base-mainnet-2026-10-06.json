@@ -1,0 +1,50 @@
+{
+  "receipt": {
+    "envelope": {
+      "v": 1,
+      "kind": "seconded-receipt",
+      "check_id": null,
+      "seq": 0,
+      "issued_at": "2026-10-06T03:57:35.018936Z",
+      "outcome_at": null,
+      "product": null,
+      "product_schema_version": null,
+      "predicate_version": null,
+      "template_version": null,
+      "model_pair_id": null,
+      "tier": null,
+      "checked_by": [],
+      "model_config_fingerprint": "4caf94431d1d78f1b029bd0b650336431c1600a48f9e17de43141fa06f5905b9",
+      "model_config_fingerprints": {},
+      "request_digest": null,
+      "request_commitment": null,
+      "state": "refused",
+      "outcome": null,
+      "disclaimer": null,
+      "billing": {
+        "mode": "paid",
+        "charged": "no",
+        "network": "eip155:8453",
+        "asset": "eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "amount_atomic": null,
+        "payer": null,
+        "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a",
+        "tx": null,
+        "settlement": "none",
+        "refund": null
+      },
+      "lane": null,
+      "unfreeze_at": null,
+      "key_id": "rk-2026-09-a"
+    },
+    "sig": "2LNan74SAcAt74xzTzOCCvP2NzCjhbCp6G18929GHVPQmpUaAozDqbInxFgDqv-wEXtEMiDmKh-8iJmFbOhyDg",
+    "key_id": "rk-2026-09-a"
+  },
+  "hints": {
+    "do_not_resign": false,
+    "poll_after_s": null,
+    "new_quote_allowed": true
+  },
+  "error": "invalid_input",
+  "reason": "unknown_product"
+}
