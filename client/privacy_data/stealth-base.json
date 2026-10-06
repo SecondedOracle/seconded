@@ -1,0 +1,35 @@
+{
+  "chain_id": 8453,
+  "chain_name": "Base mainnet",
+  "scheme_id": 1,
+  "verified_at": "2026-10-04T16:33:45.603837+00:00",
+  "verification": "primary_source_deployment_table",
+  "announcer": {
+    "address": "0x55649E01B5Df198D18D95b5cc5051630cfD45564",
+    "sources": [
+      "https://github.com/ScopeLift/stealth-address-erc-contracts#deployments",
+      "https://eips.ethereum.org/EIPS/eip-5564#deployment-method"
+    ]
+  },
+  "registry": {
+    "address": "0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538",
+    "sources": [
+      "https://github.com/ScopeLift/stealth-address-erc-contracts#deployments",
+      "https://eips.ethereum.org/EIPS/eip-6538#deployment-method"
+    ]
+  },
+  "observations": [
+    "ScopeLift's Mainnet Networks table explicitly lists Base and both addresses.",
+    "Both ERC deployment sections independently specify the canonical addresses.",
+    "This is documentary deployment verification, not a live code or liveness check.",
+    "The module owns a 30-day evidence limit; requests cannot override its clock or freshness.",
+    "The ScopeLift scheme-1 SDK hashes the compressed SEC1 shared point with Keccak-256."
+  ],
+  "derivation_source": "https://github.com/ScopeLift/stealth-address-sdk/blob/main/src/utils/crypto/generateStealthAddress.ts",
+  "current_runtime": "unknown",
+  "source_sha256": {
+    "https://raw.githubusercontent.com/ScopeLift/stealth-address-erc-contracts/master/README.md": "adfef2a3bdbd72a1b15cbabb0b50157e3799000fda251dc21b580135d6bdf17c",
+    "https://eips.ethereum.org/EIPS/eip-5564": "556af078c666e1ed43813e5f971be773e0f8726866c3411edad302fcf29074b4",
+    "https://eips.ethereum.org/EIPS/eip-6538": "1a318e2c6219c20b26b1bc9b136bf11dac2d6d26a1d98e998d580ff77d31d470"
+  }
+}

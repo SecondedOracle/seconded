@@ -1,0 +1,286 @@
+{
+  "schema": "seconded-trade-pins/v1",
+  "chain_id": 5042,
+  "network": "eip155:5042",
+  "hash_algorithm": "sha256(decoded_runtime_bytes)",
+  "measured": {
+    "probe": "docs/probes/11-verifiable-checks.md",
+    "results": "docs/probes/data/11-verifiable/results.json",
+    "results_sha256": "f7c8f9659cf475f3a739aa2da04652d275125b70563b98c62c0ec4784e398650",
+
+    "started_at": "2026-09-25T00:14:38Z",
+    "finished_at": "2026-09-25T00:18:01Z",
+    "block": {
+      "number": 22601112,
+      "hash": "0x523bc56fc4cce8e28800d0247af8ea30eb177fc655bfee60120cf0a9df5a0491"
+    },
+    "readers": [
+      "https://rpc.drpc.mainnet.arc.io",
+      "https://rpc.mainnet.arc.io"
+    ]
+  },
+  "contracts": [
+    {
+      "label": "uniswap_v4_poolmanager",
+      "kind": "pool_manager",
+      "address": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24009,
+        "sha256": "6eb21c69298b064e37fcf8089a941ae096fe08c0f179b2d399567aef1b10585b"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "uniswap_v4_quoter",
+      "kind": "quoter",
+      "address": "0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 6118,
+        "sha256": "aa37fb59c400cc63566d93fd24982289227cdc90716656332e93a42bb17ba758"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "universal_router",
+      "kind": "router",
+      "address": "0x4fcA4a51Ab4F23A7447b3284fBd7D73289A89Fb1",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24546,
+        "sha256": "93f94c5caf02dd0ff92b783bfdbcdfe8e72287b5d6c3a079491de4ff9e7f72ae"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "universal_router_2_1_2",
+      "kind": "router",
+      "address": "0x8702463e73f74d0b6765aBceb314Ef07aCb92650",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24380,
+        "sha256": "9bd09180c4c3132d6d4d2c8d45a173dddc16fc09ce9d7076206566a12ad0f06f"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "permit2",
+      "kind": "permit2",
+      "address": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 9152,
+        "sha256": "0236a7eda5b748bc2b0bffc6304fa30f15c634beb211025290c9a6d098433067"
+      },
+      "address_source": "U4,ARC"
+    },
+    {
+      "label": "multicall3",
+      "kind": "multicall",
+      "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 3808,
+        "sha256": "2756d7c52baee85cacb504f6ee1df7aad6809ac8d94a4a111d76991f90d36d6e"
+      },
+      "address_source": "ARC"
+    },
+    {
+      "label": "token_usdc",
+      "kind": "token",
+      "address": "0x3600000000000000000000000000000000000000",
+      "symbol": "USDC",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1798,
+        "sha256": "d06405421b354a12b2f03fcc8aac4b324f274aed5b8ecc5fd62d8fa119067154"
+      },
+      "address_source": "ARC,NET",
+      "implementation": {
+        "via": "zos",
+        "address": "0xC6AD664ac6679F4Ce74e10E91449C93Ec1ae3cA6",
+        "code": {
+          "bytes": 23659,
+          "sha256": "e473fcfea30ffc44af1278d3691b1523e30bcd9b620be902796870f32d1a1e99"
+        }
+      }
+    },
+    {
+      "label": "token_eurc",
+      "kind": "token",
+      "address": "0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1",
+      "symbol": "EURC",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1798,
+        "sha256": "8a1d56e04e76c7cc44aadc6e41bab3f6fed6b12f03cbaef73fd2bdc325199d8c"
+      },
+      "address_source": "ARC",
+      "implementation": {
+        "via": "zos",
+        "address": "0xC6061272419BB754a6C0386D1DF81ddb3Fe5cF3c",
+        "code": {
+          "bytes": 23464,
+          "sha256": "58523d6e70d3190ab673d9d1d9626c3f70703d12c67a421ee13bdd43943e3114"
+        }
+      }
+    },
+    {
+      "label": "token_usyc",
+      "kind": "token",
+      "address": "0x8a5D989Bbb96929F689B0200f435f53dA42bF490",
+      "symbol": "USYC",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 183,
+        "sha256": "00c2969b72e6e8d286b9655e8599ce13216dded899c15de9b89b6bd281ac44a2"
+      },
+      "address_source": "ARC",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0x7Eb324c2B505fc778fa3480a587ebDa70aa5f948",
+        "code": {
+          "bytes": 11927,
+          "sha256": "9e6e8269e7a05282c3bb747cd547ba550c1c07bdab7473afcebc6ba9000d081a"
+        }
+      }
+    },
+    {
+      "label": "token_weth",
+      "kind": "token",
+      "address": "0x128cC466B61f542da60c70e3aA11c10e19B84EDB",
+      "symbol": "WETH",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 735,
+        "sha256": "061f1b02072d5273aac921461bf879e7e4ddece9e79a42806ad1f78cba4c02fa"
+      },
+      "address_source": "ARC"
+    },
+    {
+      "label": "token_cirbtc",
+      "kind": "token",
+      "address": "0x171A4217b86A807A64eB94757Db6849fb4bDbAA0",
+      "symbol": "cirBTC",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1798,
+        "sha256": "8a1d56e04e76c7cc44aadc6e41bab3f6fed6b12f03cbaef73fd2bdc325199d8c"
+      },
+      "address_source": "ARC",
+      "implementation": {
+        "via": "zos",
+        "address": "0xC6061272419BB754a6C0386D1DF81ddb3Fe5cF3c",
+        "code": {
+          "bytes": 23464,
+          "sha256": "58523d6e70d3190ab673d9d1d9626c3f70703d12c67a421ee13bdd43943e3114"
+        }
+      }
+    },
+    {
+      "label": "stablefx_fxescrow",
+      "kind": "other",
+      "address": "0xe2E5F173576B513d994073CCbDaCBE027d43DFe6",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 130,
+        "sha256": "f6c5db6412c918731e2ca917761ba34a29ba3018b2ccaf92e552ca37c4392fc0"
+      },
+      "address_source": "ARC",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0xBD01a88aE56f9dd6791DfC39079387901D77cC6d",
+        "code": {
+          "bytes": 22550,
+          "sha256": "fed283d4a65b0a5d2965a5517ad27c5729d5875ac0aaf25c829fa386234f979b"
+        }
+      }
+    },
+    {
+      "label": "cctp_v2_token_messenger",
+      "kind": "bridge",
+      "address": "0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 2175,
+        "sha256": "501b4a60e24ea82032b7442d75995dee3bdbfc17b25caffc3c955eadc8c2a418"
+      },
+      "address_source": "ARC",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0x1CcaFdffBC1b7B5C499c97322F961B7d929a41b4",
+        "code": {
+          "bytes": 16283,
+          "sha256": "cff375318c7d5edac5e328ae8b49634f9127d68b88165cfd9c93f2ca6e8f2464"
+        }
+      }
+    },
+    {
+      "label": "stork",
+      "kind": "oracle",
+      "address": "0xacC0a0cF13571d30B4b8637996F5D6D774d4fd62",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 170,
+        "sha256": "c85d18dc1e49769e01f9f88981176e213b2bc24d2f14d33a81d54bc06579f6db"
+      },
+      "address_source": "DES",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0xF89CEf90CF229c564596cf105D19bc92e17b98C4",
+        "code": {
+          "bytes": 21649,
+          "sha256": "e9616c375039274c91f82511b5ed4c133e89601af0d714a2cb7bad6ff0a01c13"
+        }
+      }
+    }
+  ]
+}

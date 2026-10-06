@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Optional caller-owned spending policy, compared outside judge prompts. Never copy intent from a seller or third party. Unknown scope withholds proceed; omitted or null preserves normal checks.",
+  "properties": {
+    "asset": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$",
+      "description": "Intended token address; the zero address means the chain native asset."
+    },
+    "max_amount": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9]+$",
+          "maxLength": 78
+        }
+      ],
+      "description": "Maximum integer base units, uint256. Use a decimal string to preserve precision; no floats, hex, human units or USD."
+    },
+    "recipient": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$",
+      "description": "Optional final transfer or swap recipient. An approval alone does not establish a transfer recipient."
+    }
+  },
+  "required": [
+    "asset",
+    "max_amount"
+  ]
+}

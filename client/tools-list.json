@@ -1,0 +1,1775 @@
+[
+  {
+    "name": "seconded_get_limits",
+    "description": "Use when the owner asks about limits or affordability needs missing budget information. Shows current limits and safety switches; null means no user limit. Not a required preflight; every check enforces limits.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "seconded_set_limits",
+    "description": "Change spending limits at the user's request, without a password. For 'set my daily limit to $20', pass {\"daily_usd\":20}. Chat can only tighten limits or freeze. Any increase, removal, safety-switch weakening or unfreeze requires the human terminal. These changes require the owner to run the terminal command returned on refusal. There is an absolute $25/day chat ceiling, even when the owner has authorized a higher daily limit in the terminal. Omitted fields stay unchanged. The hard $2.50 per-authorization cap always applies, even if per_check_usd is higher or none. Also changes value_gate, dedupe, loop_brake, alerts and frozen switches.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "alerts": {
+          "type": "boolean"
+        },
+        "daily_usd": {
+          "anyOf": [
+            {
+              "maximum": 999999999.999999,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(none|no_limit|(0|[1-9][0-9]{0,8})(\\.[0-9]{1,6})?)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "USD amount with up to six decimals; omit to leave unchanged. Chat may only lower an existing limit or add a limit. Raising or removing any limit requires owner-terminal confirmation. Chat may set daily limits only at or below $25, even when the previous daily limit was absent or higher. The compiled $2.50 authorization cap always applies."
+        },
+        "dedupe": {
+          "type": "boolean"
+        },
+        "frozen": {
+          "type": "boolean"
+        },
+        "hourly_usd": {
+          "anyOf": [
+            {
+              "maximum": 999999999.999999,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(none|no_limit|(0|[1-9][0-9]{0,8})(\\.[0-9]{1,6})?)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "USD amount with up to six decimals; omit to leave unchanged. Chat may only lower an existing limit or add a limit. Raising or removing any limit requires owner-terminal confirmation. Chat may set daily limits only at or below $25, even when the previous daily limit was absent or higher. The compiled $2.50 authorization cap always applies."
+        },
+        "loop_brake": {
+          "type": "boolean"
+        },
+        "outstanding_usd": {
+          "anyOf": [
+            {
+              "maximum": 999999999.999999,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(none|no_limit|(0|[1-9][0-9]{0,8})(\\.[0-9]{1,6})?)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "USD amount with up to six decimals; omit to leave unchanged. Chat may only lower an existing limit or add a limit. Raising or removing any limit requires owner-terminal confirmation. Chat may set daily limits only at or below $25, even when the previous daily limit was absent or higher. The compiled $2.50 authorization cap always applies."
+        },
+        "per_check_usd": {
+          "anyOf": [
+            {
+              "maximum": 999999999.999999,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(none|no_limit|(0|[1-9][0-9]{0,8})(\\.[0-9]{1,6})?)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "USD amount with up to six decimals; omit to leave unchanged. Chat may only lower an existing limit or add a limit. Raising or removing any limit requires owner-terminal confirmation. Chat may set daily limits only at or below $25, even when the previous daily limit was absent or higher. The compiled $2.50 authorization cap always applies."
+        },
+        "value_gate": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_products",
+    "description": "Use when tool descriptions do not identify the needed check or input shape. With complete input for a matching check, call it directly. Lists prices, examples and answer meanings.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "seconded_quote",
+    "description": "Use when a price preview is requested or needed to decide affordability. Quotes price only; does not assess the action. A fully specified bounded check can be called directly.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "type": "object"
+        },
+        "network": {
+          "description": "Payment network to quote; omitted uses the default.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "product": {
+          "enum": [
+            "trade_check",
+            "stock_token_check",
+            "token_check",
+            "agent_registry_check",
+            "counterparty_check",
+            "cross_chain_compare",
+            "scam_check",
+            "lending_check",
+            "job_escrow_check",
+            "x402_payment_check",
+            "shielded_route_check",
+            "route_check"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "product",
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "seconded_receipt",
+    "description": "Recover a check or recent checks by fetching status only. With no check_id, lists the 20 newest checks and any older check still awaiting its receipt, newest first. A result's verification holds the receipt's signed findings and coverage. Never creates a new payment authorization; standard recovery may re-post the identical credential, while legacy recovery signs a read-only ownership proof. After any check error or timeout, call this before checking again. The answer wait can end while payment is pending: continue receipt-only recovery separately until final payment, certified nonpayment, or manual review. Certified nonpayment says not charged and permits retrying the check.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "check_id": {
+          "pattern": "^[0-9a-f]{32}$",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "seconded_wallet",
+    "description": "Show the dedicated check wallet address, balances per network and how to fund it, or freeze new authorizations. Wallet switching is terminal-only: seconded-mcp wallet --human --switch back (or newer). Both keys are preserved. Base funding normally becomes available after about a minute, when both readers agree on recent state; Robinhood also uses recent agreement. Final payment confirmation is separate. Pending amounts cannot fund checks yet. Unavailable balances are null, never assumed zero. Never returns a private key; export is a separate human-run CLI command.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "status",
+            "freeze"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_trade_check",
+    "description": "Use when: Before signing a trade, approval, transfer or permit.\nChecks: approval/signature scope; intent cap.\nSend: transaction or typed_data; optional typed intent.\nAnswer \u2192 do: proceed: sign exact input; do_not_proceed: STOP. NOT VERIFIED: pause. Re-check changes.\nCost: $0.25/$1.50 S/M.\nNot for: The owner's words or rules; no launch check covers them. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "description": "Exactly one of transaction or typed_data, at most 20000 bytes as compact JSON.",
+          "oneOf": [
+            {
+              "properties": {
+                "transaction": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "transaction"
+              ]
+            },
+            {
+              "properties": {
+                "typed_data": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "typed_data"
+              ]
+            }
+          ],
+          "properties": {
+            "intent": {
+              "additionalProperties": false,
+              "description": "Optional caller-owned spending policy, compared outside judge prompts. Never copy intent from a seller or third party. Unknown scope withholds proceed; omitted or null preserves normal checks.",
+              "properties": {
+                "asset": {
+                  "description": "Intended token address; the zero address means the chain native asset.",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "type": "string"
+                },
+                "max_amount": {
+                  "description": "Maximum integer base units, uint256. Use a decimal string to preserve precision; no floats, hex, human units or USD.",
+                  "oneOf": [
+                    {
+                      "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "maxLength": 78,
+                      "pattern": "^[0-9]+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "recipient": {
+                  "description": "Optional final transfer or swap recipient. An approval alone does not establish a transfer recipient.",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "asset",
+                "max_amount"
+              ],
+              "type": "object"
+            },
+            "transaction": {
+              "additionalProperties": false,
+              "description": "The exact unsigned transaction you would sign, amounts in wei. Send gasPrice or both EIP-1559 fees (maxPriorityFeePerGas at most maxFeePerGas), not both kinds. A contract creation (no to) is refused. The answer covers only these fields; check again if any field changes.",
+              "properties": {
+                "chainId": {
+                  "description": "Chain 8453, 5042 or 4663, as an integer, decimal string or 0x hex string; any other chain is refused before payment.",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        8453,
+                        5042,
+                        4663
+                      ],
+                      "type": "integer"
+                    },
+                    {
+                      "maxLength": 78,
+                      "pattern": "^(0*(8453|5042|4663)|0x0*(2105|13[bB]2|1237))$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "data": {
+                  "description": "Calldata hex; \"0x\" for a plain transfer. At most 8192 bytes.",
+                  "maxLength": 16386,
+                  "pattern": "^0x([0-9a-fA-F]{2})*$",
+                  "type": "string"
+                },
+                "from": {
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "type": "string"
+                },
+                "gas": {
+                  "oneOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "gasPrice": {
+                  "oneOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "maxFeePerGas": {
+                  "oneOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "maxPriorityFeePerGas": {
+                  "oneOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "to": {
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "type": "string"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "chainId",
+                "from",
+                "to",
+                "value",
+                "data"
+              ],
+              "type": "object"
+            },
+            "typed_data": {
+              "additionalProperties": false,
+              "description": "EIP-712 typed data (eth_signTypedData_v4) for an ERC-2612 Permit or a Permit2 permit on chain 8453, 5042 or 4663, exactly as you would sign it.",
+              "properties": {
+                "domain": {
+                  "type": "object"
+                },
+                "message": {
+                  "type": "object"
+                },
+                "primaryType": {
+                  "enum": [
+                    "Permit",
+                    "PermitBatch",
+                    "PermitBatchTransferFrom",
+                    "PermitSingle",
+                    "PermitTransferFrom"
+                  ]
+                },
+                "types": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "types",
+                "primaryType",
+                "domain",
+                "message"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_stock_token_check",
+    "description": "Use when: Before trading a Robinhood or Coinbase Base stock token.\nSend: input with network (eip155:4663 or eip155:8453), address; ticker and intended_price_usd optional.\nAnswer \u2192 do: official_stock_token: continue checks; not_official_or_out_of_line: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) S only; larger inputs refused. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "intended_price_usd": {
+              "oneOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "pattern": "^(0|[1-9][0-9]{0,11})(\\.[0-9]{1,18})?$",
+                  "type": "string"
+                }
+              ]
+            },
+            "network": {
+              "enum": [
+                "eip155:4663",
+                "eip155:8453"
+              ],
+              "type": "string"
+            },
+            "ticker": {
+              "pattern": "^[A-Z0-9][A-Z0-9.]{0,15}c?$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "network",
+            "address"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_token_check",
+    "description": "Use when: Before interacting with a token.\nSend: input with network, address.\nAnswer \u2192 do: issuer_controlled_expected: proceed; issuer can freeze/upgrade. no_checked_warning_signs: proceed with normal checks; any warning_*: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "context": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "network": {
+              "enum": [
+                "eip155:84532",
+                "eip155:8453",
+                "eip155:5042",
+                "eip155:4663"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "network",
+            "address"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_agent_registry_check",
+    "description": "Use when: Before paying or trusting another agent that claims an ERC-8004 identity.\nSend: input with network, agent_id; claimed_owner, claimed_wallet, context optional.\nAnswer \u2192 do: registered_with_feedback/registered_without_feedback: proceed with normal checks; other answers: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.25 small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "agent_id": {
+              "oneOf": [
+                {
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^(0|[1-9][0-9]{0,77})$",
+                  "type": "string"
+                }
+              ]
+            },
+            "claimed_owner": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "claimed_wallet": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "context": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "network": {
+              "enum": [
+                "eip155:8453",
+                "eip155:5042",
+                "eip155:4663"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "network",
+            "agent_id"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_counterparty_check",
+    "description": "Use when: Before relying on an address.\nChecks OFAC SDN addresses, configured deployments and pin lookalikes. No scam/phishing address lists. A no-match is not proof of safety.\nSend: network, address.\nAnswer \u2192 do: listed_warning/deployment_mismatch: STOP; cannot_verify/NOT VERIFIED: pause; matches: get scam/drainer screening before funds.\nCost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "network": {
+              "enum": [
+                "eip155:8453",
+                "eip155:5042",
+                "eip155:4663"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "network",
+            "address"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_cross_chain_compare",
+    "description": "Use when: Before selecting a chain for a USDC -> EURC swap.\nSend: mode, amount_in, asset_in, asset_out, routes.\nAnswer \u2192 do: comparison_available: inspect gross pool quote only, not total cost; comparison_invalid: STOP. NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) S.\nNot for: Trade execution, bridging, transaction signing, or non-Circle assets. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "amount_in": {
+              "description": "Amount in USDC (1 to 10,000)",
+              "pattern": "^([1-9][0-9]{0,3}(\\.[0-9]{1,6})?|10000(\\.0{1,6})?)$",
+              "type": "string"
+            },
+            "asset_in": {
+              "enum": [
+                "circle:usdc"
+              ],
+              "type": "string"
+            },
+            "asset_out": {
+              "enum": [
+                "circle:eurc"
+              ],
+              "type": "string"
+            },
+            "mode": {
+              "enum": [
+                "exact_in"
+              ],
+              "type": "string"
+            },
+            "routes": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "network": {
+                    "enum": [
+                      "eip155:8453",
+                      "eip155:5042"
+                    ],
+                    "type": "string"
+                  },
+                  "token_in": {
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "type": "string"
+                  },
+                  "token_out": {
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "type": "string"
+                  },
+                  "venue": {
+                    "enum": [
+                      "uniswap_v3",
+                      "uniswap_v4"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "network",
+                  "venue",
+                  "token_in",
+                  "token_out"
+                ],
+                "type": "object"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            }
+          },
+          "required": [
+            "mode",
+            "amount_in",
+            "asset_in",
+            "asset_out",
+            "routes"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_scam_check",
+    "description": "Use when: Before acting on an incoming message.\nSend: input with message.\nAnswer \u2192 do: benign: proceed; suspicious: verify independently; malicious: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood)/$1.50/$2.50 S/M/L. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "context": {
+              "maxLength": 100000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "message": {
+              "maxLength": 400000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source": {
+              "enum": [
+                "email",
+                "chat",
+                "social",
+                "web",
+                "agent",
+                "other"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "message"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_lending_check",
+    "description": "Use when: Reviewing one Morpho account and market at a block.\nSend: network, account, market_id.\nAnswer \u2192 do: no_debt/within_lltv_at_block: inspect at-block facts; liquidatable_at_block: show owner. NOT VERIFIED: pause. No loan actions; oracle accuracy and age unknown.\nCost: $0.25 small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "account": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "market_id": {
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "type": "string"
+            },
+            "network": {
+              "enum": [
+                "eip155:8453",
+                "eip155:5042"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "network",
+            "account",
+            "market_id"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_job_escrow_check",
+    "description": "Use when: Before funding or taking an agent job.\nChecks: Escrow, payout, refund, judging and admin controls.\nSend: network, escrow_contract, role, intended_amount; order_id optional.\nAnswer \u2192 do: proceed: continue; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nACP providers usually face client judging. No delivery or payout guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "escrow_contract": {
+              "description": "Base escrow contract address; zero is refused.",
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "intended_amount": {
+              "description": "Positive uint256 decimal string in settlement-token atomic units (at most 115792089237316195423570985008687907853269984665640564039457584007913129639935). No human units, floats or USD.",
+              "pattern": "^[1-9][0-9]{0,77}$",
+              "type": "string"
+            },
+            "network": {
+              "enum": [
+                "eip155:8453"
+              ],
+              "type": "string"
+            },
+            "order_id": {
+              "description": "Optional bytes32 order ID; ACP job ID encoded as a 32-byte big-endian word. Omit for contract-only coverage. Null is refused.",
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "type": "string"
+            },
+            "role": {
+              "description": "Client before funding or provider before starting paid work.",
+              "enum": [
+                "client",
+                "provider"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "network",
+            "escrow_contract",
+            "role",
+            "intended_amount"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_x402_payment_check",
+    "description": "Use when: Before authorizing an x402 offer. Send: one input object; never input.input. Copy offer fields exactly; do not rename amount. Supply actual pending typed data in top-level signing; never invent signing context. Answer \u2192 do: do_not_proceed: STOP. NOT VERIFIED: pause without authorizing. Cost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "description": "One input object with network and accepts; preserve supplied chosen_index and budget. Never input.input. Preserve offer fields and values. Client derives signing_context from top-level signing; never invent it.",
+          "properties": {
+            "accepts": {
+              "description": "Copy one to eight x402 offers exactly; preserve field names and values. Metadata is preserved and digest-bound; unsupported extension semantics withhold proceed.",
+              "items": {
+                "additionalProperties": true,
+                "maxProperties": 32,
+                "oneOf": [
+                  {
+                    "required": [
+                      "amount"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "maxAmountRequired"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "amount": {
+                    "description": "Positive uint256 decimal atomic units; never human units or USD.",
+                    "pattern": "^[1-9][0-9]{0,77}$",
+                    "type": "string"
+                  },
+                  "asset": {
+                    "description": "Asset to move; token address or the explicitly allowed native asset name.",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "type": "string"
+                  },
+                  "facilitator_url": {
+                    "description": "Exact HTTPS facilitator endpoint reported by the offer; never fetched.",
+                    "maxLength": 256,
+                    "pattern": "^https://[a-z0-9.-]+(?::443)?(?:/[a-zA-Z0-9/_-]*)?$",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "maxAmountRequired": {
+                    "description": "Legacy alias: use only if supplied by the seller; do not rename amount. Supply exactly one amount field.",
+                    "pattern": "^[1-9][0-9]{0,77}$",
+                    "type": "string"
+                  },
+                  "maxTimeoutSeconds": {
+                    "description": "Positive offer authorization timeout in seconds.",
+                    "maximum": 9007199254740991,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "network": {
+                    "description": "CAIP-2 subject chain, independent of the payment network.",
+                    "enum": [
+                      "eip155:8453",
+                      "eip155:5042",
+                      "eip155:4663"
+                    ],
+                    "type": "string"
+                  },
+                  "payTo": {
+                    "description": "Exact payment recipient from the offer.",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "type": "string"
+                  },
+                  "resource": {
+                    "description": "Optional opaque resource identifier; never fetched or forwarded to judges.",
+                    "maxLength": 2048,
+                    "minLength": 1,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "scheme": {
+                    "description": "Exact price or upto signed charge ceiling.",
+                    "enum": [
+                      "exact",
+                      "upto"
+                    ]
+                  }
+                },
+                "required": [
+                  "scheme",
+                  "network",
+                  "asset",
+                  "payTo",
+                  "maxTimeoutSeconds"
+                ],
+                "type": "object"
+              },
+              "maxItems": 8,
+              "minItems": 1,
+              "type": "array"
+            },
+            "budget": {
+              "description": "Maximum authorized charge in atomic units of the chosen asset.",
+              "pattern": "^(0|[1-9][0-9]{0,77})$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "chosen_index": {
+              "description": "Zero-based index of the chosen offer, less than the accepts length.",
+              "maximum": 7,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "network": {
+              "description": "CAIP-2 subject chain, independent of the payment network.",
+              "enum": [
+                "eip155:8453",
+                "eip155:5042",
+                "eip155:4663"
+              ],
+              "type": "string"
+            },
+            "prior_paytos": {
+              "description": "At most eight previously used recipient addresses.",
+              "items": {
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "type": "string"
+              },
+              "maxItems": 8,
+              "type": "array"
+            },
+            "settlement_tx": {
+              "description": "Optional transaction hash; verification requires separately bound trusted signing context.",
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "signing_context": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "allowance": {
+                      "anyOf": [
+                        {
+                          "pattern": "^(0|[1-9][0-9]{0,77})$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Any additional approval granted by this signing operation, in atomic units."
+                    },
+                    "eip3009": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "chain_id": {
+                              "description": "EIP-712 domain chain ID as an integer.",
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "nonce": {
+                              "description": "Exact authorization nonce: bytes32 for EIP-3009, decimal uint256 for Permit2.",
+                              "pattern": "^0x[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "owner": {
+                              "description": "Payer address signing this authorization, not a private key.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "to": {
+                              "description": "Signed recipient, compared with the chosen offer payTo.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "token": {
+                              "description": "Token address from the EIP-712 domain or permitted token.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "valid_after": {
+                              "description": "Signed earliest authorization time as decimal Unix seconds.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            },
+                            "valid_before": {
+                              "description": "Signed EIP-3009 expiry as decimal Unix seconds.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            },
+                            "value": {
+                              "description": "Exact EIP-3009 value in decimal atomic units.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "chain_id",
+                            "owner",
+                            "token",
+                            "to",
+                            "value",
+                            "valid_after",
+                            "valid_before",
+                            "nonce"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Decoded EIP-3009 authorization from the actual pending wallet request."
+                    },
+                    "facilitator": {
+                      "anyOf": [
+                        {
+                          "pattern": "^0x[0-9a-f]{40}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Onchain facilitator address; must equal the upto witness when present."
+                    },
+                    "facilitator_url": {
+                      "anyOf": [
+                        {
+                          "maxLength": 256,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Exact HTTPS facilitator endpoint from the offer; never fetched."
+                    },
+                    "input_sha256": {
+                      "description": "SHA-256, with 0x prefix, of the normalized request excluding signing_context.",
+                      "pattern": "^0x[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "mechanism": {
+                      "description": "Decoded pending signing mechanism; unsupported approval paths are refused.",
+                      "enum": [
+                        "eip3009",
+                        "permit2_witness",
+                        "permit2",
+                        "erc20_approval",
+                        "unknown"
+                      ]
+                    },
+                    "permit2": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "amount": {
+                              "description": "Permit2 signed price or charge ceiling in decimal atomic units.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            },
+                            "chain_id": {
+                              "description": "EIP-712 domain chain ID as an integer.",
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "deadline": {
+                              "description": "Signed Permit2 expiry as decimal Unix seconds.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            },
+                            "facilitator": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^0x[0-9a-f]{40}$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ],
+                              "description": "Onchain facilitator address; must equal the upto witness when present."
+                            },
+                            "nonce": {
+                              "description": "Exact authorization nonce: bytes32 for EIP-3009, decimal uint256 for Permit2.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            },
+                            "owner": {
+                              "description": "Payer address signing this authorization, not a private key.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "spender": {
+                              "description": "Signed Permit2 spender; must be the canonical x402 proxy for the scheme.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "to": {
+                              "description": "Signed recipient, compared with the chosen offer payTo.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "token": {
+                              "description": "Token address from the EIP-712 domain or permitted token.",
+                              "pattern": "^0x[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "valid_after": {
+                              "description": "Signed earliest authorization time as decimal Unix seconds.",
+                              "pattern": "^(0|[1-9][0-9]{0,77})$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "chain_id",
+                            "owner",
+                            "token",
+                            "amount",
+                            "spender",
+                            "nonce",
+                            "deadline",
+                            "to",
+                            "valid_after"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Decoded Permit2 witness authorization from the actual pending wallet request."
+                    },
+                    "scheme": {
+                      "description": "Exact price or upto signed ceiling from the chosen offer.",
+                      "enum": [
+                        "exact",
+                        "upto"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "input_sha256",
+                    "scheme",
+                    "mechanism"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Client-decoded actual authorization bound to the normalized request SHA-256; evidence, never authority."
+            }
+          },
+          "required": [
+            "network",
+            "accepts"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "signing": {
+          "additionalProperties": false,
+          "properties": {
+            "allowance": {
+              "description": "Any additional approval granted by the pending signing operation, in atomic units.",
+              "type": "string"
+            },
+            "owner": {
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "type": "string"
+            },
+            "typed_data": {
+              "description": "Exact pending eth_signTypedData_v4 object; no signature or secret. Client decodes and binds it to input.",
+              "type": "object"
+            }
+          },
+          "required": [
+            "owner",
+            "typed_data"
+          ],
+          "type": "object"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_shielded_route_check",
+    "description": "Use when: Compare bounded shielded route quotes.\nSend: network, asset, amount.\nAnswer \u2192 do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nNo anonymity or legal-compliance guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "description": "Positive uint256 decimal atomic units; never human units or USD.",
+              "pattern": "^[1-9][0-9]{0,77}$",
+              "type": "string"
+            },
+            "asset": {
+              "description": "Asset to move; token address or the explicitly allowed native asset name.",
+              "enum": [
+                "ETH",
+                "USDC",
+                "WETH",
+                "USDG"
+              ]
+            },
+            "network": {
+              "description": "CAIP-2 subject chain, independent of the payment network.",
+              "enum": [
+                "eip155:8453",
+                "eip155:5042",
+                "eip155:4663"
+              ],
+              "type": "string"
+            },
+            "priority": {
+              "description": "Ranking to select; other rankings remain visible.",
+              "enum": [
+                "cheapest",
+                "fastest",
+                "safest"
+              ]
+            }
+          },
+          "required": [
+            "network",
+            "asset",
+            "amount"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_route_check",
+    "description": "Use when: Check a proposed public route for bounded linkability evidence.\nSend: from, hops, to, history_blocks.\nAnswer \u2192 do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) small only.\nNo anonymity or legal-compliance guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "from": {
+              "additionalProperties": false,
+              "description": "Typed public route origin; no private keys or arbitrary RPC endpoints.",
+              "properties": {
+                "address": {
+                  "description": "Nonzero EVM address.",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "type": "string"
+                },
+                "network": {
+                  "description": "CAIP-2 subject chain, independent of the payment network.",
+                  "enum": [
+                    "eip155:8453",
+                    "eip155:5042",
+                    "eip155:4663"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "network",
+                "address"
+              ],
+              "type": "object"
+            },
+            "history_blocks": {
+              "description": "Bounded public history window, from one to 32 blocks.",
+              "maximum": 32,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "hops": {
+              "description": "One to four ordered, connected route hops.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount": {
+                    "description": "Positive uint256 decimal atomic units; never human units or USD.",
+                    "pattern": "^[1-9][0-9]{0,77}$",
+                    "type": "string"
+                  },
+                  "asset": {
+                    "description": "Asset to move; token address or the explicitly allowed native asset name.",
+                    "oneOf": [
+                      {
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "type": "string"
+                      },
+                      {
+                        "const": "native"
+                      }
+                    ]
+                  },
+                  "contract": {
+                    "description": "Contract used for this route hop.",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "type": "string"
+                  },
+                  "delay_seconds": {
+                    "description": "Proposed delay before this hop, from zero to 30 days.",
+                    "maximum": 2592000,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "network": {
+                    "description": "CAIP-2 subject chain, independent of the payment network.",
+                    "enum": [
+                      "eip155:8453",
+                      "eip155:5042",
+                      "eip155:4663"
+                    ],
+                    "type": "string"
+                  },
+                  "recipient": {
+                    "description": "Nonzero public recipient of this hop.",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "type": "string"
+                  },
+                  "to_network": {
+                    "description": "Destination chain of this hop, matching the next hop or final destination.",
+                    "enum": [
+                      "eip155:8453",
+                      "eip155:5042",
+                      "eip155:4663"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "network",
+                  "contract",
+                  "to_network",
+                  "recipient",
+                  "asset",
+                  "amount",
+                  "delay_seconds"
+                ],
+                "type": "object"
+              },
+              "maxItems": 4,
+              "minItems": 1,
+              "type": "array"
+            },
+            "to": {
+              "additionalProperties": false,
+              "description": "Final public recipient, matching the final hop.",
+              "properties": {
+                "address": {
+                  "description": "Nonzero EVM address.",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "type": "string"
+                },
+                "network": {
+                  "description": "CAIP-2 subject chain, independent of the payment network.",
+                  "enum": [
+                    "eip155:8453",
+                    "eip155:5042",
+                    "eip155:4663"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "network",
+                "address"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "from",
+            "hops",
+            "to",
+            "history_blocks"
+          ],
+          "type": "object"
+        },
+        "max_price_usd": {
+          "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet.",
+          "enum": [
+            "base_sepolia",
+            "arc_testnet",
+            "robinhood_testnet",
+            "base",
+            "arc",
+            "robinhood"
+          ],
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 25,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  }
+]

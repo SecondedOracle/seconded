@@ -1,0 +1,221 @@
+{
+  "chain_profiles": {
+    "4663": {
+      "label": "Robinhood Chain Mainnet",
+      "native_privacy": "native_eth_notes_only",
+      "status": "supported",
+      "tacit_pool": "0x000000c2a20657ce25f2ba99737933d031afbee9",
+      "usdg_issuer_freeze": true
+    },
+    "5042": {
+      "label": "Arc Mainnet",
+      "native_privacy": "unavailable",
+      "note": "Arc APS is unavailable (roadmap only); USDC gas and account balances are public.",
+      "status": "privacy_unavailable"
+    },
+    "8453": {
+      "chainalysis_oracle": "0x3a91a31cb3dc49b4db9ce721f50a9d076c8d739b",
+      "inco_factory": "0x6f9a0ecd77c3dade8dc14a507cababfd746575f8",
+      "inco_status": "unknown",
+      "label": "Base Mainnet",
+      "native_privacy": "partial_stealth_and_native_eth_notes",
+      "status": "supported",
+      "stealth_contracts": {
+        "announcer": "0x55649e01b5df198d18d95b5cc5051630cfd45564",
+        "registry": "0x6538e6bf4b0ebd30a8ea093027ac2422ce5d6538"
+      },
+      "tacit_pool": "0x000000c2a20657ce25f2ba99737933d031afbee9"
+    }
+  },
+  "fact_notice": "Fact attestations carry no direct payment identifiers. The issuer can link issuance to the originating check; repeated presentations of the same fact are linkable.",
+  "pool_warnings": {
+    "exact_amount_linkage": "An exact-amount deposit/withdrawal pair is linkable evidence, not proof of a unique owner.",
+    "gpl_verifier": "The snarkjs-generated TransactVerifier is GPL-3.0; distribution needs license review. No Tacit code is bundled.",
+    "immutable_no_pause": "The reviewed pool is immutable with no pause/admin; a discovered circuit bug cannot be paused.",
+    "no_human_audit": "No independent human audit identified for TacitEvmPool/transact.circom; V1 AI reviews cover different code.",
+    "post_sweep_destruction": "EIP-6780: a receive box created and self-destructed during its sweep transaction is deleted at transaction end. Later ETH sent to it in that same transaction can be destroyed. Never schedule post-sweep payments.",
+    "public_boundaries": "Deposit sender and amount, withdrawal recipient and amount, timing and gas are public.",
+    "receive_box_reuse": "Receive boxes are reused standing addresses; payments into one box are publicly linked.",
+    "relay_dependency": "Keeper/relayer availability and metadata are dependencies; their current state is unknown.",
+    "small_set": "Small/young sets are a risk. Counts and tree slots do not establish independent users or eligible unspent notes.",
+    "unvalidated_ceremony": "Groth16 ceremony is vendor-claimed and unvalidated; setup or circuit failure can lose all funds."
+  },
+  "public_settlement": [
+    "0x2626664c2603336e57b271c5c0b26f421741e481",
+    "0x33128a8fc17869897dce68ed026d694621f6fdfd",
+    "0x4752ba5dbc23f44d87826276bf6fd6b1c372ad24",
+    "0x886d9fd312f442c4e1f3cdeae7b4ab73493e57cd",
+    "0x9008d19f58aabd9ed0d60971565aa8510560ab41"
+  ],
+  "purchase": {
+    "compartmentalization": {
+      "freshness": "not_in_supplied_history_only",
+      "instructions": [
+        "Generate a new wallet locally; keep all keys on device.",
+        "Use it once; avoid linked gas funding, address reuse and consolidation."
+      ],
+      "unlinkability": "unknown"
+    },
+    "execution_boundary": "agent_local_only",
+    "fulfillment": {
+      "status": "unknown"
+    },
+    "kind": "unsigned_purchase_plan",
+    "residual_public_signals": [
+      "payment_amount",
+      "payment_timing",
+      "payee",
+      "payer",
+      "asset",
+      "account_balance"
+    ],
+    "schema": "seconded-private-purchase/v1",
+    "warnings": [
+      "A clear result is not universal clearance. Address matching does not evaluate persons, ownership or geography, or guarantee safety.",
+      "Fresh addresses do not prove unlinkability.",
+      "Delivery, account login, KYC and merchant/facilitator metadata may identify the buyer.",
+      "Token issuer freeze/block powers survive compartmentalization.",
+      "Other chains/assets receive public compartmentalization guidance only.",
+      "x402 rail negotiation and authorizations require a separately reviewed local adapter.",
+      "Payment is not proof of fulfillment; authenticate delivery off-chain.",
+      "Refunds, if agreed, are merchant-to-wallet; SECONDED never escrows, relays or charges a flow fee."
+    ]
+  },
+  "purchase_disclaimer": "A clear result is not universal clearance. Address matching does not evaluate persons, ownership or geography, or guarantee safety.",
+  "receive": {
+    "announcement": {
+      "caller_requirement": "payer_or_unlinked_account",
+      "contract": "0x55649E01B5Df198D18D95b5cc5051630cfD45564",
+      "scheme_id": 1
+    },
+    "chain_id": 8453,
+    "evidence": {
+      "current_runtime": "unknown"
+    },
+    "execution_ready": false,
+    "links": {
+      "address_reuse": "refused",
+      "sweep": "separate_review_required"
+    },
+    "privacy": {
+      "amount": "public",
+      "balance": "public",
+      "intent": "unknown",
+      "metadata": "unknown",
+      "recipient_identity": "unknown",
+      "sender": "public",
+      "timing": "public"
+    },
+    "registration": {
+      "reason": "durable_recovery_not_implemented",
+      "status": "deferred"
+    },
+    "scan": {
+      "chain_id": 8453,
+      "checkpoint": "not_scanned",
+      "contract": "0x55649E01B5Df198D18D95b5cc5051630cfD45564",
+      "instructions": [
+        "Fetch all scheme-1 logs; do not send wallet filters to RPC.",
+        "Validate event contract, scheme, curve point, view tag and derived address locally.",
+        "Verify actual transfer; announcements alone do not prove payment.",
+        "Persist block hash and rescan on reorg; metadata is untrusted."
+      ],
+      "processing": "agent_local",
+      "to_block": "finalized"
+    },
+    "scheme_id": 1,
+    "status": "prepared",
+    "warnings": [
+      "Gas funding from linked wallets reveals the recipient.",
+      "The announce caller is public: use the payer or an unlinked account; the registrant or a recipient-linked caller reveals the recipient.",
+      "Never reuse a derived address, including across invoices.",
+      "Sweeps and consolidation can link receipts; review separately.",
+      "Keep invoice metadata off-chain and encrypted; only a view tag is planned on-chain.",
+      "RPC providers can correlate IP and queries; registration is public.",
+      "Token issuers retain freeze powers; screening is unknown.",
+      "Keys and reuse history are volatile; durable local recovery is not implemented.",
+      "Registration is deferred: third-party payments to a registered volatile meta-address after a restart would be permanently unrecoverable.",
+      "Do not fund until recovery, live contract checks and local signer review are complete."
+    ]
+  },
+  "swap": {
+    "data_handling": {
+      "execution_boundary": "agent_local_only",
+      "logs": "none",
+      "network": "none",
+      "recipients": [
+        "local_caller"
+      ],
+      "retention": "until close, or expiry pruned on next access",
+      "storage": "volatile_session_memory",
+      "warning": "Hosting this function would disclose the request to the host."
+    },
+    "execution_allowed": false,
+    "freshness": {
+      "note": "Session age is not quote or evidence freshness.",
+      "plan_ttl_seconds": 300,
+      "venue_evidence": "unknown"
+    },
+    "local_signer_requirements": [
+      "Re-verify this exact plan in the originating local session.",
+      "Independently verify fresh venue evidence, chain, EIP-712 domain, spender, assets, amount, minimum output, receiver, refund and expiry.",
+      "Obtain explicit consent for any binding quote; sign and submit locally.",
+      "This advisory has no executable calldata, typed data or spending authority."
+    ],
+    "mode": "advisory_only",
+    "sanctions": {
+      "limitation": "An address no-match is not clearance.",
+      "list_timestamp": null,
+      "required_before_signing": [
+        "recipient",
+        "refund_address",
+        "spender",
+        "venue",
+        "token_contracts",
+        "counterparties"
+      ],
+      "scope": "No address, person, ownership or geography screening performed.",
+      "source": null,
+      "status": "unknown"
+    },
+    "version": "private-swap-advisory/v1"
+  },
+  "swap_visibility": {
+    "bridge": [
+      "unknown",
+      "public_boundaries",
+      "unknown",
+      "unknown"
+    ],
+    "custodial": [
+      "unknown",
+      "unknown",
+      "visible_to_operator",
+      "operator_can_link"
+    ],
+    "local_intent": [
+      "unknown",
+      "public",
+      "visible_to_solvers",
+      "public"
+    ],
+    "public_amm": [
+      "public",
+      "public",
+      "unknown",
+      "public"
+    ],
+    "rfq": [
+      "visible_to_rfq_counterparties",
+      "public",
+      "visible_to_rfq_counterparties",
+      "public"
+    ],
+    "unverified": [
+      "unknown",
+      "unknown",
+      "unknown",
+      "unknown"
+    ]
+  }
+}

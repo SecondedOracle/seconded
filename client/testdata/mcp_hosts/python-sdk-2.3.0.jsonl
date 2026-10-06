@@ -1,0 +1,2 @@
+{"jsonrpc":"2.0","id":"discover","method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"mcp","version":"0.1.0"},"io.modelcontextprotocol/clientCapabilities":{"roots":{"listChanged":true},"sampling":{},"elicitation":{"form":{},"url":{}}}}}}
+{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","clientInfo":{"name":"mcp","version":"0.1.0"},"capabilities":{"roots":{"listChanged":true},"sampling":{},"elicitation":{"form":{},"url":{}}}}}

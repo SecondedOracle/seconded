@@ -1,0 +1,89 @@
+{
+  "version": "tacit-pools/v1",
+  "reviewed_at": "2026-10-03",
+  "source_commit": "9da3b1596d97075e5c191bc34773ed99716e812b",
+  "manifest_url": "https://raw.githubusercontent.com/src-company/tacit/9da3b1596d97075e5c191bc34773ed99716e812b/contracts/deployments/evm-pool.json",
+  "manifest_sha256": "5977832cafb69bdf3f17dc53d6822f1645d1cd88c65ab2ae6de5a27c29a6862f",
+  "asset": "0x0000000000000000000000000000000000000000",
+  "asset_symbol": "ETH",
+  "asset_decimals": 18,
+  "human_audit": "none_identified_for_TacitEvmPool_and_transact.circom",
+  "ceremony": "unvalidated",
+  "verifier_license": "GPL-3.0",
+  "pool_immutable": true,
+  "pool_pause": false,
+  "sources": {
+    "pool": "https://raw.githubusercontent.com/src-company/tacit/9da3b1596d97075e5c191bc34773ed99716e812b/contracts/src/TacitEvmPool.sol",
+    "router": "https://raw.githubusercontent.com/src-company/tacit/9da3b1596d97075e5c191bc34773ed99716e812b/contracts/src/TacitEvmPoolRouter.sol",
+    "audit": "https://raw.githubusercontent.com/src-company/tacit/9da3b1596d97075e5c191bc34773ed99716e812b/audit/AUDITS.md",
+    "selfdestruct": "https://eips.ethereum.org/EIPS/eip-6780"
+  },
+  "chains": {
+    "8453": {
+      "pool": "0x000000c2a20657ce25f2ba99737933d031afbee9",
+      "router": "0x0000006c96afa6f1cd4df8fe19bc0d8b6a6cd7b5",
+      "verifier": "0x000000b1c0e84cec8adf8278b90c4d6400dfb153",
+      "deployment_block": 51864014,
+      "router_deployment_block": 51864015,
+      "runtime": {
+        "pool": {
+          "sha256": "1713ad88ba859ef8ff01da0eed83ab9ea018817628a384c16eb393edae8358c6",
+          "source_url": "https://sourcify.dev/server/v2/contract/8453/0x000000c2a20657ce25f2ba99737933d031afbee9?fields=all",
+          "source_response_sha256": "ad656229f31c021d6fb86d7c16a87422bf74f09139f824e043390352dc9ee40c",
+          "runtime_match": "match",
+          "verified_at": "2026-09-27T14:03:18Z",
+          "basis": "Sourcify recorded runtime; not a live RPC observation"
+        },
+        "router": {
+          "sha256": "fd1f083bd84bdd3c7ce4a34356e566cf458535ff00e91ad4b436bbe292413c08",
+          "source_url": "https://sourcify.dev/server/v2/contract/8453/0x0000006c96afa6f1cd4df8fe19bc0d8b6a6cd7b5?fields=all",
+          "source_response_sha256": "dfe9b0d37a76394bff15881d27fdfca291a05f898cc6378573ea2ef0a31f3498",
+          "runtime_match": "match",
+          "verified_at": "2026-09-27T14:04:06Z",
+          "basis": "Sourcify recorded runtime; not a live RPC observation"
+        },
+        "verifier": {
+          "sha256": "09fc61b310f363a6b7a275558104bf79bc14b979f5f4aecca3298c7d43ce49c4",
+          "source_url": "https://sourcify.dev/server/v2/contract/8453/0x000000b1c0e84cec8adf8278b90c4d6400dfb153?fields=all",
+          "source_response_sha256": "d1b82742c1e720f174e34f4ca8e5e9b447506e6d8d9feb5f620d1f24a6f6a2ee",
+          "runtime_match": "match",
+          "verified_at": "2026-09-27T14:00:10Z",
+          "basis": "Sourcify recorded runtime; not a live RPC observation"
+        }
+      }
+    },
+    "4663": {
+      "pool": "0x000000c2a20657ce25f2ba99737933d031afbee9",
+      "router": "0x0000006c96afa6f1cd4df8fe19bc0d8b6a6cd7b5",
+      "verifier": "0x000000b1c0e84cec8adf8278b90c4d6400dfb153",
+      "deployment_block": 73991661,
+      "router_deployment_block": 73991692,
+      "runtime": {
+        "pool": {
+          "sha256": "e92638b20969671c1859b89e19b315a139ffdcad81136c96566ca18263848b53",
+          "source_url": "https://sourcify.dev/server/v2/contract/4663/0x000000c2a20657ce25f2ba99737933d031afbee9?fields=all",
+          "source_response_sha256": "9408485c214924ec94ea3cbf2de807bf5e72e55e602d823e95b4e15016ab7bc6",
+          "runtime_match": "match",
+          "verified_at": "2026-09-27T14:05:35Z",
+          "basis": "Sourcify recorded runtime; not a live RPC observation"
+        },
+        "router": {
+          "sha256": "f8014783063e5c1f0913e3be12c056a3faa8d5a17309ea22fe7da39b8313438f",
+          "source_url": "https://sourcify.dev/server/v2/contract/4663/0x0000006c96afa6f1cd4df8fe19bc0d8b6a6cd7b5?fields=all",
+          "source_response_sha256": "a3bdfd29681d7b0953b7ec4a3e4635d20b4690abcc23cd1d0c43b92a2186028c",
+          "runtime_match": "match",
+          "verified_at": "2026-09-27T14:05:44Z",
+          "basis": "Sourcify recorded runtime; not a live RPC observation"
+        },
+        "verifier": {
+          "sha256": "09fc61b310f363a6b7a275558104bf79bc14b979f5f4aecca3298c7d43ce49c4",
+          "source_url": "https://sourcify.dev/server/v2/contract/4663/0x000000b1c0e84cec8adf8278b90c4d6400dfb153?fields=all",
+          "source_response_sha256": "71cd9787176fdde8e34e1b7a35539c5f13526250dac2439dc01afb95b8d12481",
+          "runtime_match": "match",
+          "verified_at": "2026-09-27T14:05:08Z",
+          "basis": "Sourcify recorded runtime; not a live RPC observation"
+        }
+      }
+    }
+  }
+}

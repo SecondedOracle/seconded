@@ -1,0 +1,251 @@
+{
+  "schema": "seconded-trade-pins/v1",
+  "chain_id": 4663,
+  "network": "eip155:4663",
+  "hash_algorithm": "sha256(decoded_runtime_bytes)",
+  "measured": {
+    "probe": "docs/probes/11-verifiable-checks.md",
+    "results": "docs/probes/data/11-verifiable/results.json",
+    "results_sha256": "f7c8f9659cf475f3a739aa2da04652d275125b70563b98c62c0ec4784e398650",
+
+    "started_at": "2026-09-25T00:14:38Z",
+    "finished_at": "2026-09-25T00:18:01Z",
+    "block": {
+      "number": 71792417,
+      "hash": "0x5e2917ef02221dc7e10981e4bec5b1e3c59960318cdded630777fe41b9c79b6b"
+    },
+    "readers": [
+      "https://robinhood-rpc.publicnode.com",
+      "https://rpc.mainnet.chain.robinhood.com"
+    ]
+  },
+  "contracts": [
+    {
+      "label": "uniswap_v2_router02",
+      "kind": "router",
+      "address": "0x89e5DB8B5aA49aA85AC63f691524311AEB649eba",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 21902,
+        "sha256": "b2fb74d35307341a0255c32566ace2a56d7ff66fb6f807376439466ad1a84cdb"
+      },
+      "address_source": "U2",
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3; probe 11 reports run-2 agreement, but run 2 has no surviving log"
+    },
+    {
+      "label": "uniswap_v3_factory",
+      "kind": "factory",
+      "address": "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24535,
+        "sha256": "6c41051606215dd79309b298d5395b8e4e4acb155516920b52051c230ee125cf"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "uniswap_v3_quoterv2",
+      "kind": "quoter",
+      "address": "0x33e885eD0Ec9bF04EcfB19341582aADCb4c8A9E7",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 8273,
+        "sha256": "cbe792709be619ef62094970e1aa40487a104feec2360bb5b65310a89aac77d9"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "uniswap_swaprouter02",
+      "kind": "router",
+      "address": "0xCaf681a66D020601342297493863E78C959E5cb2",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24497,
+        "sha256": "a84426d2e34ef0d88f458c34993f1aef59617481f17891a74cfc15e6ee93c0cf"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "universal_router",
+      "kind": "router",
+      "address": "0x8876789976dEcBfCbBbe364623C63652db8C0904",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 24546,
+        "sha256": "9b70267279e3d106d908cbd43927a251acd7a5e94cf34da431228c3c421c7dfb"
+      },
+      "address_source": "U3,U4",
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3"
+    },
+    {
+      "label": "universal_router_2_1_2",
+      "kind": "router",
+      "address": "0x204FAca1764B154221e35c0d20aBb3c525710498",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24380,
+        "sha256": "181b1ac28443740bb07db7ed0bb908815dcf90435af0c9f45406bc1c89a80ac3"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "uniswap_v4_poolmanager",
+      "kind": "pool_manager",
+      "address": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24009,
+        "sha256": "6eb21c69298b064e37fcf8089a941ae096fe08c0f179b2d399567aef1b10585b"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "uniswap_v4_quoter",
+      "kind": "quoter",
+      "address": "0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 6118,
+        "sha256": "aa37fb59c400cc63566d93fd24982289227cdc90716656332e93a42bb17ba758"
+      },
+      "address_source": "U4",
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3"
+    },
+    {
+      "label": "permit2",
+      "kind": "permit2",
+      "address": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 9152,
+        "sha256": "f1230820cf308bc40f6464d01918ecf44ffc3f692df923b382bc2b32370f6be8"
+      },
+      "address_source": "U3,U4",
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3"
+    },
+    {
+      "label": "multicall3",
+      "kind": "multicall",
+      "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 3808,
+        "sha256": "2756d7c52baee85cacb504f6ee1df7aad6809ac8d94a4a111d76991f90d36d6e"
+      },
+      "address_source": "DES(UNVERIFIED)",
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3; probe 11 reports run-2 agreement, but run 2 has no surviving log"
+    },
+    {
+      "label": "l2_multicall",
+      "kind": "multicall",
+      "address": "0x2cAC2D899eCC914d704FeaAE33ac1bF36277DaD1",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 3339,
+        "sha256": "dcd6bb237580a9494167667d5f301573f4a3c3b59800512ac7c52067553a6855"
+      },
+      "address_source": "DES",
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3"
+    },
+    {
+      "label": "arb_gas_info",
+      "kind": "system",
+      "address": "0x000000000000000000000000000000000000006C",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1,
+        "sha256": "aa687b58b0e73e2e383f8c500d75b591e188efe0168b3ffbcd3771caaa6dd4c7"
+      },
+      "address_source": "DES"
+    },
+    {
+      "label": "token_usdg",
+      "kind": "token",
+      "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "symbol": "USDG",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 170,
+        "sha256": "c85d18dc1e49769e01f9f88981176e213b2bc24d2f14d33a81d54bc06579f6db"
+      },
+      "address_source": "NET",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0x68184C449E1a8f34fA18d289737129FD27B66f8F",
+        "code": {
+          "bytes": 18644,
+          "sha256": "0d8203b94e33c2458a137c0c70d2491f3625837405a74fd332f4cba5a979c372"
+        }
+      },
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3"
+    },
+    {
+      "label": "token_weth",
+      "kind": "token",
+      "address": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "symbol": "WETH",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "one_reader",
+      "code": {
+        "bytes": 2202,
+        "sha256": "eb5a5f69ebb602e71cdf5fdeb7d49ca9e4b37d105432c0cbd31a754fc4d360a7"
+      },
+      "address_source": "DES",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0xC6B81b429797E0f555440b70cD99e032D7AE947e",
+        "code": {
+          "bytes": 6961,
+          "sha256": "55b626d0ffe56312da49df2fda047bf9d89ad7c565cad341efe76a496fcad043"
+        }
+      },
+      "note": "second reader refused the pinned-state read (probe 11 F2); only the official reader measured this code in run 3"
+    }
+  ]
+}

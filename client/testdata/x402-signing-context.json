@@ -1,0 +1,102 @@
+{
+  "input": {
+    "network": "eip155:8453",
+    "accepts": [
+      {
+        "scheme": "exact",
+        "network": "eip155:8453",
+        "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "amount": "10000",
+        "payTo": "0x8bc2aecdd86097f74a1a5fa17764108d9a683c8c",
+        "maxTimeoutSeconds": 60,
+        "resource": null,
+        "facilitator_url": "https://api.cdp.coinbase.com/platform/v2/x402"
+      }
+    ],
+    "chosen_index": 0,
+    "budget": "20000",
+    "prior_paytos": []
+  },
+  "signing": {
+    "owner": "0x5555555555555555555555555555555555555555",
+    "typed_data": {
+      "domain": {
+        "name": "USD Coin",
+        "version": "2",
+        "chainId": 8453,
+        "verifyingContract": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+      },
+      "primaryType": "TransferWithAuthorization",
+      "types": {
+        "TransferWithAuthorization": [
+          {
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "name": "value",
+            "type": "uint256"
+          },
+          {
+            "name": "validAfter",
+            "type": "uint256"
+          },
+          {
+            "name": "validBefore",
+            "type": "uint256"
+          },
+          {
+            "name": "nonce",
+            "type": "bytes32"
+          }
+        ]
+      },
+      "message": {
+        "from": "0x5555555555555555555555555555555555555555",
+        "to": "0x8bc2aecdd86097f74a1a5fa17764108d9a683c8c",
+        "value": "10000",
+        "validAfter": "0",
+        "validBefore": "1791163087",
+        "nonce": "0xabababababababababababababababababababababababababababababababab"
+      }
+    }
+  },
+  "expected": {
+    "network": "eip155:8453",
+    "accepts": [
+      {
+        "scheme": "exact",
+        "network": "eip155:8453",
+        "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "amount": "10000",
+        "payTo": "0x8bc2aecdd86097f74a1a5fa17764108d9a683c8c",
+        "maxTimeoutSeconds": 60,
+        "resource": null,
+        "facilitator_url": "https://api.cdp.coinbase.com/platform/v2/x402"
+      }
+    ],
+    "chosen_index": 0,
+    "budget": "20000",
+    "prior_paytos": [],
+    "signing_context": {
+      "input_sha256": "0xf194e64dd62970c1f7ee5c15c8459c699b259277474fb9ef29fff7ae5d49954c",
+      "scheme": "exact",
+      "mechanism": "eip3009",
+      "facilitator_url": "https://api.cdp.coinbase.com/platform/v2/x402",
+      "eip3009": {
+        "chain_id": 8453,
+        "owner": "0x5555555555555555555555555555555555555555",
+        "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "to": "0x8bc2aecdd86097f74a1a5fa17764108d9a683c8c",
+        "value": "10000",
+        "valid_after": "0",
+        "valid_before": "1791163087",
+        "nonce": "0xabababababababababababababababababababababababababababababababab"
+      }
+    }
+  }
+}

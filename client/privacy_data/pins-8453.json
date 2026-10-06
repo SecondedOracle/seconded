@@ -1,0 +1,305 @@
+{
+  "schema": "seconded-trade-pins/v1",
+  "chain_id": 8453,
+  "network": "eip155:8453",
+  "hash_algorithm": "sha256(decoded_runtime_bytes)",
+  "measured": {
+    "probe": "docs/probes/11-verifiable-checks.md",
+    "results": "docs/probes/data/11-verifiable/results.json",
+    "results_sha256": "f7c8f9659cf475f3a739aa2da04652d275125b70563b98c62c0ec4784e398650",
+
+    "started_at": "2026-09-25T00:14:38Z",
+    "finished_at": "2026-09-25T00:18:01Z",
+    "block": {
+      "number": 51752963,
+      "hash": "0xb2c54475ec90876aa50895d4d6e330516753be17891f175ecf7ec0f3e6b91247"
+    },
+    "readers": [
+      "https://base-rpc.publicnode.com",
+      "https://mainnet.base.org"
+    ]
+  },
+  "contracts": [
+    {
+      "label": "uniswap_v2_router02",
+      "kind": "router",
+      "address": "0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 17891,
+        "sha256": "b0ecf9b8d663bba70f764280a6ef21ef481ab27e671b9e419a2509ddfe52babf"
+      },
+      "address_source": "U2"
+    },
+    {
+      "label": "uniswap_v3_factory",
+      "kind": "factory",
+      "address": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24535,
+        "sha256": "8545609892cc8d7d608dd4420ee110ab98448730570824fb029228e33846d28c"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "uniswap_v3_quoterv2",
+      "kind": "quoter",
+      "address": "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 8273,
+        "sha256": "a204e355059d9c809bfc026503d49b4ecf8655f482a76040dec4bcb4618047b4"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "uniswap_swaprouter02",
+      "kind": "router",
+      "address": "0x2626664c2603336E57B271c5C0b26F421741e481",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24497,
+        "sha256": "cdd0e7bce67f3b8cc4a3f517beaa9afa00ea25ee7b6c6ff14a60898228289ef6"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "universal_router",
+      "kind": "router",
+      "address": "0x6fF5693b99212Da76ad316178A184AB56D299b43",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 19499,
+        "sha256": "6fb868a9f23a4b35d1e139bc83c6c52e82891b81f852c23255371cdfe1cc34d4"
+      },
+      "address_source": "U3,U4"
+    },
+    {
+      "label": "universal_router_2_1_1",
+      "kind": "router",
+      "address": "0xFdf682F51FE81Aa4898F0AE2163d8A55c127fbC7",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24546,
+        "sha256": "7dbc8755c7ba92c2263f109720d0c6efd34b8a26bce8680348ba865421b99f9c"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "universal_router_2_1_2",
+      "kind": "router",
+      "address": "0xd6145b2D3F379919E8CdEda7B97e37c4b2Ca9c40",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24380,
+        "sha256": "0e59e7db302dd806fd6f7f7c6ead9c9c838723df46fbee9e4052cd517f5e4cb4"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "uniswap_v4_poolmanager",
+      "kind": "pool_manager",
+      "address": "0x498581fF718922c3f8e6A244956aF099B2652b2b",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 24009,
+        "sha256": "b08ceda0478797f4a64fa9a089a97290411d71ce00131ccf599412210c191868"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "uniswap_v4_quoter",
+      "kind": "quoter",
+      "address": "0x0d5e0F971ED27FBfF6c2837bf31316121532048D",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 5820,
+        "sha256": "029fda93293ee7526cfebf7a62ed26b79ec3aa19cd575e8ff244186e6b69eaaf"
+      },
+      "address_source": "U4"
+    },
+    {
+      "label": "permit2",
+      "kind": "permit2",
+      "address": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+      "status": "pinned",
+      "roles": [
+        "call_target",
+        "spender"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 9152,
+        "sha256": "14aac65013451ac5878cca13f96c26e761c659ceece37c822604451e1608f5fc"
+      },
+      "address_source": "U3,U4"
+    },
+    {
+      "label": "multicall3",
+      "kind": "multicall",
+      "address": "0xcA11bde05977b3631167028862bE2a173976CA11",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 3808,
+        "sha256": "2756d7c52baee85cacb504f6ee1df7aad6809ac8d94a4a111d76991f90d36d6e"
+      },
+      "address_source": "DES(UNVERIFIED)"
+    },
+    {
+      "label": "gas_price_oracle",
+      "kind": "system",
+      "address": "0x420000000000000000000000000000000000000F",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 2055,
+        "sha256": "5dcd6f463e4a502836560cbd1e7e4dd3eb37d3282b1c14f70bb31ff8c35ca112"
+      },
+      "address_source": "DES",
+      "implementation": {
+        "via": "eip1967",
+        "address": "0x4f1db3c6AbD250ba86E0928471A8F7DB3AFd88F1",
+        "code": {
+          "bytes": 7848,
+          "sha256": "7e49db5c1d54bab9a75a387dc972d4fb1c3c78f3fbf31336a9d8413d6d125cc3"
+        }
+      }
+    },
+    {
+      "label": "b20_stock_registry",
+      "kind": "system",
+      "address": "0x3f3E8cf41cdd3b1D118c16471aB0113DfDDd5CaD",
+      "status": "pinned",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1548,
+        "sha256": "ca2b277c7f6798b371598454a28f467575fed9f0a88daac98ff3d1c36534acc5"
+      },
+      "address_source": "DES"
+    },
+    {
+      "label": "token_usdc",
+      "kind": "token",
+      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "symbol": "USDC",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1852,
+        "sha256": "98d785fcb1bf847f287adc2310759fd94cc13e754b974bc72131382e8266f607"
+      },
+      "address_source": "NET",
+      "implementation": {
+        "via": "zos",
+        "address": "0x2Ce6311ddAE708829bc0784C967b7d77D19FD779",
+        "code": {
+          "bytes": 23464,
+          "sha256": "dcb3b7ca28662970d0a7cdad420e529fb837d7bf8a246b1a680c20e153db79e8"
+        }
+      }
+    },
+    {
+      "label": "token_eurc",
+      "kind": "token",
+      "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "symbol": "EURC",
+      "status": "unverified",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1798,
+        "sha256": "c9cf7c3f11c4d3d818801b5a965cea3bae6ff3b9b923242b91a9b4e5888e7835"
+      },
+      "address_source": "Circle EURC issuer catalogue",
+      "implementation": {
+        "via": "zos",
+        "address": "0x2Ce6311ddAE708829bc0784C967b7d77D19FD779",
+        "code": {
+          "bytes": 23464,
+          "sha256": "dcb3b7ca28662970d0a7cdad420e529fb837d7bf8a246b1a680c20e153db79e8"
+        }
+      },
+      "note": "full address came from memory and matches only the design prefix 0x60a3E35C...db42; no raw official source re-read (probe 11 Not measured); superseded by exact Circle EURC row in server/checks/data_snapshots/tokens.json (source SHA-256 1e11ee121da7622f637210747f34d89f90f746c70d0ff467a1d9497871e266bb). Runtime and implementation measurements unchanged; no additional trade role granted. Shared Trade status remains diagnostic/unverified. Reviewed Token Check-only approval is in issuers/8453.json; it grants no general Trade membership or roles."
+    },
+    {
+      "label": "token_weth",
+      "kind": "token",
+      "address": "0x4200000000000000000000000000000000000006",
+      "symbol": "WETH",
+      "status": "pinned",
+      "roles": [
+        "call_target"
+      ],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 2041,
+        "sha256": "667c900c2c6da80d452501a9c6332e046384a0c438c3334ce6f71c86dd7b8735"
+      },
+      "address_source": "U3"
+    },
+    {
+      "label": "token_cbbtc",
+      "kind": "token",
+      "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+      "symbol": "cbBTC",
+      "status": "unverified",
+      "roles": [],
+      "evidence": "two_readers",
+      "code": {
+        "bytes": 1550,
+        "sha256": "7bac213090f4f3785394eb9912cef518b76f1272fd224bc6ddae4ecfe3859cad"
+      },
+      "address_source": "Coinbase official cbBTC table",
+      "implementation": {
+        "via": "zos",
+        "address": "0x7458bfDC30034EB860B265E6068121D18Fa5Aa72",
+        "code": {
+          "bytes": 16328,
+          "sha256": "5cdcb01e0ed4dad8152d4496fde5b5420a742c62c6b9a5915ab23c6d9490580c"
+        }
+      },
+      "note": "address came from memory, not an official source (probe 11 F11 Base notes); pin after an official address source is read raw; superseded by official Coinbase table reviewed 2026-10-05 via search index, recorded in issuer_tokens.json and tests/token/fixtures/coinbase-cbbtc-excerpt.txt. Raw HTTP returned 403; conservative catalogue age retained. Runtime measurements unchanged; no additional trade role granted. Raw official Coinbase HTML subsequently captured 2026-10-05 in tests/token/fixtures/coinbase-cbbtc-source.txt, SHA-256 3c1f81cd2878589fb18c7294f6c835364000b6b1fec5479b5884c87538a202ca. This supersedes the search-index-only provenance limitation; decoded runtime measurements remain unchanged. Shared Trade status remains diagnostic/unverified. Reviewed Token Check-only approval is in issuers/8453.json; it grants no general Trade membership or roles."
+    }
+  ]
+}

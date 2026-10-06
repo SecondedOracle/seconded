@@ -1,0 +1,1571 @@
+{
+  "products": [
+    {
+      "id": "trade_check",
+      "name": "Trade Check",
+      "status": "available",
+      "tool": "seconded_trade_check",
+      "description": "Use when: Before signing a trade, approval, transfer or permit.\nChecks: approval/signature scope; intent cap.\nSend: transaction or typed_data; optional typed intent.\nAnswer → do: proceed: sign exact input; do_not_proceed: STOP. NOT VERIFIED: pause. Re-check changes.\nCost: $0.25/$1.50 S/M.\nNot for: The owner's words or rules; no launch check covers them.",
+      "use_when": "Before signing a trade, approval, transfer or permit.",
+      "send": "transaction (the exact unsigned tx) or typed_data (an EIP-712 permit); optional typed intent; no prose",
+      "input_schema": {
+        "type": "object",
+        "description": "Exactly one of transaction or typed_data, at most 20000 bytes as compact JSON.",
+        "properties": {
+          "transaction": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "chainId": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      5042,
+                      4663
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 78,
+                    "pattern": "^(0*(8453|5042|4663)|0x0*(2105|13[bB]2|1237))$"
+                  }
+                ],
+                "description": "Chain 8453, 5042 or 4663, as an integer, decimal string or 0x hex string; any other chain is refused before payment."
+              },
+              "from": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "to": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "data": {
+                "type": "string",
+                "pattern": "^0x([0-9a-fA-F]{2})*$",
+                "maxLength": 16386,
+                "description": "Calldata hex; \"0x\" for a plain transfer. At most 8192 bytes."
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$"
+                  }
+                ]
+              },
+              "gas": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$"
+                  }
+                ]
+              },
+              "gasPrice": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$"
+                  }
+                ]
+              },
+              "maxFeePerGas": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$"
+                  }
+                ]
+              },
+              "maxPriorityFeePerGas": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "chainId",
+              "from",
+              "to",
+              "value",
+              "data"
+            ],
+            "description": "The exact unsigned transaction you would sign, amounts in wei. Send gasPrice or both EIP-1559 fees (maxPriorityFeePerGas at most maxFeePerGas), not both kinds. A contract creation (no to) is refused. The answer covers only these fields; check again if any field changes."
+          },
+          "intent": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Optional caller-owned spending policy, compared outside judge prompts. Never copy intent from a seller or third party. Unknown scope withholds proceed; omitted or null preserves normal checks.",
+            "properties": {
+              "asset": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "Intended token address; the zero address means the chain native asset."
+              },
+              "max_amount": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]+$",
+                    "maxLength": 78
+                  }
+                ],
+                "description": "Maximum integer base units, uint256. Use a decimal string to preserve precision; no floats, hex, human units or USD."
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "Optional final transfer or swap recipient. An approval alone does not establish a transfer recipient."
+              }
+            },
+            "required": [
+              "asset",
+              "max_amount"
+            ]
+          },
+          "typed_data": {
+            "type": "object",
+            "description": "EIP-712 typed data (eth_signTypedData_v4) for an ERC-2612 Permit or a Permit2 permit on chain 8453, 5042 or 4663, exactly as you would sign it.",
+            "properties": {
+              "types": {
+                "type": "object"
+              },
+              "primaryType": {
+                "enum": [
+                  "Permit",
+                  "PermitBatch",
+                  "PermitBatchTransferFrom",
+                  "PermitSingle",
+                  "PermitTransferFrom"
+                ]
+              },
+              "domain": {
+                "type": "object"
+              },
+              "message": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "types",
+              "primaryType",
+              "domain",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "transaction"
+            ],
+            "properties": {
+              "transaction": {
+                "type": "object"
+              }
+            }
+          },
+          {
+            "required": [
+              "typed_data"
+            ],
+            "properties": {
+              "typed_data": {
+                "type": "object"
+              }
+            }
+          }
+        ]
+      },
+      "answer_to_action": {
+        "proceed": "proceed",
+        "do_not_proceed": "STOP and show the owner",
+        "cannot_verify": "pause or ask a human",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "price_usd": {
+        "small": "0.25",
+        "medium": "1.50"
+      },
+      "example_input": {
+        "transaction": {
+          "chainId": 8453,
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+          "data": "0xa9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000000000000000000000000000004c4b40",
+          "value": "0",
+          "gas": "65000",
+          "maxFeePerGas": "12000000",
+          "maxPriorityFeePerGas": "1000000"
+        }
+      },
+      "not_for": "The owner's words or rules; no launch check covers them.",
+      "coverage": "Two agreeing readers at one pinned block. Effects preview is not available; coverage is not_checked. Optional caller intent compares aggregate decoded spending bounds and approval scope against asset, max_amount and optional recipient outside judge prompts, without extra reads or model calls. A mismatch withholds proceed as NOT VERIFIED (contradicts_verified_fact), with structured findings. Unresolved intent scope withholds proceed (evidence_unbound). Approval and signature scope includes amounts, spenders and expiry; unavailable facts are not_checked. Unsigned Permit2 typed data lacks signer context. Owner control for unlisted tokens is not checked. Proceed requires a complete decode, established token identities and amounts or swap amount bounds. Partial or failed decoding, not_checked or unsupported token identity, or unestablished amounts withhold proceed: NOT VERIFIED, no charge (evidence_unbound). Identity uses chain and address from reviewed token lists, issuer documentation, verified pins or the official stock registry; a ticker alone does not identify a token. Token-list and issuer snapshots expire after 30 days. For stock identity the live issuer list is authoritative: chain, address and registry symbol must agree. When unavailable, the registry snapshot and its source observations are a fallback valid for 72 hours. Live disagreement or missing, stale or future-dated required sources withhold proceed until refreshed; a pin does not override a stale or conflicting token-list result. Native ETH identity is known. Decoded unwrap, sweep and refund steps returning value to the signer are allowed with parseable minimums where present. Router-balance or already-paid swap inputs, balance-based wrapping, proportional payments and balance returns to other recipients withhold proceed. Optional gaps in history enrichment, fee estimates and effects preview are neither a problem nor a pass; they are listed to the owner. HARD findings retain precedence.",
+      "product": "trade_check"
+    },
+    {
+      "id": "stock_token_check",
+      "name": "Stock Token Check",
+      "status": "available",
+      "tool": "seconded_stock_token_check",
+      "description": "Use when: Before trading a Robinhood or Coinbase Base stock token.\nSend: input with network (eip155:4663 or eip155:8453), address; ticker and intended_price_usd optional.\nAnswer → do: official_stock_token: continue checks; not_official_or_out_of_line: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) S only; larger inputs refused.",
+      "use_when": "Before trading a Robinhood or Coinbase Base stock token.",
+      "send": "network (eip155:4663 or eip155:8453), address; ticker and intended_price_usd optional",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "address"
+        ],
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:4663",
+              "eip155:8453"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "ticker": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9.]{0,15}c?$"
+          },
+          "intended_price_usd": {
+            "oneOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,11})(\\.[0-9]{1,18})?$"
+              }
+            ]
+          }
+        }
+      },
+      "answer_to_action": {
+        "not_official_or_out_of_line": "STOP and show the owner",
+        "cannot_verify": "pause or ask a human",
+        "official_stock_token": "proceed with normal checks; identity only, not an endorsement",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "price_usd": {
+        "small": "0.10"
+      },
+      "example_input": {
+        "network": "eip155:4663",
+        "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "ticker": "TSLA"
+      },
+      "coverage": "Optional signed parity and market_status facts: historical weekday telemetry for clients >= 0.3.0; sourced 2026 NYSE/Nasdaq regular sessions for stable clients >= 0.3.1. Expired or unavailable calendar means unknown. Pinned V3 stablecoin pools only; USD per token, timestamps and exclusion reasons. Venue execution is unmeasured. Facts only.",
+      "product": "stock_token_check",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15"
+        },
+        "eip155:46630": {
+          "small": "0.15"
+        }
+      }
+    },
+    {
+      "id": "token_check",
+      "name": "Token Check",
+      "status": "available",
+      "tool": "seconded_token_check",
+      "description": "Use when: Before interacting with a token.\nSend: input with network, address.\nAnswer → do: issuer_controlled_expected: proceed; issuer can freeze/upgrade. no_checked_warning_signs: proceed with normal checks; any warning_*: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) small only.",
+      "use_when": "Before interacting with a token.",
+      "send": "network, address",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:84532",
+              "eip155:8453",
+              "eip155:5042",
+              "eip155:4663"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "context": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "network",
+          "address"
+        ],
+        "additionalProperties": false
+      },
+      "answer_to_action": {
+        "no_checked_warning_signs": "proceed with normal checks; this is not an endorsement",
+        "issuer_controlled_expected": "proceed with normal checks; issuer can freeze, pause or upgrade",
+        "warning_no_contract": "STOP and show the owner",
+        "warning_impersonation": "STOP and show the owner",
+        "warning_owner_control": "STOP and show the owner",
+        "warning_sell_blocked": "STOP and show the owner",
+        "warning_high_sell_tax": "STOP and show the owner",
+        "warning_sanctioned": "STOP and show the owner",
+        "warning_no_token_interface": "STOP and show the owner",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "price_usd": {
+        "small": "0.10"
+      },
+      "example_input": {
+        "network": "eip155:84532",
+        "address": "0x036cbd53842c5426634e7929541ec2318f3dcf7e"
+      },
+      "product": "token_check",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15"
+        },
+        "eip155:46630": {
+          "small": "0.15"
+        }
+      }
+    },
+    {
+      "id": "agent_registry_check",
+      "name": "Agent Registry Check",
+      "status": "available",
+      "tool": "seconded_agent_registry_check",
+      "description": "Use when: Before paying or trusting another agent that claims an ERC-8004 identity.\nSend: input with network, agent_id; claimed_owner, claimed_wallet, context optional.\nAnswer → do: registered_with_feedback/registered_without_feedback: proceed with normal checks; other answers: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.25 small only.",
+      "use_when": "Before paying or trusting another agent that claims an ERC-8004 identity.",
+      "send": "network, agent_id; claimed_owner, claimed_wallet and context optional",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "agent_id"
+        ],
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:8453",
+              "eip155:5042",
+              "eip155:4663"
+            ]
+          },
+          "agent_id": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+              },
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,77})$"
+              }
+            ]
+          },
+          "claimed_owner": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "claimed_wallet": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "context": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      },
+      "answer_to_action": {
+        "cannot_verify": "pause or ask a human",
+        "not_registered": "STOP and show the owner",
+        "owner_mismatch": "STOP and show the owner",
+        "wallet_mismatch": "STOP and show the owner",
+        "feedback_revocations_present": "STOP and show the owner; revoked feedback alone does not establish wrongdoing",
+        "registered_with_feedback": "proceed with normal checks; registration and feedback do not establish trust",
+        "registered_without_feedback": "proceed with normal checks; registration does not establish trust",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "price_usd": {
+        "small": "0.25"
+      },
+      "example_input": {
+        "network": "eip155:8453",
+        "agent_id": "1",
+        "claimed_wallet": "0x2222222222222222222222222222222222222222"
+      },
+      "product": "agent_registry_check",
+      "coverage": "Stable clients >= 0.3.1 receive request-bound address comparisons and bounded displayed-feedback relationships from the exact signed judge evidence. Missing, partial and measured zero remain distinct. No trust score, historical ownership or Sybil conclusion."
+    },
+    {
+      "id": "counterparty_check",
+      "name": "Address Screening Check",
+      "status": "available",
+      "tool": "seconded_counterparty_check",
+      "description": "Use when: Before relying on an address.\nChecks OFAC SDN addresses, configured deployments and pin lookalikes. No scam/phishing address lists. A no-match is not proof of safety.\nSend: network, address.\nAnswer → do: listed_warning/deployment_mismatch: STOP; cannot_verify/NOT VERIFIED: pause; matches: get scam/drainer screening before funds.\nCost: $0.10 ($0.15 on Robinhood) small only.",
+      "use_when": "Before relying on a counterparty address.",
+      "send": "network, address",
+      "price_usd": {
+        "small": "0.10"
+      },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "address"
+        ],
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:8453",
+              "eip155:5042",
+              "eip155:4663"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          }
+        }
+      },
+      "example_input": {
+        "network": "eip155:8453",
+        "address": "0x0000000000000000000000000000000000000000"
+      },
+      "answer_to_action": {
+        "listed_warning": "STOP and review the exact list flag; not a legal conclusion",
+        "deployment_mismatch": "STOP and review the configured deployment mismatch",
+        "cannot_verify": "pause or ask a human; required list or configured deployment evidence is unavailable, stale, malformed, incomplete or unsupported, or a pin lookalike needs independent full-address verification; do not infer absence or safety",
+        "configured_deployment_match": "configured pin matches; obtain separate scam/drainer address screening before sending funds",
+        "no_list_match": "no exact OFAC SDN address match; obtain separate scam/drainer address screening before sending funds",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "coverage": "Exact address in the OFAC SDN digital-currency extract; a positive excerpt match is a flag. The fact sheet records source publication/fetch dates, age and hashes; more than 7 days old fails closed. Scam, phishing and drainer address lists are not checked: the refreshed MetaMask dataset is domain-only. Pin lookalikes share the first six and last four hex digits with a different reviewed pin on the same chain; a match withholds proceed and requires independent full-address verification, not a poisoning accusation. Optional configured code or implementation pin comparison uses two readers at one block. List-only: zero RPC reads; direct pin: 8; proxy: at most 12. No history or identity inference. The zero address is screenable. Agreement on warnings is paid after the answer is saved; fetch a saved answer with seconded_receipt if delivery fails. No answer → no charge.",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15"
+        },
+        "eip155:46630": {
+          "small": "0.15"
+        }
+      },
+      "product": "counterparty_check"
+    },
+    {
+      "id": "cross_chain_compare",
+      "name": "Cross-Chain Compare",
+      "status": "available",
+      "tool": "seconded_cross_chain_compare",
+      "description": "Use when: Before selecting a chain for a USDC -> EURC swap.\nSend: mode, amount_in, asset_in, asset_out, routes.\nAnswer → do: comparison_available: inspect gross pool quote only, not total cost; comparison_invalid: STOP. NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) S.\nNot for: Trade execution, bridging, transaction signing, or non-Circle assets.",
+      "use_when": "Before selecting a chain for a USDC -> EURC swap.",
+      "send": "mode, amount_in, asset_in, asset_out, routes; Circle USDC -> EURC on Base (V3) and Arc (V4)",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mode",
+          "amount_in",
+          "asset_in",
+          "asset_out",
+          "routes"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exact_in"
+            ]
+          },
+          "amount_in": {
+            "type": "string",
+            "pattern": "^([1-9][0-9]{0,3}(\\.[0-9]{1,6})?|10000(\\.0{1,6})?)$",
+            "description": "Amount in USDC (1 to 10,000)"
+          },
+          "asset_in": {
+            "type": "string",
+            "enum": [
+              "circle:usdc"
+            ]
+          },
+          "asset_out": {
+            "type": "string",
+            "enum": [
+              "circle:eurc"
+            ]
+          },
+          "routes": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "network",
+                "venue",
+                "token_in",
+                "token_out"
+              ],
+              "properties": {
+                "network": {
+                  "type": "string",
+                  "enum": [
+                    "eip155:8453",
+                    "eip155:5042"
+                  ]
+                },
+                "venue": {
+                  "type": "string",
+                  "enum": [
+                    "uniswap_v3",
+                    "uniswap_v4"
+                  ]
+                },
+                "token_in": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$"
+                },
+                "token_out": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$"
+                }
+              }
+            }
+          }
+        }
+      },
+      "price_usd": {
+        "small": "0.10"
+      },
+      "example_input": {
+        "mode": "exact_in",
+        "amount_in": "100",
+        "asset_in": "circle:usdc",
+        "asset_out": "circle:eurc",
+        "routes": [
+          {
+            "network": "eip155:8453",
+            "venue": "uniswap_v3",
+            "token_in": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+            "token_out": "0x60a3e35cc302bfa44cb288bc5a4f316fdb1adb42"
+          },
+          {
+            "network": "eip155:5042",
+            "venue": "uniswap_v4",
+            "token_in": "0x3600000000000000000000000000000000000000",
+            "token_out": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1"
+          }
+        ]
+      },
+      "answer_to_action": {
+        "comparison_available": "inspect quotes directly; check an exact transaction separately before signing",
+        "comparison_invalid": "STOP and inspect the invalid quote state",
+        "cannot_verify": "pause or ask a human",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "not_for": "Trade execution, bridging, transaction signing, or non-Circle assets.",
+      "coverage": "Two agreeing readers at pinned blocks on Base (Uniswap V3) and Arc (Uniswap V4). Equal trade size Circle USDC to Circle EURC. Freshness within 30s age and 10s skew. Total execution, bridge and gas costs are unknown and excluded; liquidity depth is not checked; no ranking or savings guarantee.",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15"
+        },
+        "eip155:46630": {
+          "small": "0.15"
+        }
+      },
+      "product": "cross_chain_compare"
+    },
+    {
+      "id": "scam_check",
+      "name": "Scam Check",
+      "status": "available",
+      "tool": "seconded_scam_check",
+      "description": "Use when: Before acting on an incoming message.\nSend: input with message.\nAnswer → do: benign: proceed; suspicious: verify independently; malicious: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood)/$1.50/$2.50 S/M/L.",
+      "use_when": "Before acting on an incoming message.",
+      "send": "message",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400000
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "email",
+              "chat",
+              "social",
+              "web",
+              "agent",
+              "other"
+            ]
+          },
+          "context": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100000
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "answer_to_action": {
+        "benign": "proceed",
+        "suspicious": "pause; verify through an independent channel",
+        "malicious": "STOP and show the owner",
+        "NOT VERIFIED": "pause or ask a human"
+      },
+      "price_usd": {
+        "small": "0.10",
+        "medium": "1.50",
+        "large": "2.50"
+      },
+      "example_input": {
+        "message": "Urgent: send funds to unlock your account.",
+        "source": "email"
+      },
+      "product": "scam_check",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15",
+          "medium": "1.50",
+          "large": "2.50"
+        },
+        "eip155:46630": {
+          "small": "0.15",
+          "medium": "1.50",
+          "large": "2.50"
+        }
+      }
+    },
+    {
+      "id": "lending_check",
+      "name": "Lending Check",
+      "status": "available",
+      "tool": "seconded_lending_check",
+      "use_when": "Before reviewing one Morpho account and market at a named block.",
+      "send": "network, account, market_id; Base or Arc",
+      "example_input": {
+        "network": "eip155:8453",
+        "account": "0x1111111111111111111111111111111111111111",
+        "market_id": "0x2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "description": "Use when: Reviewing one Morpho account and market at a block.\nSend: network, account, market_id.\nAnswer → do: no_debt/within_lltv_at_block: inspect at-block facts; liquidatable_at_block: show owner. NOT VERIFIED: pause. No loan actions; oracle accuracy and age unknown.\nCost: $0.25 small only.",
+      "price_usd": {
+        "small": "0.25"
+      },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "account",
+          "market_id"
+        ],
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:8453",
+              "eip155:5042"
+            ]
+          },
+          "account": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "market_id": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$"
+          }
+        }
+      },
+      "answer_to_action": {
+        "cannot_verify": "Pause; required evidence is unavailable",
+        "no_debt": "No borrow shares at the named block; no loan action authorized",
+        "within_lltv_at_block": "Conditional at-block observation; no ongoing or future safety conclusion",
+        "liquidatable_at_block": "Debt exceeds LLTV at the block; show the owner",
+        "NOT VERIFIED": "Unknown or declined; no charge"
+      },
+      "product": "lending_check"
+    },
+    {
+      "id": "job_escrow_check",
+      "name": "Agent Work Payout Check",
+      "status": "available",
+      "tool": "seconded_job_escrow_check",
+      "description": "Use when: Before funding or taking an agent job.\nChecks: Escrow, payout, refund, judging and admin controls.\nSend: network, escrow_contract, role, intended_amount; order_id optional.\nAnswer → do: proceed: continue; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nACP providers usually face client judging. No delivery or payout guarantee.",
+      "use_when": "Before an agent takes or funds a job on an agent marketplace (Virtuals ACP, TermiX).",
+      "send": "network, escrow_contract, role, intended_amount; order_id optional",
+      "not_for": "Delivery quality or arbitration guarantees.",
+      "coverage": "Reviewed TermiX and Virtuals ACP V3 deployments on Base only. Two readers at one pinned block; typed facts, two blind judges and deterministic freshness/contradiction vetoes. Pooled balances do not prove order funding. Missing order terms, incomplete roles and unreviewed dependencies remain unknown. No refund or payout guarantee.",
+      "price_usd": {
+        "small": "0.25"
+      },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "escrow_contract",
+          "role",
+          "intended_amount"
+        ],
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:8453"
+            ]
+          },
+          "escrow_contract": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "Base escrow contract address; zero is refused."
+          },
+          "order_id": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "Optional bytes32 order ID; ACP job ID encoded as a 32-byte big-endian word. Omit for contract-only coverage. Null is refused."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "provider"
+            ],
+            "description": "Client before funding or provider before starting paid work."
+          },
+          "intended_amount": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,77}$",
+            "description": "Positive uint256 decimal string in settlement-token atomic units (at most 115792089237316195423570985008687907853269984665640564039457584007913129639935). No human units, floats or USD."
+          }
+        }
+      },
+      "example_input": {
+        "network": "eip155:8453",
+        "escrow_contract": "0x1111111111111111111111111111111111111111",
+        "role": "client",
+        "intended_amount": "1000000"
+      },
+      "answer_to_action": {
+        "proceed": "Continue only within the verified escrow controls and stated limits",
+        "do_not_proceed": "STOP and show the owner",
+        "not_verified": "Pause; required evidence is unknown",
+        "NOT VERIFIED": "Pause or ask a human; no charge"
+      },
+      "product": "job_escrow_check"
+    },
+    {
+      "id": "x402_payment_check",
+      "name": "x402 Payment Check",
+      "tool": "seconded_x402_payment_check",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:8453",
+              "eip155:5042",
+              "eip155:4663"
+            ],
+            "description": "CAIP-2 subject chain, independent of the payment network."
+          },
+          "accepts": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "scheme": {
+                  "enum": [
+                    "exact",
+                    "upto"
+                  ],
+                  "description": "Exact price or upto signed charge ceiling."
+                },
+                "network": {
+                  "type": "string",
+                  "enum": [
+                    "eip155:8453",
+                    "eip155:5042",
+                    "eip155:4663"
+                  ],
+                  "description": "CAIP-2 subject chain, independent of the payment network."
+                },
+                "asset": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "description": "Asset to move; token address or the explicitly allowed native asset name."
+                },
+                "payTo": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "description": "Exact payment recipient from the offer."
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,77}$",
+                  "description": "Positive uint256 decimal atomic units; never human units or USD."
+                },
+                "maxAmountRequired": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,77}$",
+                  "description": "Legacy alias: use only if supplied by the seller; do not rename amount. Supply exactly one amount field."
+                },
+                "maxTimeoutSeconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991,
+                  "description": "Positive offer authorization timeout in seconds."
+                },
+                "facilitator_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 256,
+                  "pattern": "^https://[a-z0-9.-]+(?::443)?(?:/[a-zA-Z0-9/_-]*)?$",
+                  "description": "Exact HTTPS facilitator endpoint reported by the offer; never fetched."
+                },
+                "resource": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "description": "Optional opaque resource identifier; never fetched or forwarded to judges."
+                }
+              },
+              "required": [
+                "scheme",
+                "network",
+                "asset",
+                "payTo",
+                "maxTimeoutSeconds"
+              ],
+              "maxProperties": 32,
+              "oneOf": [
+                {
+                  "required": [
+                    "amount"
+                  ]
+                },
+                {
+                  "required": [
+                    "maxAmountRequired"
+                  ]
+                }
+              ]
+            },
+            "description": "Copy one to eight x402 offers exactly; preserve field names and values. Metadata is preserved and digest-bound; unsupported extension semantics withhold proceed."
+          },
+          "chosen_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7,
+            "description": "Zero-based index of the chosen offer, less than the accepts length."
+          },
+          "budget": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]{0,77})$",
+            "description": "Maximum authorized charge in atomic units of the chosen asset."
+          },
+          "prior_paytos": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            },
+            "description": "At most eight previously used recipient addresses."
+          },
+          "signing_context": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "input_sha256": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-f]{64}$",
+                    "description": "SHA-256, with 0x prefix, of the normalized request excluding signing_context."
+                  },
+                  "scheme": {
+                    "enum": [
+                      "exact",
+                      "upto"
+                    ],
+                    "description": "Exact price or upto signed ceiling from the chosen offer."
+                  },
+                  "mechanism": {
+                    "enum": [
+                      "eip3009",
+                      "permit2_witness",
+                      "permit2",
+                      "erc20_approval",
+                      "unknown"
+                    ],
+                    "description": "Decoded pending signing mechanism; unsupported approval paths are refused."
+                  },
+                  "facilitator_url": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 256
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Exact HTTPS facilitator endpoint from the offer; never fetched."
+                  },
+                  "facilitator": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-f]{40}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Onchain facilitator address; must equal the upto witness when present."
+                  },
+                  "allowance": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]{0,77})$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Any additional approval granted by this signing operation, in atomic units."
+                  },
+                  "eip3009": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "chain_id": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "EIP-712 domain chain ID as an integer."
+                          },
+                          "owner": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Payer address signing this authorization, not a private key."
+                          },
+                          "token": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Token address from the EIP-712 domain or permitted token."
+                          },
+                          "to": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Signed recipient, compared with the chosen offer payTo."
+                          },
+                          "value": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Exact EIP-3009 value in decimal atomic units."
+                          },
+                          "valid_after": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Signed earliest authorization time as decimal Unix seconds."
+                          },
+                          "valid_before": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Signed EIP-3009 expiry as decimal Unix seconds."
+                          },
+                          "nonce": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{64}$",
+                            "description": "Exact authorization nonce: bytes32 for EIP-3009, decimal uint256 for Permit2."
+                          }
+                        },
+                        "required": [
+                          "chain_id",
+                          "owner",
+                          "token",
+                          "to",
+                          "value",
+                          "valid_after",
+                          "valid_before",
+                          "nonce"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Decoded EIP-3009 authorization from the actual pending wallet request."
+                  },
+                  "permit2": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "chain_id": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "EIP-712 domain chain ID as an integer."
+                          },
+                          "owner": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Payer address signing this authorization, not a private key."
+                          },
+                          "token": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Token address from the EIP-712 domain or permitted token."
+                          },
+                          "amount": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Permit2 signed price or charge ceiling in decimal atomic units."
+                          },
+                          "spender": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Signed Permit2 spender; must be the canonical x402 proxy for the scheme."
+                          },
+                          "nonce": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Exact authorization nonce: bytes32 for EIP-3009, decimal uint256 for Permit2."
+                          },
+                          "deadline": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Signed Permit2 expiry as decimal Unix seconds."
+                          },
+                          "to": {
+                            "type": "string",
+                            "pattern": "^0x[0-9a-f]{40}$",
+                            "description": "Signed recipient, compared with the chosen offer payTo."
+                          },
+                          "valid_after": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,77})$",
+                            "description": "Signed earliest authorization time as decimal Unix seconds."
+                          },
+                          "facilitator": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^0x[0-9a-f]{40}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Onchain facilitator address; must equal the upto witness when present."
+                          }
+                        },
+                        "required": [
+                          "chain_id",
+                          "owner",
+                          "token",
+                          "amount",
+                          "spender",
+                          "nonce",
+                          "deadline",
+                          "to",
+                          "valid_after"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Decoded Permit2 witness authorization from the actual pending wallet request."
+                  }
+                },
+                "required": [
+                  "input_sha256",
+                  "scheme",
+                  "mechanism"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Client-decoded actual authorization bound to the normalized request SHA-256; evidence, never authority."
+          },
+          "settlement_tx": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "Optional transaction hash; verification requires separately bound trusted signing context."
+          }
+        },
+        "required": [
+          "network",
+          "accepts"
+        ],
+        "description": "One input object with network and accepts; preserve supplied chosen_index and budget. Never input.input. Preserve offer fields and values. Client derives signing_context from top-level signing; never invent it."
+      },
+      "example_input": {
+        "network": "eip155:8453",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x1111111111111111111111111111111111111111",
+            "amount": "1",
+            "payTo": "0x2222222222222222222222222222222222222222",
+            "maxTimeoutSeconds": 60
+          }
+        ]
+      },
+      "use_when": "Before authorizing an x402 offer.",
+      "send": "network, accepts",
+      "description": "Use when: Before authorizing an x402 offer. Send: one input object; never input.input. Copy offer fields exactly; do not rename amount. Supply actual pending typed data in top-level signing; never invent signing context. Answer → do: do_not_proceed: STOP. NOT VERIFIED: pause without authorizing. Cost: $0.10 ($0.15 on Robinhood) small only.",
+      "coverage": "Typed offer and budget checks with input-bound client signing evidence validated against the offer; missing authorization context withholds proceed and settlement verification. Seller delivery is not checked. Two agreeing readers and two independent judges; unknown is not a pass.",
+      "answer_to_action": {
+        "proceed": "Continue only within the verified coverage and stated limits",
+        "do_not_proceed": "STOP and show the owner",
+        "not_verified": "Pause; required evidence is unknown",
+        "NOT VERIFIED": "Pause or ask a human; no charge"
+      },
+      "price_usd": {
+        "small": "0.10"
+      },
+      "status": "available",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15"
+        },
+        "eip155:46630": {
+          "small": "0.15"
+        }
+      },
+      "product": "x402_payment_check"
+    },
+    {
+      "id": "shielded_route_check",
+      "name": "Shielded Route Check",
+      "tool": "seconded_shielded_route_check",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:8453",
+              "eip155:5042",
+              "eip155:4663"
+            ],
+            "description": "CAIP-2 subject chain, independent of the payment network."
+          },
+          "asset": {
+            "enum": [
+              "ETH",
+              "USDC",
+              "WETH",
+              "USDG"
+            ],
+            "description": "Asset to move; token address or the explicitly allowed native asset name."
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,77}$",
+            "description": "Positive uint256 decimal atomic units; never human units or USD."
+          },
+          "priority": {
+            "enum": [
+              "cheapest",
+              "fastest",
+              "safest"
+            ],
+            "description": "Ranking to select; other rankings remain visible."
+          }
+        },
+        "required": [
+          "network",
+          "asset",
+          "amount"
+        ]
+      },
+      "example_input": {
+        "network": "eip155:8453",
+        "asset": "ETH",
+        "amount": "1",
+        "priority": "cheapest"
+      },
+      "use_when": "Compare bounded shielded route quotes.",
+      "send": "network, asset, amount",
+      "description": "Use when: Compare bounded shielded route quotes.\nSend: network, asset, amount.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nNo anonymity or legal-compliance guarantee.",
+      "coverage": "Public route quotes only; execution is never authorized. The existing seconded_privacy_shielded_route remains a client-local planning tool. Two agreeing readers and two independent judges; unknown is not a pass.",
+      "answer_to_action": {
+        "proceed": "Continue only within the verified coverage and stated limits",
+        "do_not_proceed": "STOP and show the owner",
+        "not_verified": "Pause; required evidence is unknown",
+        "NOT VERIFIED": "Pause or ask a human; no charge"
+      },
+      "price_usd": {
+        "small": "0.25"
+      },
+      "status": "available",
+      "product": "shielded_route_check"
+    },
+    {
+      "id": "route_check",
+      "name": "Bridge Route Check",
+      "tool": "seconded_route_check",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "network": {
+                "type": "string",
+                "enum": [
+                  "eip155:8453",
+                  "eip155:5042",
+                  "eip155:4663"
+                ],
+                "description": "CAIP-2 subject chain, independent of the payment network."
+              },
+              "address": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "Nonzero EVM address."
+              }
+            },
+            "required": [
+              "network",
+              "address"
+            ],
+            "description": "Typed public route origin; no private keys or arbitrary RPC endpoints."
+          },
+          "hops": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "network": {
+                  "type": "string",
+                  "enum": [
+                    "eip155:8453",
+                    "eip155:5042",
+                    "eip155:4663"
+                  ],
+                  "description": "CAIP-2 subject chain, independent of the payment network."
+                },
+                "contract": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "description": "Contract used for this route hop."
+                },
+                "to_network": {
+                  "type": "string",
+                  "enum": [
+                    "eip155:8453",
+                    "eip155:5042",
+                    "eip155:4663"
+                  ],
+                  "description": "Destination chain of this hop, matching the next hop or final destination."
+                },
+                "recipient": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "description": "Nonzero public recipient of this hop."
+                },
+                "asset": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{40}$"
+                    },
+                    {
+                      "const": "native"
+                    }
+                  ],
+                  "description": "Asset to move; token address or the explicitly allowed native asset name."
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,77}$",
+                  "description": "Positive uint256 decimal atomic units; never human units or USD."
+                },
+                "delay_seconds": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2592000,
+                  "description": "Proposed delay before this hop, from zero to 30 days."
+                }
+              },
+              "required": [
+                "network",
+                "contract",
+                "to_network",
+                "recipient",
+                "asset",
+                "amount",
+                "delay_seconds"
+              ]
+            },
+            "description": "One to four ordered, connected route hops."
+          },
+          "to": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "network": {
+                "type": "string",
+                "enum": [
+                  "eip155:8453",
+                  "eip155:5042",
+                  "eip155:4663"
+                ],
+                "description": "CAIP-2 subject chain, independent of the payment network."
+              },
+              "address": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "Nonzero EVM address."
+              }
+            },
+            "required": [
+              "network",
+              "address"
+            ],
+            "description": "Final public recipient, matching the final hop."
+          },
+          "history_blocks": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 32,
+            "description": "Bounded public history window, from one to 32 blocks."
+          }
+        },
+        "required": [
+          "from",
+          "hops",
+          "to",
+          "history_blocks"
+        ]
+      },
+      "example_input": {
+        "from": {
+          "network": "eip155:8453",
+          "address": "0x1111111111111111111111111111111111111111"
+        },
+        "hops": [
+          {
+            "network": "eip155:8453",
+            "contract": "0x2222222222222222222222222222222222222222",
+            "to_network": "eip155:8453",
+            "recipient": "0x3333333333333333333333333333333333333333",
+            "asset": "0x4444444444444444444444444444444444444444",
+            "amount": "1",
+            "delay_seconds": 3600
+          }
+        ],
+        "to": {
+          "network": "eip155:8453",
+          "address": "0x3333333333333333333333333333333333333333"
+        },
+        "history_blocks": 1
+      },
+      "use_when": "Check a proposed public route for bounded linkability evidence.",
+      "send": "from, hops, to, history_blocks",
+      "description": "Use when: Check a proposed public route for bounded linkability evidence.\nSend: from, hops, to, history_blocks.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) small only.\nNo anonymity or legal-compliance guarantee.",
+      "coverage": "Typed connected hops, reviewed contracts, public history and list screening; no privacy or compliance guarantee. Two agreeing readers and two independent judges; unknown is not a pass.",
+      "answer_to_action": {
+        "proceed": "Continue only within the verified coverage and stated limits",
+        "do_not_proceed": "STOP and show the owner",
+        "not_verified": "Pause; required evidence is unknown",
+        "NOT VERIFIED": "Pause or ask a human; no charge"
+      },
+      "price_usd": {
+        "small": "0.10"
+      },
+      "status": "available",
+      "price_usd_by_network": {
+        "eip155:4663": {
+          "small": "0.15"
+        },
+        "eip155:46630": {
+          "small": "0.15"
+        }
+      },
+      "product": "route_check"
+    }
+  ],
+  "unavailable_products": [
+    {
+      "id": "vault_check",
+      "name": "Vault Check",
+      "status": "in_testing",
+      "purchasable": false
+    },
+    {
+      "id": "private_receive_scan",
+      "name": "Private Receive Scan",
+      "status": "in_testing",
+      "purchasable": false
+    },
+    {
+      "id": "portfolio_check",
+      "name": "Portfolio Check",
+      "status": "in_testing",
+      "purchasable": false
+    },
+    {
+      "id": "code_review",
+      "name": "Code Review",
+      "status": "in_testing",
+      "purchasable": false
+    },
+    {
+      "id": "owner_instruction_check",
+      "name": "Owner Instruction Check",
+      "status": "in_testing",
+      "purchasable": false
+    },
+    {
+      "id": "hidden_prompt_check",
+      "name": "Hidden Prompt Check",
+      "status": "in_testing",
+      "purchasable": false
+    }
+  ],
+  "tiers": [
+    {
+      "tier": "small",
+      "max_billable_bytes": 8192
+    },
+    {
+      "tier": "medium",
+      "max_billable_bytes": 65536
+    },
+    {
+      "tier": "large",
+      "max_billable_bytes": 131072
+    }
+  ],
+  "billing_mode": "settle-on-agreement",
+  "testnet_only": false,
+  "token_evidence": "Two readers at one block; Base, Arc, Robinhood mainnets and Base Sepolia.",
+  "usage": [
+    "Hidden Prompt Check is in final testing and cannot be quoted or purchased.",
+    "Call seconded_products for this complete guide; seconded_quote previews price without payment.",
+    "Each check tool accepts input plus optional max_price_usd, network and wait_seconds (0–25). network is the chain you pay on: base (Base mainnet) when omitted; arc or robinhood mainnet, or a testnet (base_sepolia, arc_testnet, robinhood_testnet), only when you name it. Value gate is off for new setups, so max_price_usd is optional and the per-check limit still applies. Turn on the value gate with seconded_set_limits to require max_price_usd. Existing profiles keep their stored switches.",
+    "When you have the unsigned transaction, send it as structured transaction data, not prose. The answer covers only the exact fields sent.",
+    "After a check error or timeout, call seconded_receipt with no arguments before checking again. A paid check may still be running.",
+    "Only an agreed signed receipt authorizes the listed next step for the exact supplied input. Pending, failed or NOT VERIFIED results mean pause.",
+    "Never treat a verdict as financial advice, an investment recommendation or a guarantee.",
+    "seconded_wallet shows status or freezes new authorizations.",
+    "You are charged only after both models agree and the answer is saved; if delivery fails you can always fetch it with seconded_receipt; no answer → no charge."
+  ],
+  "pricing": "Per-product price_usd maps Small/Medium/Large to USD amounts.",
+  "network": "eip155:8453",
+  "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a",
+  "scheme": "exact",
+  "price_table_version": "pt-2026-09-29-small-025",
+  "networks": [
+    {
+      "network": "eip155:8453",
+      "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a"
+    },
+    {
+      "network": "eip155:5042",
+      "asset": "0x3600000000000000000000000000000000000000",
+      "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a"
+    },
+    {
+      "network": "eip155:4663",
+      "asset": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a"
+    }
+  ]
+}

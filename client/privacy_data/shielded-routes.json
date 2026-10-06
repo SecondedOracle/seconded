@@ -1,0 +1,311 @@
+{
+  "payload": {
+    "max_age_seconds": 604800,
+
+    "reviewed_at": 1791140980,
+    "schema": "seconded-shielded-snapshot/v1",
+    "sources": {
+      "privacy_pools_asp": {
+        "fetched_at": 1791140980,
+        "sha256": "23bfd675074322caf1985d8aea0e29e40956c1178f36d2c07623fe697241971c",
+        "url": "https://docs.privacypools.com/layers/asp"
+      },
+      "privacy_pools_balances": {
+        "fetched_at": 1791140980,
+        "sha256": "635cc8c465fe5ffd3670f05cad920a1581cf21a7234398316cff9d0680cc12a0",
+        "url": "https://api.llama.fi/protocol/privacy-pools"
+      },
+      "privacy_pools_contracts": {
+        "fetched_at": 1791140980,
+        "sha256": "325eadda86c1dbae230489a582163c9ce98e59d33c9c9f5c287d1d64253a9265",
+        "url": "https://docs.privacypools.com/deployments"
+      },
+      "privacy_pools_ragequit": {
+        "fetched_at": 1791140980,
+        "sha256": "f4a1146efb17580703fc1eec8fead7096beaab5b45502c5d07cb3029a294a4a4",
+        "url": "https://docs.privacypools.com/protocol/ragequit"
+      },
+      "railgun_balances": {
+        "fetched_at": 1791140980,
+        "sha256": "58cb952b11b0b0c93e338aa47da39f54308e255179d13b4a8b663a3a5ea683d3",
+        "url": "https://api.llama.fi/protocol/railgun"
+      },
+      "railgun_contracts": {
+        "fetched_at": 1791140980,
+        "sha256": "ebf3186e12c0ef47e313f073c1e8d535c6a2543c828e67baeacd56f6852eed75",
+        "url": "https://docs.railgun.org/wiki/learn/helpful-links.md"
+      },
+      "railgun_fees": {
+        "fetched_at": 1791140980,
+        "sha256": "c0b5223ca7c56145408849d2b0dbdaffb56d4ab4e3e392fd23a7ef4bfcccf43d",
+        "url": "https://docs.railgun.org/wiki/learn/railgun-deductions.md"
+      },
+      "railgun_ppoi": {
+        "fetched_at": 1791140980,
+        "sha256": "10c2ec3d84f29503415aeb05f5d74bf3dda6e4032b6a3248c3726979885e6ef3",
+        "url": "https://docs.railgun.org/wiki/assurance/private-proofs-of-innocence.md"
+      }
+    },
+    "thin_crowd_threshold_bps": 100,
+    "venues": [
+      {
+        "assets": {
+          "USDC": {
+            "amount": "16947451.52421",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "16946401.93533"
+          },
+          "USDT": {
+            "amount": "28418363.98409",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "28414894.62371"
+          },
+          "USDT0": {
+            "amount": null,
+            "observed_at": 1791133583,
+            "reason": "asset_balance_not_separately_reported",
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "unknown",
+            "usd": null
+          },
+          "WETH": {
+            "amount": "19826.9505",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "53555280.67635"
+          }
+        },
+        "chain": "ethereum",
+        "compliance": "PPOI is optional and separate from core contracts; wallet and broadcaster policies apply. This is not legal clearance.",
+        "contracts": {
+          "pool": "0xfa7093cdd9ee6932b4eb2c9e1cde7ce00b1fa4b9"
+        },
+        "exit_note": "Unshield recipient and amount are public.",
+        "fee_bps": 25,
+        "id": "railgun",
+        "private_leg": "Shielded transfers can hide sender linkage with a community broadcaster; self-broadcast links the sender.",
+        "sources": [
+          "railgun_contracts",
+          "railgun_fees",
+          "railgun_ppoi",
+          "railgun_balances"
+        ],
+        "wait_note": "PPOI-supporting wallets document a 1 hour standby before forward spending; return to the original shielding wallet is immediate and public."
+      },
+      {
+        "assets": {
+          "USDC": {
+            "amount": "816293.57697",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "816235.90585"
+          },
+          "USDT": {
+            "amount": null,
+            "observed_at": 1791133583,
+            "reason": "asset_balance_not_separately_reported",
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "unknown",
+            "usd": null
+          },
+          "USDT0": {
+            "amount": "965011.84591",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "965600.02117"
+          },
+          "WETH": {
+            "amount": "701.88663",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "1894432.22289"
+          }
+        },
+        "chain": "arbitrum",
+        "compliance": "PPOI is optional and separate from core contracts; wallet and broadcaster policies apply. This is not legal clearance.",
+        "contracts": {
+          "pool": "0xfa7093cdd9ee6932b4eb2c9e1cde7ce00b1fa4b9"
+        },
+        "exit_note": "Unshield recipient and amount are public.",
+        "fee_bps": 25,
+        "id": "railgun",
+        "private_leg": "Shielded transfers can hide sender linkage with a community broadcaster; self-broadcast links the sender.",
+        "sources": [
+          "railgun_contracts",
+          "railgun_fees",
+          "railgun_ppoi",
+          "railgun_balances"
+        ],
+        "wait_note": "PPOI-supporting wallets document a 1 hour standby before forward spending; return to the original shielding wallet is immediate and public."
+      },
+      {
+        "assets": {
+          "USDC": {
+            "amount": "352788.89759",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "352767.56079"
+          },
+          "USDT": {
+            "amount": null,
+            "observed_at": 1791133583,
+            "reason": "asset_balance_not_separately_reported",
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "unknown",
+            "usd": null
+          },
+          "USDT0": {
+            "amount": "94395.04776",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "94452.58159"
+          },
+          "WETH": {
+            "amount": "6.37063",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "17195.56053"
+          }
+        },
+        "chain": "polygon",
+        "compliance": "PPOI is optional and separate from core contracts; wallet and broadcaster policies apply. This is not legal clearance.",
+        "contracts": {
+          "pool": "0x19b620929f97b7b990801496c3b361ca5def8c71"
+        },
+        "exit_note": "Unshield recipient and amount are public.",
+        "fee_bps": 25,
+        "id": "railgun",
+        "private_leg": "Shielded transfers can hide sender linkage with a community broadcaster; self-broadcast links the sender.",
+        "sources": [
+          "railgun_contracts",
+          "railgun_fees",
+          "railgun_ppoi",
+          "railgun_balances"
+        ],
+        "wait_note": "PPOI-supporting wallets document a 1 hour standby before forward spending; return to the original shielding wallet is immediate and public."
+      },
+      {
+        "assets": {
+          "USDC": {
+            "amount": "10917.89598",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "10917.51481"
+          },
+          "USDT": {
+            "amount": "225892.83065",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "225865.25328"
+          },
+          "USDT0": {
+            "amount": null,
+            "observed_at": 1791133583,
+            "reason": "asset_balance_not_separately_reported",
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "unknown",
+            "usd": null
+          },
+          "WETH": {
+            "amount": "0.2494",
+            "observed_at": 1791133583,
+            "reason": null,
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "railgun_balances",
+            "status": "observed",
+            "usd": "673.14694"
+          }
+        },
+        "chain": "bsc",
+        "compliance": "PPOI is optional and separate from core contracts; wallet and broadcaster policies apply. This is not legal clearance.",
+        "contracts": {
+          "pool": "0x590162bf4b50f6576a459b75309ee21d92178a10"
+        },
+        "exit_note": "Unshield recipient and amount are public.",
+        "fee_bps": 25,
+        "id": "railgun",
+        "private_leg": "Shielded transfers can hide sender linkage with a community broadcaster; self-broadcast links the sender.",
+        "sources": [
+          "railgun_contracts",
+          "railgun_fees",
+          "railgun_ppoi",
+          "railgun_balances"
+        ],
+        "wait_note": "PPOI-supporting wallets document a 1 hour standby before forward spending; return to the original shielding wallet is immediate and public."
+      },
+      {
+        "assets": {
+          "ETH": {
+            "amount": null,
+            "observed_at": 1791134531,
+            "reason": "asset_balance_not_separately_reported",
+            "scope": "chain_asset_symbol_balance_not_eligible_depositor_count",
+            "source": "privacy_pools_balances",
+            "status": "unknown",
+            "usd": null
+          }
+        },
+        "chain": "ethereum",
+        "compliance": "Private withdrawal requires Association Set Provider approval. The original depositor can ragequit publicly without ASP approval; entrypoint is upgradeable.",
+        "contracts": {
+          "entrypoint_implementation": "0xdd8aa0560a08e39c0b3a84bba356bc025afbd4c1",
+          "entrypoint_proxy": "0x6818809eefce719e480a7526d76bd3e561526b46",
+          "pool": "0xf241d57c6debae225c0f2e6ea1529373c9a9c9fb",
+          "ragequit_verifier": "0xa45aca8604a73d80c551faad6355a5c3a5565ec6",
+          "withdrawal_verifier": "0x022891f938ae7fdc8ab9ead0fbf50aba8c897d6d"
+        },
+        "exit_note": "Withdrawal recipient and amount are public; ragequit links back to the original depositor.",
+        "fee_bps": null,
+        "id": "privacy_pools",
+        "private_leg": "ZK withdrawal hides the deposit link only for an approved association-set member; eligible set size is unknown.",
+        "sources": [
+          "privacy_pools_contracts",
+          "privacy_pools_asp",
+          "privacy_pools_ragequit",
+          "privacy_pools_balances"
+        ],
+        "wait_note": "ASP approval latency is unknown; no guaranteed wait time is documented in the reviewed sources."
+      }
+    ]
+  },
+  "sha256": "dc452c3fc017505e5391cc3d8dbf7e3eae0eac24e9b0e64e982bae5ad1e76719"
+}

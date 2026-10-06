@@ -1,0 +1,19 @@
+# Build output
+client/dist/
+client/coverage.out
+client/.cache/
+verifier/dist/
+*.test
+*.out
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Never commit wallet profiles, ledgers or keys
+*.key
+wallet.key
+install.json
+ledger*.json

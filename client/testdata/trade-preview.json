@@ -1,0 +1,1735 @@
+[
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xbb64005e6c943388461a745db5b6082b436ac798a90b0d3de72a8be909b8d463",
+          "number": 52217925,
+          "timestamp": 1791225197
+        },
+        "effects": {
+          "alchemy_cu": 132,
+          "approval_columns": [
+            "asset",
+            "owner",
+            "spender",
+            "standard",
+            "before",
+            "after",
+            "old_expiry",
+            "expiry",
+            "human_after"
+          ],
+          "approvals": [],
+          "assets": [
+            [
+              "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+              "USDC",
+              6,
+              "pin"
+            ]
+          ],
+          "balance_columns": [
+            "asset",
+            "party",
+            "before",
+            "after",
+            "delta",
+            "human_delta"
+          ],
+          "balances": [
+            [
+              0,
+              0,
+              "1500000000",
+              "2850000000",
+              "1350000000",
+              "1350"
+            ],
+            [
+              0,
+              2,
+              "5774013529757",
+              "5772663529757",
+              "-1350000000",
+              "-1350"
+            ]
+          ],
+          "coverage": "partial",
+          "gas": {
+            "estimate": "45071",
+            "excludes": [
+              "l1_data_fee",
+              "operator_fee"
+            ],
+            "limit": "10000000",
+            "limit_source": "simulation_default",
+            "native": "ETH"
+          },
+          "parties": [
+            "0x24a0b438aae3992cb919019bc54f0b448779cf64",
+            "0x2ce6311ddae708829bc0784c967b7d77d19fd779",
+            "0x307576dd4f73f91bb8c4a2edb762938e8e067d31",
+            "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+          ],
+          "readers": [
+            "base-mainnet.g.alchemy.com",
+            "base.drpc.org"
+          ],
+          "reason": "bounded_observers_not_all_assets_or_allowances",
+          "recipients": [
+            0,
+            1,
+            3
+          ],
+          "sender": 2,
+          "spenders": [],
+          "unknowns": [
+            "native_fee_attribution",
+            "undiscovered_allowance_keys"
+          ]
+        },
+        "evidence_sha256": "2c8eb77ad05e35d66fe0b6a3ca61a377830d00cb675a45168289995931dd4478",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "8453",
+    "product": "trade_check",
+    "provenance": "Recorded Alchemy/dRPC trace and observer replay; no live RPC or judges.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xbb64005e6c943388461a745db5b6082b436ac798a90b0d3de72a8be909b8d463",
+        "number": 52217925
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_partial",
+          "status": "partial"
+        }
+      ],
+      "evidence_sha256": "2c8eb77ad05e35d66fe0b6a3ca61a377830d00cb675a45168289995931dd4478",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xbb64005e6c943388461a745db5b6082b436ac798a90b0d3de72a8be909b8d463",
+          "number": 52217925,
+          "timestamp": 1791225197
+        },
+        "effects": {
+          "alchemy_cu": 132,
+          "approval_columns": [
+            "asset",
+            "owner",
+            "spender",
+            "standard",
+            "before",
+            "after",
+            "old_expiry",
+            "expiry",
+            "human_after"
+          ],
+          "approvals": [
+            [
+              0,
+              2,
+              "0x24a0b438aae3992cb919019bc54f0b448779cf64",
+              "erc20",
+              "0",
+              "1000000",
+              null,
+              null,
+              "1"
+            ],
+            [
+              0,
+              2,
+              "0x24a0b438aae3992cb919019bc54f0b448779cf64",
+              "permit2",
+              "0",
+              "1000000",
+              "0",
+              "1800000000",
+              "1"
+            ]
+          ],
+          "assets": [
+            [
+              "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+              "USDC",
+              6,
+              "pin"
+            ]
+          ],
+          "balance_columns": [
+            "asset",
+            "party",
+            "before",
+            "after",
+            "delta",
+            "human_delta"
+          ],
+          "balances": [
+            [
+              0,
+              0,
+              "1500000000",
+              "2850000000",
+              "1350000000",
+              "1350"
+            ],
+            [
+              0,
+              2,
+              "5774013529757",
+              "5772663529757",
+              "-1350000000",
+              "-1350"
+            ]
+          ],
+          "coverage": "partial",
+          "gas": {
+            "estimate": "45071",
+            "excludes": [
+              "l1_data_fee",
+              "operator_fee"
+            ],
+            "execution_fee": "0.00090142",
+            "execution_fee_base_units": "901420000000000",
+            "limit": "10000000",
+            "limit_source": "simulation_default",
+            "native": "ETH"
+          },
+          "parties": [
+            "0x24a0b438aae3992cb919019bc54f0b448779cf64",
+            "0x2ce6311ddae708829bc0784c967b7d77d19fd779",
+            "0x307576dd4f73f91bb8c4a2edb762938e8e067d31",
+            "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+          ],
+          "readers": [
+            "base-mainnet.g.alchemy.com",
+            "base.drpc.org"
+          ],
+          "reason": "bounded_observers_not_all_assets_or_allowances",
+          "recipients": [
+            0,
+            1,
+            3
+          ],
+          "sender": 2,
+          "spenders": [
+            0
+          ],
+          "unknowns": [
+            "native_fee_attribution",
+            "undiscovered_allowance_keys"
+          ]
+        },
+        "evidence_sha256": "4fd0fd160686dd7065b73b9e8526ee05f33b4b67681e609586b2a71484b15fd3",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "8453-fees-approvals",
+    "product": "trade_check",
+    "provenance": "Recorded balance replay with synthetic fee and ERC-20/Permit2 approval controls.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xbb64005e6c943388461a745db5b6082b436ac798a90b0d3de72a8be909b8d463",
+        "number": 52217925
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_partial",
+          "status": "partial"
+        }
+      ],
+      "evidence_sha256": "4fd0fd160686dd7065b73b9e8526ee05f33b4b67681e609586b2a71484b15fd3",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 5042,
+          "hash": "0x42c456c6212c43775feeec048da51d0f52b9521535d09e7f4dcedb4347718f23",
+          "number": 24432861,
+          "timestamp": 1791225136
+        },
+        "effects": {
+          "alchemy_cu": 132,
+          "approval_columns": [
+            "asset",
+            "owner",
+            "spender",
+            "standard",
+            "before",
+            "after",
+            "old_expiry",
+            "expiry",
+            "human_after"
+          ],
+          "approvals": [],
+          "assets": [
+            [
+              "native",
+              "USDC",
+              18,
+              "chain_native"
+            ]
+          ],
+          "balance_columns": [
+            "asset",
+            "party",
+            "before",
+            "after",
+            "delta",
+            "human_delta"
+          ],
+          "balances": [
+            [
+              0,
+              3,
+              "69609227924000000000000",
+              "71477524820000000000000",
+              "1868296896000000000000",
+              "1868.296896"
+            ],
+            [
+              0,
+              4,
+              "1968293000274831630860",
+              "99996104274831630860",
+              "-1868296896000000000000",
+              "-1868.296896"
+            ]
+          ],
+          "coverage": "partial",
+          "gas": {
+            "estimate": "48962",
+            "limit": "10000000",
+            "limit_source": "simulation_default",
+            "native": "USDC"
+          },
+          "native_token_alias": "0x3600000000000000000000000000000000000000",
+          "parties": [
+            "0x1800000000000000000000000000000000000000",
+            "0x3600000000000000000000000000000000000000",
+            "0xc6ad664ac6679f4ce74e10e91449c93ec1ae3ca6",
+            "0xd55273357eb916e62e7b23114312989dfee4a3db",
+            "0xdedb0e722e69d7794cbae19bac32da650849490a"
+          ],
+          "readers": [
+            "arc-mainnet.g.alchemy.com",
+            "rpc.drpc.mainnet.arc.io"
+          ],
+          "reason": "bounded_observers_not_all_assets_or_allowances",
+          "recipients": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "sender": 4,
+          "spenders": [],
+          "unknowns": [
+            "native_fee_attribution",
+            "undiscovered_allowance_keys"
+          ]
+        },
+        "evidence_sha256": "44652d6985890f530b3799b0543d0e3b7c6a2e5a3ae68280a856d7cc854ba507",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "5042",
+    "product": "trade_check",
+    "provenance": "Recorded Alchemy/dRPC trace and observer replay; no live RPC or judges.",
+    "verification": {
+      "block": {
+        "chain_id": 5042,
+        "hash": "0x42c456c6212c43775feeec048da51d0f52b9521535d09e7f4dcedb4347718f23",
+        "number": 24432861
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_partial",
+          "status": "partial"
+        }
+      ],
+      "evidence_sha256": "44652d6985890f530b3799b0543d0e3b7c6a2e5a3ae68280a856d7cc854ba507",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 5042,
+          "hash": "0x42c456c6212c43775feeec048da51d0f52b9521535d09e7f4dcedb4347718f23",
+          "number": 24432861,
+          "timestamp": 1791225136
+        },
+        "effects": {
+          "alchemy_cu": 132,
+          "approval_columns": [
+            "asset",
+            "owner",
+            "spender",
+            "standard",
+            "before",
+            "after",
+            "old_expiry",
+            "expiry",
+            "human_after"
+          ],
+          "approvals": [
+            [
+              1,
+              4,
+              "0x1800000000000000000000000000000000000000",
+              "erc20",
+              "0",
+              "1000000",
+              null,
+              null,
+              "1"
+            ],
+            [
+              1,
+              4,
+              "0x1800000000000000000000000000000000000000",
+              "permit2",
+              "0",
+              "1000000",
+              "0",
+              "1800000000",
+              "1"
+            ]
+          ],
+          "assets": [
+            [
+              "native",
+              "USDC",
+              18,
+              "chain_native"
+            ],
+            [
+              "0x3600000000000000000000000000000000000000",
+              "USDC",
+              6,
+              "pin"
+            ]
+          ],
+          "balance_columns": [
+            "asset",
+            "party",
+            "before",
+            "after",
+            "delta",
+            "human_delta"
+          ],
+          "balances": [
+            [
+              0,
+              3,
+              "69609227924000000000000",
+              "71477524820000000000000",
+              "1868296896000000000000",
+              "1868.296896"
+            ],
+            [
+              0,
+              4,
+              "1968293000274831630860",
+              "99996104274831630860",
+              "-1868296896000000000000",
+              "-1868.296896"
+            ]
+          ],
+          "coverage": "partial",
+          "gas": {
+            "estimate": "48962",
+            "execution_fee": "0.00097924",
+            "execution_fee_base_units": "979240000000000",
+            "limit": "10000000",
+            "limit_source": "simulation_default",
+            "native": "USDC"
+          },
+          "native_token_alias": "0x3600000000000000000000000000000000000000",
+          "parties": [
+            "0x1800000000000000000000000000000000000000",
+            "0x3600000000000000000000000000000000000000",
+            "0xc6ad664ac6679f4ce74e10e91449c93ec1ae3ca6",
+            "0xd55273357eb916e62e7b23114312989dfee4a3db",
+            "0xdedb0e722e69d7794cbae19bac32da650849490a"
+          ],
+          "readers": [
+            "arc-mainnet.g.alchemy.com",
+            "rpc.drpc.mainnet.arc.io"
+          ],
+          "reason": "bounded_observers_not_all_assets_or_allowances",
+          "recipients": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "sender": 4,
+          "spenders": [
+            0
+          ],
+          "unknowns": [
+            "native_fee_attribution",
+            "undiscovered_allowance_keys"
+          ]
+        },
+        "evidence_sha256": "a8ae372d32bed2a2756f9d6decedd82233a8baa1d975da0f1ad7864d8a482fbd",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "5042-fees-approvals",
+    "product": "trade_check",
+    "provenance": "Recorded balance replay with synthetic fee and ERC-20/Permit2 approval controls.",
+    "verification": {
+      "block": {
+        "chain_id": 5042,
+        "hash": "0x42c456c6212c43775feeec048da51d0f52b9521535d09e7f4dcedb4347718f23",
+        "number": 24432861
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_partial",
+          "status": "partial"
+        }
+      ],
+      "evidence_sha256": "a8ae372d32bed2a2756f9d6decedd82233a8baa1d975da0f1ad7864d8a482fbd",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "unsigned_typed_data_has_no_execution_envelope"
+        },
+        "evidence_sha256": "289e7024c89d5653bfe5c44097aca7419f18640e8389c8cdeccc5260c0c51340",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "unsigned_typed_data_has_no_execution_envelope",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "289e7024c89d5653bfe5c44097aca7419f18640e8389c8cdeccc5260c0c51340",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 4663,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "nitro_transfer_accounting_unverified"
+        },
+        "evidence_sha256": "cc489dffd07ea487c414577fddc8635fdccbe7762479a1260531285ddf8165b5",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "nitro_transfer_accounting_unverified",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 4663,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "cc489dffd07ea487c414577fddc8635fdccbe7762479a1260531285ddf8165b5",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "chain_trace_accounting_unverified"
+        },
+        "evidence_sha256": "9af3f9f819a95f8132af1ed0e81cfbff8b4867ec7c25332f89547650b3c83cda",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "chain_trace_accounting_unverified",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "9af3f9f819a95f8132af1ed0e81cfbff8b4867ec7c25332f89547650b3c83cda",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "trace_reader_not_bound"
+        },
+        "evidence_sha256": "5370695d231db8019b9fa70a4226ba2190d009ccfa8f6937b9cdcec9e5153bc1",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "trace_reader_not_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "5370695d231db8019b9fa70a4226ba2190d009ccfa8f6937b9cdcec9e5153bc1",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "trace_cu_tariff_unverified"
+        },
+        "evidence_sha256": "43c9bfab83f99daa4b6b192cd4bc57f1e3668ff294da8635e8a4deb99dfd51f2",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "trace_cu_tariff_unverified",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "43c9bfab83f99daa4b6b192cd4bc57f1e3668ff294da8635e8a4deb99dfd51f2",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "two_reader_trace_support_unverified"
+        },
+        "evidence_sha256": "1ad9619a3979c2db2c2dd9e144d2e65ebcc28115252ea806a7a208e6ce0beb46",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "two_reader_trace_support_unverified",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "1ad9619a3979c2db2c2dd9e144d2e65ebcc28115252ea806a7a208e6ce0beb46",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "effects_read_cap"
+        },
+        "evidence_sha256": "eccca7b2ed3c96d3001a204907b98477d7b6551f9fe512438dc1e85fbf4c0641",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "effects_read_cap",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "eccca7b2ed3c96d3001a204907b98477d7b6551f9fe512438dc1e85fbf4c0641",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "two_reader_trace_disagreement"
+        },
+        "evidence_sha256": "7a1d7f5091b3867fa3198c0fbe6820dd98f52cb6ca34cff444b5d95feff35c68",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "two_reader_trace_disagreement",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "7a1d7f5091b3867fa3198c0fbe6820dd98f52cb6ca34cff444b5d95feff35c68",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "two_reader_trace_unavailable"
+        },
+        "evidence_sha256": "ed8011ede2a902ce17a62512a79161a5fcfb84eec64dc56d484c9fab16b05a74",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "two_reader_trace_unavailable",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "ed8011ede2a902ce17a62512a79161a5fcfb84eec64dc56d484c9fab16b05a74",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "execution_reverted"
+        },
+        "evidence_sha256": "9155fef29e4ebf32f5d22ba9bae39cd2d176cf7d706099bdec0733102476d816",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "execution_reverted",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "9155fef29e4ebf32f5d22ba9bae39cd2d176cf7d706099bdec0733102476d816",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "observer_state_collision"
+        },
+        "evidence_sha256": "ae1a0a1c0a0957119bc1fb8d0e047fd81c5647baa335a4492e4f1ffcd6be70e5",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "observer_state_collision",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "ae1a0a1c0a0957119bc1fb8d0e047fd81c5647baa335a4492e4f1ffcd6be70e5",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "effects_observer_bound"
+        },
+        "evidence_sha256": "230b15290968535a718eef32045371c78d6a7951da293f3277665cc94cf72b15",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "effects_observer_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "230b15290968535a718eef32045371c78d6a7951da293f3277665cc94cf72b15",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "two_reader_poststate_disagreement"
+        },
+        "evidence_sha256": "3063ed453745e2f2fa42a1d587188a6a1d39556a75e4fc3ef7bca4be76930762",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "two_reader_poststate_disagreement",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "3063ed453745e2f2fa42a1d587188a6a1d39556a75e4fc3ef7bca4be76930762",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "two_reader_poststate_unavailable"
+        },
+        "evidence_sha256": "7ec5961ad60dceb84a7160bfd7ee7b754c2fbf235344c220dfed95c78039cc4b",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "two_reader_poststate_unavailable",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "7ec5961ad60dceb84a7160bfd7ee7b754c2fbf235344c220dfed95c78039cc4b",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "arc_native_alias_observer_unavailable"
+        },
+        "evidence_sha256": "94397a8870f055211ebc3daf2090cb341d7e71a104196606cdd57d2571df753f",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "arc_native_alias_observer_unavailable",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "94397a8870f055211ebc3daf2090cb341d7e71a104196606cdd57d2571df753f",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "arc_native_alias_mismatch"
+        },
+        "evidence_sha256": "a3816e622e5a04c0a14d964cc37d6bbb3d680245cb6a2c293d330defb75c3ee4",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "arc_native_alias_mismatch",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "a3816e622e5a04c0a14d964cc37d6bbb3d680245cb6a2c293d330defb75c3ee4",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "arc_native_alias_unverified"
+        },
+        "evidence_sha256": "3ced6c571e691db388c841dbc8c743b8791b275296d4f561da6428a30134a54b",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "arc_native_alias_unverified",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "3ced6c571e691db388c841dbc8c743b8791b275296d4f561da6428a30134a54b",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "effects_row_bound"
+        },
+        "evidence_sha256": "65fae47b344c18c49459eb37dbf0633851bde8c7996ae86210fda64bce0b78bb",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "effects_row_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "65fae47b344c18c49459eb37dbf0633851bde8c7996ae86210fda64bce0b78bb",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "trace_account_bound"
+        },
+        "evidence_sha256": "72858dccb7d415a020e59be812fb2c1bb90028785c4f1af9d10ad0fb391c3bed",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "trace_account_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "72858dccb7d415a020e59be812fb2c1bb90028785c4f1af9d10ad0fb391c3bed",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "trace_storage_bound"
+        },
+        "evidence_sha256": "b8316b845c14d31d1ce27a32b67dadf77af59908f94eaafccf6eafe723f63929",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "trace_storage_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "b8316b845c14d31d1ce27a32b67dadf77af59908f94eaafccf6eafe723f63929",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "trace_frame_bound"
+        },
+        "evidence_sha256": "4cf7d2ea3f564b565779eaa382a25122d2285fa9e7ac085f6890459ad9cc476c",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "trace_frame_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "4cf7d2ea3f564b565779eaa382a25122d2285fa9e7ac085f6890459ad9cc476c",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "trace_log_bound"
+        },
+        "evidence_sha256": "d6ff9573b194237346433f75318b6fe1097c1bd99f098471b148f060b81dc54d",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "trace_log_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "d6ff9573b194237346433f75318b6fe1097c1bd99f098471b148f060b81dc54d",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "observer_discovery_bound"
+        },
+        "evidence_sha256": "77218b79b48423c8d5b5d965edd537d6c83a76bb07f2768aa54dedc1bb8572ca",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "observer_discovery_bound",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "77218b79b48423c8d5b5d965edd537d6c83a76bb07f2768aa54dedc1bb8572ca",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "effects_sheet_budget"
+        },
+        "evidence_sha256": "4fd928ad3ede1e37ea3d802dc83dc54fe0e9cdc4c324a52ff99ef6eb121fc665",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "effects_sheet_budget",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "4fd928ad3ede1e37ea3d802dc83dc54fe0e9cdc4c324a52ff99ef6eb121fc665",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  {
+    "answer": {
+      "data_as_of": {},
+      "data_freshness": "not_verified",
+      "label_id": "do_not_proceed",
+      "option": 1,
+      "trade_preview": {
+        "block": {
+          "chain_id": 8453,
+          "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "number": 1,
+          "timestamp": 1700000000
+        },
+        "effects": {
+          "coverage": "not_checked",
+          "reason": "effects_not_reported"
+        },
+        "evidence_sha256": "215e002cc83f6fba8b6e42919d102ae76785dd6f87b58c6abde4f8faac929afd",
+        "schema": "seconded-trade-preview/v1"
+      }
+    },
+    "name": "effects_not_reported",
+    "product": "trade_check",
+    "provenance": "Synthetic exact unavailable-reason control.",
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "number": 1
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        }
+      ],
+      "evidence_sha256": "215e002cc83f6fba8b6e42919d102ae76785dd6f87b58c6abde4f8faac929afd",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  }
+]

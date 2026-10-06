@@ -1,0 +1,48 @@
+{
+  "if": {
+    "properties": {
+      "data_freshness": {
+        "const": "current"
+      }
+    }
+  },
+  "properties": {
+    "data_as_of": {
+      "additionalProperties": {
+        "format": "date-time",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,9})?(Z|[+-][0-9]{2}:[0-9]{2})$",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "maxProperties": 128,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]{0,79}$"
+      },
+      "type": "object"
+    },
+    "data_freshness": {
+      "enum": [
+        "current",
+        "not_verified"
+      ]
+    }
+  },
+  "required": [
+    "data_as_of",
+    "data_freshness"
+  ],
+  "then": {
+    "properties": {
+      "data_as_of": {
+        "additionalProperties": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "minProperties": 1
+      }
+    }
+  },
+  "type": "object"
+}
