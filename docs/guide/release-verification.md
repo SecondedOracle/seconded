@@ -5,8 +5,10 @@ Client 0.4.1 was published on 2026-10-06 as the npm package
 [`SecondedOracle/seconded-mcp-releases` tag `v0.4.1`](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
 The release contains five native binaries, an MCPB bundle, build information,
 `SHA-256SUMS` and its OpenSSH signature. Verify the signed manifest and the selected
-artifact before running it. This repository's client source is a separate development
-snapshot; see the source-provenance note in the [README](../../README.md).
+artifact before running it. Release binaries are built from private release source
+and verified by the signed manifest. This public tree uses renamed module paths,
+which change build digests, and retains earlier development-snapshot differences;
+see the source-provenance note in the [README](../../README.md).
 
 ## What a release contains
 

@@ -12,7 +12,8 @@
 ![go](https://img.shields.io/badge/go-1.26.7-00ADD8)
 ![receipts](https://img.shields.io/badge/receipts-Ed25519%20%C2%B7%20RFC%208785-success)
 ![chains](https://img.shields.io/badge/pays%20on-Base%20%C2%B7%20Arc%20%C2%B7%20Robinhood%20Chain-informational)
-![license](https://img.shields.io/badge/license-not%20yet%20chosen-lightgrey)
+[![license](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![ci](https://github.com/SecondedOracle/seconded/actions/workflows/ci.yml/badge.svg)](https://github.com/SecondedOracle/seconded/actions/workflows/ci.yml)
 
 </div>
 
@@ -34,13 +35,17 @@ This repository is the public, buildable surface: the Go MCP client, a standalon
 verifier, the shipped tool and price catalogs, and the documentation. The service that
 runs the checks is not here; see [What this repository does not contain](#what-this-repository-does-not-contain).
 
-This checkout reports client version 0.4.1. Its baseline client files match development
-snapshot `ff16198c799c7d2b6b3dafb32e847168249b033d` except for the sanitized vendor-patch
-note. The corrections in this checkout add further changes. It is not the source
-snapshot used for the published 0.4.1 binaries, whose
-[build information](https://github.com/SecondedOracle/seconded-mcp-releases/releases/download/v0.4.1/build-info.json)
-names `b8cfd7d1375d4f3a65087410a4a600e081e715bc`. Tests reported here apply to this
-checkout; no byte-for-byte reproduction of the published binaries is claimed.
+This checkout reports client version 0.4.1. Its baseline was development snapshot
+`ff16198c799c7d2b6b3dafb32e847168249b033d`, with a sanitized vendor-patch note and
+subsequent public corrections. The public modules now use
+`github.com/SecondedOracle/seconded/client` and `github.com/SecondedOracle/seconded/verifier`.
+Renaming the module paths changes build digests; this tree is not byte-identical to
+release source. Published binaries are built from the private release source named in
+[build information](https://github.com/SecondedOracle/seconded-mcp-releases/releases/download/v0.4.1/build-info.json),
+`b8cfd7d1375d4f3a65087410a4a600e081e715bc`, and are verified against the signed release
+manifest. The module rename is the only executable-source change in this update;
+the earlier snapshot differences remain. Tests here apply to this checkout, with no
+claim that its binaries match published release digests.
 
 ## Check it yourself
 
@@ -110,6 +115,16 @@ measured facts, source-backed behavior and maintainer statements. In order of ef
 [`docs/CLAIMS.md`](docs/CLAIMS.md) records the principal claims, their evidence and measurement limits.
 
 ## Quickstart
+
+After this repository is published, install either command from the public modules:
+
+```sh
+go install github.com/SecondedOracle/seconded/client/cmd/seconded-mcp@latest
+go install github.com/SecondedOracle/seconded/verifier/cmd/seconded-verify@latest
+```
+
+The repository and its CI badge are prepared for publication; remote installation
+and CI results are not available until it is published. For this local checkout:
 
 Two commands. The first proves the receipt path; the second builds the client and prints
 the line that connects it to Claude Code (`claude-desktop`, `cursor`, `codex`, `gemini`
@@ -229,8 +244,10 @@ Client 0.4.1 was published on 2026-10-06 as the npm package
 [`SecondedOracle/seconded-mcp-releases` tag `v0.4.1`](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
 The release contains five native binaries, an MCPB bundle, build information,
 `SHA-256SUMS` and its OpenSSH signature. Verify the signed manifest and the selected
-artifact before running it. This repository's client source is a separate development
-snapshot; see the source-provenance note in the [README](README.md).
+artifact before running it. Release binaries are built from private release source
+and verified by the signed manifest. This public tree uses renamed module paths,
+which change build digests, and retains earlier development-snapshot differences;
+see the source-provenance note in the [README](README.md).
 See [release verification](docs/guide/release-verification.md) for the procedure.
 
 ## Status
@@ -244,7 +261,7 @@ See [release verification](docs/guide/release-verification.md) for the procedure
 | Six products | In testing, not purchasable | `client/products.json`, `unavailable_products` |
 | Seven privacy tools | In testing, free, local | `client/privacy-tools.json` |
 | Distribution | npm/GitHub 0.4.1; Registry 0.3.3 and older 0.3.0; expected public Homebrew tap not found in review; Smithery unverified | [release-verification](docs/guide/release-verification.md) |
-| Licence | Not chosen | see below |
+| Licence | Apache-2.0 | [LICENSE](LICENSE), [NOTICE](NOTICE), [third-party licences](THIRD_PARTY.md) |
 
 ## What this repository does not contain
 
@@ -292,7 +309,8 @@ Access to the private judge submission is a maintainer statement.
 - [CONTRIBUTING.md](CONTRIBUTING.md): what we take and how to build.
 - [SECURITY.md](SECURITY.md): report to <support@secondedoracle.xyz> with `SECURITY` in the
   subject.
-- No project LICENSE has been added to this repository. The npm package is marked
-  UNLICENSED. A project licence remains a maintainer decision; vendored dependencies
-  retain their own licences.
+- Code in this repository is licensed under [Apache-2.0](LICENSE); see [NOTICE](NOTICE).
+  Vendored dependencies retain their own licences, listed in [THIRD_PARTY.md](THIRD_PARTY.md).
+  This decision does not update previously published npm package metadata.
+- SECONDED and the glass-S mark are trademarks of the maintainers; the licence covers the code, not the name or logo.
 - [CHANGELOG.md](CHANGELOG.md) records what each client version changed.

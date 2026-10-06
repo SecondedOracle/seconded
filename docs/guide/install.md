@@ -18,6 +18,19 @@ or [npm package](https://www.npmjs.com/package/@seconded/mcp). These are differe
 snapshots despite reporting the same version; choose the provenance you intend to review.
 See [Release verification](release-verification.md).
 
+Once the public repository is published, the Go install paths will be:
+
+```sh
+go install github.com/SecondedOracle/seconded/client/cmd/seconded-mcp@latest
+go install github.com/SecondedOracle/seconded/verifier/cmd/seconded-verify@latest
+```
+
+These install commands require network access and place executables in `GOBIN`
+(or `$(go env GOPATH)/bin` by default). They build the public modules; renamed
+module paths change build digests. Published release binaries instead come from
+private release source and are verified against its signed manifest. The source
+build and setup examples here use the local `./seconded-mcp` executable.
+
 ## 2. Create the wallet and connect a host
 
 ```sh

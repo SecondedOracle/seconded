@@ -25,7 +25,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"seconded.local/verifier/internal/jsoncanonicalizer"
+	"github.com/SecondedOracle/seconded/verifier/internal/jsoncanonicalizer"
 )
 
 // MaxReceiptBytes bounds standalone verifier input to 1 MiB; the client's HTTP

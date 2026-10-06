@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	client "seconded.local/client"
+	client "github.com/SecondedOracle/seconded/client"
 )
 
 const exportWarning = "store this safely; anyone with it can spend this wallet"

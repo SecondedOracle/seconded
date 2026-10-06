@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/zalando/go-keyring"
-	client "seconded.local/client"
+	client "github.com/SecondedOracle/seconded/client"
 )
 
 func TestCLILimitsDollarView(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	client "seconded.local/client"
+	client "github.com/SecondedOracle/seconded/client"
 )
 
 func TestCLILimitsPatchContract(t *testing.T) {

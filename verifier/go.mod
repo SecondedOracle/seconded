@@ -1,4 +1,4 @@
-module seconded.local/verifier
+module github.com/SecondedOracle/seconded/verifier
 
 go 1.26.6
 

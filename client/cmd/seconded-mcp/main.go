@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	client "seconded.local/client"
+	client "github.com/SecondedOracle/seconded/client"
 )
 
 var version = client.ClientVersion

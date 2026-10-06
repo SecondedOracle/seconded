@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/zalando/go-keyring"
-	client "seconded.local/client"
+	client "github.com/SecondedOracle/seconded/client"
 )
 
 func exportFixture(t *testing.T) (*client.Engine, string) {

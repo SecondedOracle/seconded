@@ -1,4 +1,4 @@
-module seconded.local/client
+module github.com/SecondedOracle/seconded/client
 
 go 1.26.6
 

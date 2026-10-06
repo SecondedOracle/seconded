@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	"seconded.local/verifier"
+	"github.com/SecondedOracle/seconded/verifier"
 )
 
 func main() {

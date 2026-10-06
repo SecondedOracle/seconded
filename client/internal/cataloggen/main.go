@@ -4,7 +4,7 @@ package main
 import (
  "encoding/json"
  "os"
- client "seconded.local/client"
+ client "github.com/SecondedOracle/seconded/client"
 )
 
 func main() {
