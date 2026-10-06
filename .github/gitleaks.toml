@@ -1,32 +1,60 @@
-# gitleaks configuration for this repository.
-#
-# Run:  gitleaks dir . --no-banner --config .github/gitleaks.toml
-#
-# The default ruleset flags every long hex string as a "generic-api-key". This tree
-# legitimately contains public hex: EVM contract and wallet addresses, 32-byte block,
-# transaction and ticket hashes, and the Ed25519 receipt public key. None of these is a
-# credential. The allowlists below are deliberately narrow: 0x-prefixed EVM values, and
-# two exact bare 64-hex values (the compiled receipt public key and a Morpho market id in
-# a test fixture). A bare 64-hex value anywhere else, which is the shape of a raw private
-# key or seed, and every other default rule, is still reported. A planted raw key, AWS
-# key, GitHub token and private-key block were all reported with this config in place
-# when it was written (2026-10-06).
+# gitleaks configuration for the publication tree.
+# Run: gitleaks dir . --no-banner --config .github/gitleaks.toml
+# Exact reviewed identifiers only; arbitrary 0x-prefixed 32-byte values remain
+# detectable private-key candidates. No vendor or fixture directory is excluded.
+# Entries cover the receipt public key, Morpho market id, three token contracts,
+# and 39 opaque challenge tickets in client/testdata/contract040.json.
+# Re-run prefixed and unprefixed synthetic-key controls whenever changing this list.
 
 [extend]
 useDefault = true
 
 [[allowlists]]
-description = "0x-prefixed EVM addresses (20 bytes) and hashes (32 bytes) are public identifiers"
+description = "Exact reviewed public identifiers from key pins, catalogs and challenge fixtures"
 regexTarget = "secret"
 regexes = [
-  '''^0x[0-9a-fA-F]{40}$''',
-  '''^0x[0-9a-fA-F]{64}$''',
-]
-
-[[allowlists]]
-description = "Exact public values: the Ed25519 receipt key pin rk-2026-09-a (docs/guide/receipts.md) and a Morpho market id in client/testdata/lending-candidate-contract.json"
-regexTarget = "secret"
-regexes = [
+  '''^0x046f07a12c21880281e812d443906d5953d7973076f14a277d683f5b9b5fd675$''',
+  '''^0x155f8dc1fbab6f0f7a0a4ef123d55342f945e2a889f5087cd62dd86a7676d65f$''',
+  '''^0x1dcd4be155fe78e683219e3fcfa8e88c808f34d0479b5a193dfdfa57589ada3c$''',
+  '''^0x1fe1c7c26f70eff6bb0d255c30c525dc6179fa6d46a96c749dd75606b388a8cc$''',
+  '''^0x2f03fc2b5ddfaf8fecb53f14d787dbc7769987e7957d01ed92ae77b5583ff364$''',
+  '''^0x3df93729ae7f762f5560d9435cd63aa7ce9cbb51c547c5a831f5941ad37d6b8e$''',
+  '''^0x3e95f7818b63f10cc656a57a611dc39583fab7c531c4a5045ac442b5bbee89e1$''',
+  '''^0x40328e93903153ec96d0b32fb1f58ffbc19d10f69f9f72fe871ba74e22fe9cd9$''',
+  '''^0x40d98a005826c30d8baeee9a25306180ce9667c5c77d29aaada1fddfdec012a0$''',
+  '''^0x4ca82d5ec60f2e01844134b5d69432ee165ea28df72604e358675952b2c805f1$''',
+  '''^0x5056363de6eb57e22623f3edd34ce7f73f89c26e76bcbbe7d31bc7a81340f026$''',
+  '''^0x5eade6fd67d6872e771fde6805995d6b465c7ded78f63a444856eeb2330d9284$''',
+  '''^0x60a3e35cc302bfa44cb288bc5a4f316fdb1adb42$''',
+  '''^0x7c6eab3bfd7335cfdd0c594c99583de68043bd570529f7290c710026e86e4989$''',
+  '''^0x811cb106d28b8df45b7a3c2d451ecf55745a69c3d17d194a6db15373347e957d$''',
+  '''^0x833589fcd6edb6e08f4c7c32d4f71b54bda02913$''',
+  '''^0x83bd26dc4567601159c2f8e16606aada5426ab1a9c05c9891dc23b968f9837b8$''',
+  '''^0x92e2121ec359c7ce13b56466371b002c87f44e27f89707ad780ee0dbd43391ff$''',
+  '''^0x9f826acce41f8bfea5f70f7196cd31374e89f0e8533d6073356fe15b4e73cab3$''',
+  '''^0xb1fb2a7ad9b900e4d8af6070d5e96ea5eb7875d094093dd8f7c9b00e446103c8$''',
+  '''^0xb2bfb7b028563f9c95eb532b621cd4f38c7fccddd25c16c469bf2f2811d04f0e$''',
+  '''^0xb9ae7b87d1352bfa9601a3b54ae060db4eb39e695058faa2d4a11a6c8a658e05$''',
+  '''^0xba367b87b313128e51bdfd21bd5551b14b90c21bfc6e615dc4e645f42dc1c16a$''',
+  '''^0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1$''',
+  '''^0xc060a1c27124fe42f483189aeb1c8f4dc2d16577014efefd4137d8b5355dad68$''',
+  '''^0xc91f02b0ec5a5e947a6fac3d500a09f81995f4b6d1a1fda7072d6d9ebfc8b740$''',
+  '''^0xca7a4832be5fe531db4d0f0690a6b4175cea3724e33fa525f13bcc0dd602e0c3$''',
+  '''^0xcb1a8f0ec9629cc5c44b35b3cf099b793e588a90c12812d2b586d82349b5433b$''',
+  '''^0xd042b0b229ee48a0c51816132391194eec720a1c77b1acd6ec6d346575b23449$''',
+  '''^0xd16dd6ceef0017c953eea4153d48afbfbca6631c5d13104eed6065baa23c54e0$''',
+  '''^0xd6befa53f7a80e4fe62e71ebeb01a99d9cdf85083bb877df40b647dac876f8b0$''',
+  '''^0xd79a69c740cb87ecfc679b8ea8e4f194ee0e6e943b82b80564d8f250aa5bc18b$''',
+  '''^0xe40bd36257e68740945b1ad41d95e9c90ca296fe6272977e29b5ee42f2d5c03f$''',
+  '''^0xe7ef6a91ef80fc532735708405476c0b835d30ee9bd36c0aed515d9a60f81c65$''',
+  '''^0xeaea5d2998e968d33e24f24d00aa46e5f52cd52f7440bb83e5bc51139a7ec31b$''',
+  '''^0xeeee35abc5ca6a70fd6350c1950c5550a56046cf139cf264fa45cf290baa33bf$''',
+  '''^0xefe28f7f784256c17a2be4916fa7e739d8e852c4aad805858fe598dcb435c4fa$''',
+  '''^0xf07773e097d9f684ece180bd8fad620b27b7758579f6a758231ab18b33e7ae34$''',
+  '''^0xf2520420d0bb1dd57b6633565c24e616deb86e545421cf2a912f787bf2389405$''',
+  '''^0xf3d63572a4f0dc3751f27aa87a2a0644caa4668ab88baf3f61b3587779f0a7d7$''',
+  '''^0xf5a0b5ebbf8313eca93f056e9625fc07e51b5c0918f7aea00ed5338d60321923$''',
+  '''^0xfacc46f859970460ebf8f832d1d0ee78c40d758ded371ec392da92467be7ad63$''',
   '''^438d9301c477c27fecc3f56da0a7d5a6b3894cef69815bae63b5349dc2cddf0b$''',
   '''^d7286d06faa48df27315f5ae576581b8fef08626574342f6c478433f0ec9ef30$''',
 ]
