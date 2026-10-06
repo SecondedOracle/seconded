@@ -23,8 +23,9 @@ findings.
   available. The automatic fallback stores a private key file **unencrypted**, protected
   by file permissions only, and says so before you fund it.
 - The private key never appears in an MCP result, an environment variable, a log, or an
-  HTTP request. `seconded-mcp export-key` is the only way out, and it requires typing on
-  the controlling terminal.
+  HTTP request. `export-key` is the supported client interface for displaying a wallet private key,
+  and it requires owner approval at the controlling terminal. This does not protect
+  against software running with the same user's access to the file or credential store.
 - **This is a hot wallet.** Software running as the same OS user can read the key file or
   use the credential store on its behalf, and can alter or roll back local files. An EOA
   does not enforce these budgets on chain.
@@ -71,10 +72,19 @@ findings.
 - Anything after the agent acts. SECONDED checks an input; it does not execute, bridge,
   sign, or watch what happens next.
 - Server-side retention of inputs and answers, and RPC-provider retention of public
-  metadata. The client does not persist raw inputs; the service's policy is at
-  https://secondedoracle.xyz/privacy.
+  metadata. The service and RPC providers have separate retention policies; see
+  [the service privacy policy](https://secondedoracle.xyz/privacy).
+
+## Local input retention
+
+The client stores the exact request body, canonical input and a usable payment
+credential in its owner-private, unencrypted recovery ledger while replay or collection
+is needed. Eligible resolved records are minimized on a successful ledger save: raw
+request fields and the credential are replaced by hashes, while receipt and ledger
+metadata remain. Pending records, backups and filesystem history may retain sensitive
+data. Source: `client/standard.go`, `client/engine.go`, `client/ledger.go`.
 
 ## Reporting
 
-See [SECURITY.md](../../SECURITY.md). Email support@secondedoracle.xyz with `SECURITY`
+See [SECURITY.md](../../SECURITY.md). Email <support@secondedoracle.xyz> with `SECURITY`
 in the subject.

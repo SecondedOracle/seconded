@@ -9,25 +9,30 @@ schemas from the compiled catalog without creating a profile.
 
 | Tool | What it does |
 | --- | --- |
-| `seconded_get_limits` | Use when the owner asks about limits or affordability needs missing budget information. Shows current limits and safety switches; null means no user limit. Not  |
-| `seconded_set_limits` | Change spending limits at the user's request, without a password. For 'set my daily limit to $20', pass {"daily_usd":20}. Chat can only tighten limits or freeze |
-| `seconded_products` | Use when tool descriptions do not identify the needed check or input shape. With complete input for a matching check, call it directly. Lists prices, examples a |
-| `seconded_quote` | Use when a price preview is requested or needed to decide affordability. Quotes price only; does not assess the action. A fully specified bounded check can be c |
-| `seconded_receipt` | Recover a check or recent checks by fetching status only. With no check_id, lists the 20 newest checks and any older check still awaiting its receipt, newest fi |
-| `seconded_wallet` | Show the dedicated check wallet address, balances per network and how to fund it, or freeze new authorizations. Wallet switching is terminal-only: seconded-mcp  |
+| `seconded_get_limits` | Show current spending limits and safety switches; null means no owner limit for that window. |
+| `seconded_set_limits` | Tighten limits, enable safety switches or freeze payments in chat. Loosening requires the owner-terminal path. |
+| `seconded_products` | List the compiled product catalog, prices, coverage and input examples. |
+| `seconded_quote` | Preview a check's price without purchasing it. |
+| `seconded_receipt` | Collect a known check, or list the twenty newest and older unresolved checks, without creating a new payment authorization. |
+| `seconded_wallet` | Show the dedicated wallet's address, balances and funding guidance, or freeze new authorizations. Switching wallets is terminal-only. |
 
 ## Paid checks
 
-Every check tool takes the same four arguments:
+Paid checks share the four arguments below. `seconded_x402_payment_check` also
+accepts the top-level `signing` object defined in its input schema.
 
 | Argument | Required | Meaning |
 | --- | --- | --- |
 | `input` | yes | The product-specific structured input; its schema is in the catalog entry. |
 | `max_price_usd` | no ¹ | Refuse the check if it would cost more. Cannot raise the owner's per-check limit. |
 | `network` | no | The chain you pay on: `base` (default), `arc`, `robinhood`, `base_sepolia`, `arc_testnet`, `robinhood_testnet`. |
-| `wait_seconds` | no | 0 to 25. Longer checks return a `check_id` to collect with `seconded_receipt`. |
+| `wait_seconds` | no | 0 through 25 in the schema; the MCP client clamps its requested wait to eight seconds. A separate 45-second default soft deadline bounds the tool call; admitted checks can continue afterwards. |
 
 ¹ Required when the owner has switched the value gate on.
+
+For x402 checks, supply the actual pending signing context through `signing` when
+available; missing authorization context limits the conclusions. Preserve offer
+fields exactly.
 
 | Tool | Use when |
 | --- | --- |
@@ -40,7 +45,7 @@ Every check tool takes the same four arguments:
 | `seconded_scam_check` | Before acting on an incoming message. |
 | `seconded_lending_check` | Reviewing one Morpho account and market at a block. |
 | `seconded_job_escrow_check` | Before funding or taking an agent job. |
-| `seconded_x402_payment_check` | Before authorizing an x402 offer. Send: one input object; never input.input. Copy offer fields exactly; do not rename amount. Supply actual pending ty |
+| `seconded_x402_payment_check` | Before authorizing an x402 offer; send the exact offer and, when available, its pending signing context. |
 | `seconded_shielded_route_check` | Compare bounded shielded route quotes. |
 | `seconded_route_check` | Check a proposed public route for bounded linkability evidence. |
 
@@ -50,11 +55,11 @@ expected to read that description, not this page.
 
 ## Results
 
-A check result carries the answer label, the action the catalog maps it to, and the
-signed receipt. A `no_agreement` receipt produces `status: "not_verified"`, the fixed
-`NOT VERIFIED` message, a closed `reason` enum and `next: "pause_or_ask_human"`; there is no
-verdict and nothing was charged. The client rejects a result whose top-level fields
-contradict its signed envelope.
+An agreed result carries the answer label, its mapped action and the signed receipt.
+A `no_agreement` receipt has no answer and returns NOT VERIFIED guidance with a
+closed reason enum and `pause_or_ask_human`. The client accepts the current message
+and a constrained legacy message. Its signed billing status is pending until payment
+evidence resolves it. The client rejects contradictory duplicated reply fields.
 
 ## Privacy tools (in testing)
 

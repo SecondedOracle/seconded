@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **support@secondedoracle.xyz** with the subject line `SECURITY`. Please include:
+Email **<support@secondedoracle.xyz>** with the subject line `SECURITY`. Please include:
 
 - the component (`client/`, `verifier/`, the public API, or a release artifact);
 - the version or commit;
@@ -14,7 +14,7 @@ wallet, forge or alter a receipt, or bypass a spending limit. Everything else ca
 through the issue tracker.
 
 We will acknowledge reports by email. There is no bug bounty programme at this time;
-if that changes it will be announced at https://secondedoracle.xyz.
+if that changes it will be announced at <https://secondedoracle.xyz>.
 
 ## What is in scope here
 
@@ -31,7 +31,8 @@ published here; reports about them are still welcome at the same address.
 - Spending limits are enforced by the client, not on chain. An attacker who controls the
   host can bypass them. Also documented.
 - `NOT VERIFIED` is a deliberate outcome, not a failure: the models disagreed or the
-  evidence was unusable, nothing was charged, and the agent is told to pause.
+  evidence was unusable, and the agent is told to pause. Read signed billing: pending
+  does not certify nonpayment. The paying client resolves payment status with chain evidence.
 - Receipts are Ed25519-signed by the service. The compiled public key pin is in
   `client/receipt.go` and `verifier/keys.go`; `/v1/keys` is advisory and cannot change it.
   A receipt that verifies under a key that is not pinned is not a SECONDED receipt.

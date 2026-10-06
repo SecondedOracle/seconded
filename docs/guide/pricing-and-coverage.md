@@ -3,42 +3,42 @@
 Source of truth: `client/products.json` (the catalog compiled into client 0.4.1,
 `price_table_version` `pt-2026-09-29-small-025`) and `client/products-live-v1.json`
 (a read-only capture of `GET https://api.secondedoracle.xyz/v1/products` taken on
-2026-09-30). Prices are USD. "—" means the tier is not sold for that product.
+2026-09-30). The local catalog defines this checkout; current availability must be checked
+against the live catalog with the intended client-version header. Prices are USD. "—" means the tier is not sold for that product.
 
 ## Paid checks in the 0.4.1 catalog
 
-| Product | MCP tool | Small | Medium | Large | Subject chains | Observed live |
+| Product | MCP tool | Small | Medium | Large | Subject chains | Advertised to client 0.4.1 on 2026-10-06? |
 | --- | --- | ---: | ---: | ---: | --- | --- |
-| Trade Check | `seconded_trade_check` | 0.25 | 1.50 | — | Base 8453, Arc 5042, Robinhood 4663 | ✓ 2026-09-30 |
-| Stock Token Check | `seconded_stock_token_check` | 0.10 ¹ | — | — | Robinhood 4663, Base 8453 | ✓ 2026-09-30 ² |
-| Token Check | `seconded_token_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663, Base Sepolia 84532 | ✓ 2026-09-30 ² |
-| Agent Registry Check | `seconded_agent_registry_check` | 0.25 | — | — | Base 8453, Arc 5042, Robinhood 4663 | ✓ 2026-09-30 |
-| Address Screening Check | `seconded_counterparty_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663 | ✓ 2026-09-30 ² |
-| Cross-Chain Compare | `seconded_cross_chain_compare` | 0.10 ¹ | — | — | Base (Uniswap V3) and Arc (Uniswap V4), fixed USDC to EURC | ✓ 2026-09-30 ² |
-| Scam Check | `seconded_scam_check` | 0.10 ¹ | 1.50 | 2.50 | chain-independent | ✓ 2026-09-30 ² |
-| Lending Check | `seconded_lending_check` | 0.25 | — | — | Base 8453, Arc 5042 (Morpho Blue) | not in the capture ³ |
-| Agent Work Payout Check | `seconded_job_escrow_check` | 0.25 | — | — | Base 8453 | not in the capture ³ |
-| x402 Payment Check | `seconded_x402_payment_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663 | not in the capture ³ |
-| Shielded Route Check | `seconded_shielded_route_check` | 0.25 | — | — | Base 8453, Arc 5042, Robinhood 4663 | refused as `unknown_product` on 2026-10-06 ³ |
-| Bridge Route Check | `seconded_route_check` | 0.10 ¹ | — | — | typed EVM routes, 1 to 4 hops | not in the capture ³ |
+| Trade Check | `seconded_trade_check` | 0.25 | 1.50 | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
+| Stock Token Check | `seconded_stock_token_check` | 0.10 ¹ | — | — | Robinhood 4663, Base 8453 | yes |
+| Token Check | `seconded_token_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663, Base Sepolia 84532 | yes |
+| Agent Registry Check | `seconded_agent_registry_check` | 0.25 | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
+| Address Screening Check | `seconded_counterparty_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
+| Cross-Chain Compare | `seconded_cross_chain_compare` | 0.10 ¹ | — | — | Base (Uniswap V3) and Arc (Uniswap V4), fixed USDC to EURC | yes |
+| Scam Check | `seconded_scam_check` | 0.10 ¹ | 1.50 | 2.50 | chain-independent | yes |
+| Lending Check | `seconded_lending_check` | 0.25 | — | — | Base 8453, Arc 5042 (Morpho Blue) | yes |
+| Agent Work Payout Check | `seconded_job_escrow_check` | 0.25 | — | — | Base 8453 | yes |
+| x402 Payment Check | `seconded_x402_payment_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
+| Shielded Route Check | `seconded_shielded_route_check` | 0.25 | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
+| Bridge Route Check | `seconded_route_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042 and Robinhood 4663; typed connected routes of 1–4 hops | yes |
 
 ¹ **$0.15 when paying on Robinhood Chain** (`eip155:4663`, testnet `eip155:46630`);
 `price_usd_by_network` in the catalog. Scam Check's medium and large tiers are the same
 on every network.
 
-² The 2026-09-30 capture lists these at **$0.25** small. The 0.4.0 release notes state that
-the lower price is selected for clients sending `SECONDED-CLIENT-VERSION` 0.4.0 or newer;
-no 0.4.x client has been released, so an older client sees the captured price.
-
-³ These five products are marked `available` in the 0.4.1 catalog but were not in the
-2026-09-30 live capture, and on 2026-10-06T03:57:35Z the production API refused a quote
-for `shielded_route_check` with `unknown_product`. The signed refusal is
-`verifier/testdata/refused-base-mainnet-2026-10-06.json`. Treat them as **not live** until
-`GET /v1/products` lists them.
+On 2026-10-06, `GET /v1/products` with `SECONDED-CLIENT-VERSION: 0.4.1` listed all
+twelve checks at the prices shown here, including the Robinhood overrides. Without
+that header it listed eight checks at legacy prices, including Lending at $0.50.
+The committed 2026-09-30 capture is historical. The older quote-refusal fixture records
+one refused request and cannot establish current availability; its outer
+`unknown_product` reason is not covered by the receipt signature. These observations
+verify the advertised catalog, not successful paid execution on every network.
+The six unavailable products remain in testing and not purchasable.
 
 Subject chains are the `network` or `chainId` enums in each product's `input_schema`.
-The catalog also carries `coverage` text per product describing what is and is not
-checked; read it before relying on a verdict. For example Address Screening Check matches
+The catalog also carries coverage text for products that provide it, alongside the
+product schemas and descriptions; read these before relying on a verdict. For example Address Screening Check matches
 the OFAC SDN digital-currency extract and configured deployments; it does not check scam,
 phishing or drainer lists, and a no-match is not proof of safety.
 
@@ -75,8 +75,8 @@ pay-to address are identical in the 2026-09-30 live capture. Billing mode is
 | Hidden Prompt Check | in_testing |
 
 They appear under `unavailable_products` with `purchasable: false`; the client refuses to
-quote or buy them. The live capture lists Code Review, Owner Instruction Check and Hidden
-Prompt Check the same way.
+quote or buy them. The dated header-aware GET lists all six as unavailable; the historical capture lists
+Code Review, Owner Instruction Check and Hidden Prompt Check the same way.
 
 ## Free, local privacy tools (in testing)
 

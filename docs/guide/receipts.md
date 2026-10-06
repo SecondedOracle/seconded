@@ -1,6 +1,11 @@
 # Receipts and verification
 
-Every response from the service, including refusals and failures, is a signed receipt:
+Check receipts, including signed refusal receipts, authenticate their canonical
+envelope. Public metadata, payment challenges, and some transport or validation
+errors are not signed receipts. The offline verifier checks the receipt signature;
+it does not establish the truth of the models' work or unsigned wrapper fields.
+
+A receipt has this form:
 
 ```json
 {
@@ -44,14 +49,14 @@ release that carries both the old and the new key.
 
 | Field | Meaning |
 | --- | --- |
-| `state` | Where the check is. Terminal agreed states: `final`, `included`, `released`, `trial_delivered`. No charge: `no_agreement`, `content_refused`, `service_failed`, `closed_no_charge`, `frozen_unsettled`, `refused`. Refunds: `refund_owed`, `refunded`. In progress: `running`, `settling`, `delayed`, `unavailable`. |
-| `outcome` | `agreed`, `no_agreement`, or the failure state repeated. |
+| `state` | Answer-bearing states include `released`, `included`, `final` and free-trial `trial_delivered`. Included payments and released answers with unknown settlement still require collection. `no_agreement` withholds an answer and can retain `charged: pending`. Refusal, failure, certified-nonpayment and refund states have distinct billing fields; do not infer final payment status from the state name alone. |
+| `outcome` | Records agreement, disagreement or the applicable failure outcome; nonterminal or other states can carry null or a pending/none value as defined by the client contract. |
 | `answer.label_id`, `answer.option` | The agreed label and its one-based index in the product's label list. Map it through the catalog's `answer_to_action`. |
-| `checked_by` | The labs whose models checked the evidence: `OpenAI` and `Anthropic`. |
-| `model_config_fingerprint` | A 64-hex fingerprint of the model configuration used; two receipts with the same fingerprint were produced under the same configuration, without revealing it. |
+| `checked_by` | The service's signed attribution to known labs, OpenAI and Anthropic; it does not independently prove which remote model ran. |
+| `model_config_fingerprint` | The service's signed digest of the configuration it reports using. Equal digests identify the same reported configuration under the hash assumption; they do not independently prove which remote model ran. |
 | `billing` | `mode` (`paid` or `free-trial`), `charged` (`yes`, `no`, `pending`, `refund_owed`, `refunded`), `network`, `asset`, `amount_atomic`, `payer`, `pay_to`, `tx` (the settlement transaction when there is one), `settlement`, `refund`. |
-| `request_commitment` | A 64-hex commitment to the exact input and a salt; the client recomputes it before paying and refuses a receipt that names a different one. |
-| `issued_at`, `outcome_at` | When the receipt was signed and when the outcome was reached. The client tolerates at most 30 seconds of clock skew on `issued_at` and rejects an `outcome_at` later than `issued_at`. |
+| `request_commitment` | The signed commitment to input and terms. The original payment door recomputes it from a challenge salt. The standard x402 door instead validates a locally computed purchase association, then adopts the server check ID and commitment from the first matching signed receipt; its public challenge carries no such salt or server ID. |
+| `issued_at`, `outcome_at` | When the receipt was signed and the outcome reached. The client rejects issuance more than 30 seconds in the future and outcomes later than issuance, with additional purchase-time checks. Observation and expiry bounds depend on the product. |
 | `verification` (v3 only) | Schema `seconded-verification/v1`: the measured findings, per-fact coverage (`checked`, `partial`, `not_checked`, `unavailable` with a reason), the pinned block, and the SHA-256 of the canonical fact sheet the models saw. Findings are fixed once published; a later receipt for the same check may not drop or change them. |
 | `data_as_of`, `data_freshness` | Inside the answer: dataset dates and whether they were current when the answer was produced. |
 
@@ -62,14 +67,23 @@ the receipt names, that the version prefix matches, and that the envelope is str
 a receipt (known state, parseable timestamps, `checked_by` naming known labs, a
 verification block exactly on v3). It needs no account and no network.
 
-**The client** does everything the verifier does and then binds the receipt to its own
-purchase: the check id and request commitment it computed before paying, the payer, the
-amount, the network's asset and `payTo`, the signed purchase association used for
-recovery, and the receipt sequence (a later receipt may not roll back an earlier outcome).
-It also validates product-specific answers against the catalog: label tables, lending
-arithmetic, cross-chain comparison bounds, stock parity facts. Those checks need the
-private ledger of the wallet that paid, so a third party cannot run them, and the verifier
-does not claim to.
+By default the verifier uses its compiled receipt key. `-keys` explicitly replaces
+those defaults for that run. It reports the signed envelope, not the surrounding HTTP
+reply. The parser requires one JSON object, rejects duplicate keys at every depth and
+trailing data, and accepts either an exact direct receipt or one check-reply wrapper
+containing it. Wrapper metadata remains unsigned; mixed direct/wrapper and nested
+wrapper shapes are rejected.
+
+A successful result authenticates the canonical signed envelope and the listed
+structural checks. It does not certify payment finality, nonpayment, model independence,
+purchase ownership, complete product semantics, or truth of the reported findings.
+
+**The client** binds a receipt to its local purchase using the applicable
+request/commitment or standard-door purchase association, payer, amount, network asset,
+payee and receipt history. It also checks product-specific labels, arithmetic and
+answer structure. Purchase-history binding needs local records; many schema and
+arithmetic checks can be implemented independently by a third party. The standalone
+verifier intentionally omits these semantic checks.
 
 ## Verify one now
 
@@ -79,6 +93,9 @@ go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json
 ```
 
 The fixture is the reply the production service returned on 2026-10-06 when refusing a
-free quote request; `verifier/testdata/README.md` explains why that is the one published.
+free quote request. Two already-public paid/disagreement examples from the
+[official documentation](https://secondedoracle.xyz/docs#example-receipts) are also
+committed under `verifier/testdata/`; its [README](../../verifier/testdata/README.md)
+records provenance and billing boundaries.
 Your own agreed receipts verify the same way. [`examples/verify-receipt`](../../examples/verify-receipt/)
 shows the output, the tamper case, and how to cross-check the pin against `/v1/keys`.

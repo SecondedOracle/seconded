@@ -1,24 +1,27 @@
 # Release verification
 
-**Status on 2026-10-06: no release has been published.** The client source here is version
-`0.4.1` (`client/api.go`, `ClientVersion`), an unsigned build candidate. The procedure
-below is fixed by the shipped client's own setup code (`client/release_digest.go`), so it
-is documented now; the publisher key and the download location will be announced at
-https://secondedoracle.xyz and on @SecondedOracle when the first release is cut.
+Client 0.4.1 was published on 2026-10-06 as the npm package
+[`@seconded/mcp`](https://www.npmjs.com/package/@seconded/mcp) and the GitHub release
+[`SecondedOracle/seconded-mcp-releases` tag `v0.4.1`](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
+The release contains five native binaries, an MCPB bundle, build information,
+`SHA-256SUMS` and its OpenSSH signature. Verify the signed manifest and the selected
+artifact before running it. This repository's client source is a separate development
+snapshot; see the source-provenance note in the [README](../../README.md).
 
 ## What a release contains
 
 | Asset | Purpose |
 | --- | --- |
-| `seconded-mcp_darwin_arm64`, `seconded-mcp_darwin_amd64`, `seconded-mcp_linux_amd64`, `seconded-mcp_linux_arm64`, `seconded-mcp_windows_amd64.exe` | The client, one static binary per platform, built with `CGO_ENABLED=0`, `-trimpath`, `-buildvcs=false` and a stripped build id (`client/Makefile`). |
+| `seconded-mcp_darwin_arm64`, `seconded-mcp_darwin_amd64`, `seconded-mcp_linux_amd64`, `seconded-mcp_linux_arm64`, `seconded-mcp_windows_amd64.exe` | The client, one native binary per platform; published build information declares `CGO_ENABLED=0`, `-trimpath`, `-buildvcs=false` and a stripped build id (`client/Makefile`). |
 | `seconded-mcp_VERSION.mcpb` | The same binary packaged as an MCP bundle for hosts that install bundles. |
 | `build-info.json` | Source commit, toolchain and flags. |
 | `SHA-256SUMS` | First line `# seconded-release-version: VERSION`, then one `<sha256>  <asset>` line per asset. |
 | `SHA-256SUMS.sig` | An OpenSSH signature over `SHA-256SUMS`, namespace `seconded-release`, made with the publisher's SSH Ed25519 key. |
 
-Releases are deliberately **not** Apple-notarized or Windows-Authenticode-signed; the SSH
-signature over the manifest is the publisher authentication. Install through a terminal
-or a package manager rather than a browser download so no quarantine flow is involved.
+The release documents no Apple notarization or Windows Authenticode signature. Its
+SSH-signed checksum manifest is a separate publisher-verification mechanism; it does
+not bypass operating-system security prompts. Follow the platform's review flow if
+it blocks execution.
 
 ## Verify before running
 
@@ -54,14 +57,24 @@ cd client && go build -o seconded-mcp ./cmd/seconded-mcp
 ./seconded-mcp setup --manual-fingerprint --release-sha256 "$(shasum -a 256 seconded-mcp | cut -d' ' -f1)"
 ```
 
-## Planned distribution channels
+## Distribution status
 
-These names come from the packaging templates in the private repository and are listed so
-nobody is surprised later. None exists yet.
+npm and GitHub: 0.4.1 published. Official MCP Registry: active
+`xyz.secondedoracle/seconded-mcp` entry at 0.3.3 and older
+`io.github.SecondedOracle/seconded-mcp` entry at 0.3.0, observed 2026-10-06.
+Homebrew: the expected public tap was not found in the review. Smithery: publication
+status not verified.
 
-- GitHub release repository: `SecondedOracle/seconded-mcp-releases`, with an
-  `install.sh` that performs the verification above before installing.
-- npm launcher: `@seconded/mcp` (`npx --yes @seconded/mcp@VERSION serve --host generic`, Node 20+).
-- Homebrew: `brew install SecondedOracle/tap/seconded-mcp`, with the formula pinning every
-  asset checksum and verifying the SSH signature.
-- Official MCP Registry name `io.github.SecondedOracle/seconded-mcp`, and Smithery.
+The npm launcher requires Node 20 or newer. A version-pinned invocation is
+`npx --yes @seconded/mcp@0.4.1 serve --host generic`. The documented Homebrew formula
+and Smithery templates do not by themselves establish a public installation channel.
+
+Public metadata checked on 2026-10-06:
+
+- [npm package metadata](https://registry.npmjs.org/@seconded%2Fmcp).
+- [GitHub release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
+- [Official MCP Registry search](https://registry.modelcontextprotocol.io/v0.1/servers?search=secondedoracle).
+
+The reviewed npm metadata contains a local archive-path disclosure. This checkout does
+not package or republish that release. Distribution metadata cleanup requires a
+separate maintainer action; no signing-key disclosure was established.

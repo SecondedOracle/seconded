@@ -3,13 +3,13 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/readme-hero-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="assets/readme-hero-light.png">
-  <img alt="SECONDED. The oracle for agents. Two rival AI models must agree. Signed receipt on every answer. No answer, no charge. Live on Base, Arc and Robinhood Chain." src="assets/readme-hero-light.png" width="800">
+  <img alt="SECONDED. The oracle for agents. Two rival AI models must agree. Signed receipt on every answer. No answer, no charge. Payment networks advertised: Base, Arc and Robinhood Chain." src="assets/readme-hero-light.png" width="800">
 </picture>
 
 **An AI agent pays per check over x402. Two models from rival labs must agree. Every answer carries an Ed25519-signed receipt. No answer, no charge.**
 
 ![client](https://img.shields.io/badge/client-0.4.1-blue)
-![go](https://img.shields.io/badge/go-1.26-00ADD8)
+![go](https://img.shields.io/badge/go-1.26.7-00ADD8)
 ![receipts](https://img.shields.io/badge/receipts-Ed25519%20%C2%B7%20RFC%208785-success)
 ![chains](https://img.shields.io/badge/pays%20on-Base%20%C2%B7%20Arc%20%C2%B7%20Robinhood%20Chain-informational)
 ![license](https://img.shields.io/badge/license-not%20yet%20chosen-lightgrey)
@@ -20,35 +20,75 @@
 
 SECONDED is a paid second opinion for autonomous agents. Before an agent signs a
 transaction, trusts a token, pays another agent or acts on a message, it sends the exact
-input to SECONDED and gets back one answer label and the action that label maps to. The
-answer counts only if two models from different labs reached it independently; otherwise
-the agent is told to pause and nothing is charged. Every response, including refusals, is
-signed, and anyone can verify the signature offline with the code in this repository.
+input to SECONDED. An agreed answer carries a label and its mapped action; pending,
+refused, failed or NOT VERIFIED results mean pause. The service requires usable
+agreement between OpenAI and Anthropic models before settlement. Receipt signatures
+authenticate what the service reports, not independent proof that the models are correct.
+
+Check receipts, including signed refusal receipts, authenticate their canonical
+envelope. Public metadata, payment challenges, and some transport or validation
+errors are not signed receipts. The offline verifier checks the receipt signature;
+it does not establish the truth of the models' work or unsigned wrapper fields.
 
 This repository is the public, buildable surface: the Go MCP client, a standalone receipt
 verifier, the shipped tool and price catalogs, and the documentation. The service that
 runs the checks is not here; see [What this repository does not contain](#what-this-repository-does-not-contain).
 
+This checkout reports client version 0.4.1. Its baseline client files match development
+snapshot `ff16198c799c7d2b6b3dafb32e847168249b033d` except for the sanitized vendor-patch
+note. The corrections in this checkout add further changes. It is not the source
+snapshot used for the published 0.4.1 binaries, whose
+[build information](https://github.com/SecondedOracle/seconded-mcp-releases/releases/download/v0.4.1/build-info.json)
+names `b8cfd7d1375d4f3a65087410a4a600e081e715bc`. Tests reported here apply to this
+checkout; no byte-for-byte reproduction of the published binaries is claimed.
+
 ## Check it yourself
 
-Every sentence above maps to something you can run or look at. In order of effort:
+The checks below reproduce key public claims; [CLAIMS.md](docs/CLAIMS.md) separates
+measured facts, source-backed behavior and maintainer statements. In order of effort:
 
-1. **Verify a production-signed receipt offline.** No account, no network, one command:
+1. **Verify public PAID and NOT VERIFIED receipts offline.** The
+   [official example receipts](https://secondedoracle.xyz/docs#example-receipts) are
+   committed under [`verifier/testdata`](verifier/testdata/). No account or purchase:
+
+   ```sh
+   cd verifier && go run ./cmd/seconded-verify testdata/trade-paid-base-mainnet-2026-09-29.json testdata/token-not-verified-base-sepolia-2026-09-29.json
+   ```
+
+   The Trade Check signs `charged=yes`, `amount_atomic=250000` ($0.25), and
+   [this Base transaction](https://basescan.org/tx/0x9472572e3cfe100973002a46b1d943a97ca3839be0c834863654d4a4e4fa1b13).
+   The Token Check signs `state=no_agreement`, `charged=pending` and `tx=null`.
+   These are public issuer assertions; chain inclusion/finality was not independently
+   queried. The Token sample checks a Base Sepolia subject while billing names Base
+   mainnet. Both receipts name OpenAI and Anthropic and use receipt version 3.
+
+   The historical refusal remains a smaller smoke test:
+
    ```sh
    cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json
    ```
+
    ```text
    OK    testdata/refused-base-mainnet-2026-10-06.json
          signature   Ed25519 by rk-2026-09-a over receipt v1 (807 canonical bytes)
-         state       refused: the request was refused before admission; nothing charged
+         state       refused: request refused before admission; consult signed billing and payment evidence
          product     null   check_id null   issued_at 2026-10-06T03:57:35.018936Z
          checked_by  none named
          billing     charged=no settlement=none network=eip155:8453 amount_atomic=null tx=null
    ```
+
    That receipt was signed by the live service on 2026-10-06 while refusing a request.
-   Change a byte and it fails ([examples/verify-receipt](examples/verify-receipt/)).
+   Changing a signed envelope value invalidates the signature. Whitespace, key ordering
+   and unsigned outer reply fields are not authenticated as file bytes.
+   See [examples/verify-receipt](examples/verify-receipt/).
 2. **Read the live catalog and compare it with the committed capture.**
-   `curl -s https://api.secondedoracle.xyz/v1/products | jq '.networks, [.products[].id]'`
+
+   ```sh
+   curl -fsS -H 'SECONDED-CLIENT-VERSION: 0.4.1' \
+     https://api.secondedoracle.xyz/v1/products |
+     jq '.networks, [.products[] | {id, price_usd, price_usd_by_network}]'
+   ```
+
    versus [`client/products-live-v1.json`](client/products-live-v1.json), captured 2026-09-30.
 3. **Compare the live receipt key with the compiled pin.**
    `curl -s https://api.secondedoracle.xyz/v1/keys` must list `rk-2026-09-a` as
@@ -57,15 +97,17 @@ Every sentence above maps to something you can run or look at. In order of effor
 4. **Look at the pay-to address on chain.** Checks settle to
    `0x010ab46d566cde25cca0ee55eb105e781c7bcf3a` on Base (`eip155:8453`, USDC), Arc
    (`eip155:5042`, USDC) and Robinhood Chain (`eip155:4663`, USDG). On Base:
-   https://basescan.org/address/0x010ab46d566cde25cca0ee55eb105e781c7bcf3a
+   <https://basescan.org/address/0x010ab46d566cde25cca0ee55eb105e781c7bcf3a>
 5. **Build the client from vendored source with the network switched off.**
+
    ```sh
    cd client && GOPROXY=off go build -o seconded-mcp ./cmd/seconded-mcp && ./seconded-mcp --version
    ```
-   prints `seconded-mcp 0.4.1`.
 
-[`docs/CLAIMS.md`](docs/CLAIMS.md) lists every claim in this README with its evidence and
-how it was checked.
+   prints `seconded-mcp 0.4.1`. The module requires Go 1.26.6 or newer and selects
+   Go 1.26.7; install or cache that toolchain before an offline build.
+
+[`docs/CLAIMS.md`](docs/CLAIMS.md) records the principal claims, their evidence and measurement limits.
 
 ## Quickstart
 
@@ -78,10 +120,11 @@ cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-1
 cd ../client && go build -o seconded-mcp ./cmd/seconded-mcp && ./seconded-mcp host-snippet --host claude-code
 ```
 
-To actually buy checks the client needs a wallet, which `seconded-mcp setup` creates, and
-a few dollars of USDC on Base. Source builds pass their own digest to setup because no
-signed release manifest exists yet. The whole path, including limits and recovery, is in
-[docs/guide/install.md](docs/guide/install.md).
+To buy checks, setup creates a dedicated wallet that you fund for the selected
+network. An ordinary build from this checkout has no publisher key or signed manifest
+for its newly compiled bytes, so its source-build setup path requires an explicit
+digest. Published binaries have their own signed release manifests. The whole path,
+including limits and recovery, is in [docs/guide/install.md](docs/guide/install.md).
 
 ## Which path do I need?
 
@@ -89,7 +132,7 @@ signed release manifest exists yet. The whole path, including limits and recover
 | --- | --- |
 | Building an agent that should stop before doing something expensive | [Install and run](docs/guide/install.md), then [Tools reference](docs/guide/tools.md). |
 | Auditing a receipt someone showed you | [`verifier/`](verifier/) and [Receipts and verification](docs/guide/receipts.md). |
-| Integrating over HTTP without the Go client | The public routes are `GET /v1/products`, `POST /v1/quote`, `POST /v1/x402/checks`, `GET /v1/checks/{check_id}`, `GET /v1/keys`, `GET /v1/health`, `GET /v1/openapi.json` at `https://api.secondedoracle.xyz`. The client source is the reference implementation of the payment door. |
+| Integrating over HTTP without the Go client | Core public routes include `GET /v1/products`, `POST /v1/quote`, `POST /v1/x402/checks`, `GET /v1/checks/{check_id}`, `GET /v1/keys`, `GET /v1/health`, `GET /v1/openapi.json` at `https://api.secondedoracle.xyz`. The client source is the reference implementation of the payment door. |
 | Judging or reviewing the project | This repository plus the private repository described in [the Colosseum note](#colosseum). |
 
 ## How a check works
@@ -102,23 +145,27 @@ flowchart LR
     S --> M2[Model, lab 2]
     M1 --> D{Same answer?}
     M2 --> D
-    D -->|yes| R1[Settle payment<br/>signed receipt with answer]
-    D -->|no| R2[Nothing settled<br/>signed NOT VERIFIED receipt]
+    D -->|yes| R1[Signed agreed answer<br/>settlement may remain pending]
+    D -->|no| R2[Signed NOT VERIFIED receipt<br/>consult billing and payment evidence]
     R1 --> C
     R2 --> C
     C -->|label, action, receipt| A
 ```
 
-1. The agent calls one tool with structured input, never prose. Inputs are bounded and
+1. The agent calls one tool with a typed JSON input object; message checks include prose
+   inside its text field. Inputs are bounded and
    priced by size tier.
 2. The client posts to the x402 door, gets a 402 challenge, compares the challenge's
    `payTo` with the pinned catalog address, and signs an EIP-3009 authorization with the
    dedicated wallet. Spending limits are enforced before signing.
 3. The service gives the same evidence to two models from different labs. For on-chain
    facts, two independent RPC readers must agree at one pinned block first.
-4. If both models agree and the answer is saved, the authorization is settled and the
-   receipt carries the answer label and the settlement transaction. If not, the receipt
-   says `NOT VERIFIED`, tells the agent to pause or ask a human, and nothing is settled.
+4. The service's policy is to settle only after usable agreement is saved. An agreed
+   answer can be released while settlement remains pending; included and final receipts
+   carry the corresponding transaction state. Without usable agreement, the agent
+   receives NOT VERIFIED guidance and must pause. Read the signed billing fields:
+   `pending` is not a certificate of nonpayment. The paying client uses independent
+   chain evidence to resolve payment status.
 5. The client verifies the receipt under the compiled key pin and binds it to the
    purchase it made. The catalog's `answer_to_action` map, not the model, says what the
    label means: `proceed`, `STOP and show the owner`, or `pause or ask a human`.
@@ -131,28 +178,32 @@ Twelve paid checks in the 0.4.1 catalog, six utility tools, and seven free local
 tools still in testing. Prices are USD per check; the checks marked ¹ cost $0.15 when paid
 on Robinhood Chain.
 
-| Check | Tool | Small | Medium | Large | Live? |
+| Check | Tool | Small | Medium | Large | Advertised to client 0.4.1 on 2026-10-06? |
 | --- | --- | ---: | ---: | ---: | --- |
-| Trade Check | `seconded_trade_check` | 0.25 | 1.50 | — | ✓ |
-| Stock Token Check | `seconded_stock_token_check` | 0.10 ¹ | — | — | ✓ ² |
-| Token Check | `seconded_token_check` | 0.10 ¹ | — | — | ✓ ² |
-| Agent Registry Check | `seconded_agent_registry_check` | 0.25 | — | — | ✓ |
-| Address Screening Check | `seconded_counterparty_check` | 0.10 ¹ | — | — | ✓ ² |
-| Cross-Chain Compare | `seconded_cross_chain_compare` | 0.10 ¹ | — | — | ✓ ² |
-| Scam Check | `seconded_scam_check` | 0.10 ¹ | 1.50 | 2.50 | ✓ ² |
-| Lending Check | `seconded_lending_check` | 0.25 | — | — | not yet ³ |
-| Agent Work Payout Check | `seconded_job_escrow_check` | 0.25 | — | — | not yet ³ |
-| x402 Payment Check | `seconded_x402_payment_check` | 0.10 ¹ | — | — | not yet ³ |
-| Shielded Route Check | `seconded_shielded_route_check` | 0.25 | — | — | not yet ³ |
-| Bridge Route Check | `seconded_route_check` | 0.10 ¹ | — | — | not yet ³ |
+| Trade Check | `seconded_trade_check` | 0.25 | 1.50 | — | yes |
+| Stock Token Check | `seconded_stock_token_check` | 0.10 ¹ | — | — | yes |
+| Token Check | `seconded_token_check` | 0.10 ¹ | — | — | yes |
+| Agent Registry Check | `seconded_agent_registry_check` | 0.25 | — | — | yes |
+| Address Screening Check | `seconded_counterparty_check` | 0.10 ¹ | — | — | yes |
+| Cross-Chain Compare | `seconded_cross_chain_compare` | 0.10 ¹ | — | — | yes |
+| Scam Check | `seconded_scam_check` | 0.10 ¹ | 1.50 | 2.50 | yes |
+| Lending Check | `seconded_lending_check` | 0.25 | — | — | yes |
+| Agent Work Payout Check | `seconded_job_escrow_check` | 0.25 | — | — | yes |
+| x402 Payment Check | `seconded_x402_payment_check` | 0.10 ¹ | — | — | yes |
+| Shielded Route Check | `seconded_shielded_route_check` | 0.25 | — | — | yes |
+| Bridge Route Check | `seconded_route_check` | 0.10 ¹ | — | — | yes |
 
-✓ listed in the live catalog captured 2026-09-30. ² The capture shows $0.25 for these;
-the lower price applies to clients 0.4.0 and newer, and no 0.4.x client is released yet.
-³ In the shipped catalog but not in the 2026-09-30 capture; on 2026-10-06 the production
-API refused `shielded_route_check` as `unknown_product` (that refusal is the verifier
-fixture). Six more products (Vault Check, Private Receive Scan, Portfolio Check, Code
-Review, Owner Instruction Check, Hidden Prompt Check) are `in_testing` and cannot be
-bought. Subject chains per check, tiers, payment networks and the privacy tools:
+On 2026-10-06, `GET /v1/products` with `SECONDED-CLIENT-VERSION: 0.4.1` listed all
+twelve checks at the prices shown here, including the Robinhood overrides. Without
+that header it listed eight checks at legacy prices, including Lending at $0.50.
+The committed 2026-09-30 capture is historical. The older quote-refusal fixture records
+one refused request and cannot establish current availability; its outer
+`unknown_product` reason is not covered by the receipt signature. These observations
+verify the advertised catalog, not successful paid execution on every network.
+The six unavailable products remain in testing and not purchasable.
+Six more products (Vault Check, Private Receive Scan, Portfolio Check, Code Review,
+Owner Instruction Check, Hidden Prompt Check) are `in_testing` and cannot be bought.
+Subject chains per check, tiers, payment networks and the privacy tools:
 [docs/guide/pricing-and-coverage.md](docs/guide/pricing-and-coverage.md).
 
 ## Verify a receipt
@@ -173,24 +224,26 @@ What the verifier checks, what only the paying client can check, and the receipt
 
 ## Release verification
 
-No binary release has been published as of 2026-10-06. When one is, it ships
-`SHA-256SUMS` and an OpenSSH Ed25519 signature over it, verified with
-`ssh-keygen -Y verify` against a publisher key announced at https://secondedoracle.xyz
-and on @SecondedOracle. The client's own `setup` repeats that verification before it
-creates a wallet. The procedure, the asset names and the planned channels (npm, Homebrew,
-the MCP Registry, Smithery) are fixed now: [docs/guide/release-verification.md](docs/guide/release-verification.md).
+Client 0.4.1 was published on 2026-10-06 as the npm package
+[`@seconded/mcp`](https://www.npmjs.com/package/@seconded/mcp) and the GitHub release
+[`SecondedOracle/seconded-mcp-releases` tag `v0.4.1`](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
+The release contains five native binaries, an MCPB bundle, build information,
+`SHA-256SUMS` and its OpenSSH signature. Verify the signed manifest and the selected
+artifact before running it. This repository's client source is a separate development
+snapshot; see the source-provenance note in the [README](README.md).
+See [release verification](docs/guide/release-verification.md) for the procedure.
 
 ## Status
 
 | Component | State on 2026-10-06 | Evidence |
 | --- | --- | --- |
-| Public API at `api.secondedoracle.xyz` | Live on Base, Arc and Robinhood Chain mainnets; seven paid checks listed | `client/products-live-v1.json` (2026-09-30); the signed refusal of 2026-10-06 |
-| Client source | 0.4.1, builds and passes its shipped tests; unsigned, unreleased | `client/api.go`, CI workflow, [CLAIMS](docs/CLAIMS.md) |
-| Receipt verifier | Builds; verifies the production fixture; 8 tests | `verifier/receipt_test.go` |
-| Five 0.4.x checks | In the catalog, not observed live | footnote ³ above |
+| Public API at `api.secondedoracle.xyz` | Public GET endpoints reachable; three mainnet payment networks and twelve checks advertised to client 0.4.1; paid execution not exercised | Dated header-aware GETs in [CLAIMS](docs/CLAIMS.md) |
+| Client source | Development snapshot reporting 0.4.1; source-built bytes differ from the published release | `client/api.go`, CI workflow, [CLAIMS](docs/CLAIMS.md) |
+| Receipt verifier | Builds; verifies three public fixtures; parser and tamper controls | `verifier/receipt_test.go` |
+| Version-dependent catalog | Twelve checks advertised to 0.4.1; eight without the header | Dated header-aware GETs |
 | Six products | In testing, not purchasable | `client/products.json`, `unavailable_products` |
 | Seven privacy tools | In testing, free, local | `client/privacy-tools.json` |
-| Binary releases, npm, Homebrew, registry listings | None published | [release-verification](docs/guide/release-verification.md) |
+| Distribution | npm/GitHub 0.4.1; Registry 0.3.3 and older 0.3.0; expected public Homebrew tap not found in review; Smithery unverified | [release-verification](docs/guide/release-verification.md) |
 | Licence | Not chosen | see below |
 
 ## What this repository does not contain
@@ -214,28 +267,32 @@ SECONDED.
   guarantee, and the receipt's `disclaimer` field says so for financial products.
 - The client wallet is a hot wallet on your machine. Spending limits are enforced by the
   client, not on chain. Keep only what you intend to spend in it.
-- Coverage is narrow by design: each check reads specific facts from two readers at one
-  block. The catalog's `coverage` text says what was not checked; a no-match is never
-  proof of safety.
+- Coverage depends on the product. On-chain checks use agreeing readers at pinned
+  blocks where specified; cross-chain comparison uses a block on each chain, message
+  checks can be chain-independent, and list-only address screening uses no RPC reads.
+  Consult the product's schema and any coverage text. Missing coverage or a no-match
+  is not proof of safety.
 - Latency, throughput and uptime are not published here because they have not been
   measured in a way we would stand behind.
-- The pricing above is what the catalog says. The live service decides what it sells to
-  which client version; the capture and the refusal fixture are the two data points we
-  have, and both are in the tree.
+- Prices and availability depend on client version. The local catalog and dated
+  header-aware live observations are both inspectable; the September capture remains
+  historical evidence.
 
 ## Colosseum
 
 This repository is SECONDED's public showcase and trust surface. The full development
 history and the server source are shared privately with the Colosseum judges through a
-separate repository; that private repository is the submission link. Everything a third
-party can check without server access is here.
+separate repository; that private repository is the submission link, according to the
+maintainers. This repository provides the public client source snapshot, verifier and
+catalog evidence; published releases and public example receipts are linked separately.
+Access to the private judge submission is a maintainer statement.
 
 ## Contributing, security, licence
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): what we take and how to build.
-- [SECURITY.md](SECURITY.md): report to support@secondedoracle.xyz with `SECURITY` in the
+- [SECURITY.md](SECURITY.md): report to <support@secondedoracle.xyz> with `SECURITY` in the
   subject.
-- Licence: **none chosen yet**, so the default applies and all rights are reserved until
-  a `LICENSE` file is added. The maintainers intend to choose one before the first
-  binary release.
+- No project LICENSE has been added to this repository. The npm package is marked
+  UNLICENSED. A project licence remains a maintainer decision; vendored dependencies
+  retain their own licences.
 - [CHANGELOG.md](CHANGELOG.md) records what each client version changed.

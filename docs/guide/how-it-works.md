@@ -3,8 +3,8 @@
 SECONDED answers one question for an AI agent: *may I act on this?* The agent sends a
 bounded, typed input (an unsigned transaction, a token address, a message, an x402 offer),
 pays a small fixed price over x402, and gets back a signed receipt. The answer is accepted
-only if two models from rival labs agree on it; otherwise the receipt says NOT VERIFIED and
-nothing is charged.
+only if two models from rival labs agree on it; otherwise the receipt says NOT VERIFIED.
+Settlement is the service policy described below; pending billing is not certified nonpayment.
 
 ```mermaid
 sequenceDiagram
@@ -23,9 +23,9 @@ sequenceDiagram
     M-->>S: two answers
     alt both agree
         S->>L: settle the authorization
-        S-->>C: signed receipt: state final/included, answer label, tx
+        S-->>C: signed agreed receipt, answer label; settlement may be pending
     else no usable agreement
-        S-->>C: signed receipt: state no_agreement, NOT VERIFIED, nothing settled
+        S-->>C: signed receipt: no_agreement, NOT VERIFIED, billing pending
     end
     C->>C: verify signature under the compiled key pin, bind to the purchase
     C-->>A: answer label and the action it maps to, plus the receipt
@@ -34,7 +34,8 @@ sequenceDiagram
 ## Step by step
 
 1. **The agent calls a tool.** Each paid check is one MCP tool, for example
-   `seconded_trade_check`. The input is structured data, never prose: the exact unsigned
+   `seconded_trade_check`. The input is a typed JSON object; message checks include prose inside its text field:
+   the exact unsigned
    transaction, the token address and network, the message text. Inputs are bounded and
    priced by size tier (small up to 8,192 bytes, medium up to 65,536, large up to 131,072;
    `client/products.json`, `tiers`).
@@ -52,13 +53,12 @@ sequenceDiagram
    facts, two independent readers must agree at one pinned block) and gives it to two
    models from different labs. Receipts record which labs under `checked_by`; the values the
    client accepts are `OpenAI` and `Anthropic` (`client/receipt.go`).
-5. **Agreement settles the payment; disagreement does not.** If both models reach the
-   same answer and it is saved, the authorization is settled and the receipt carries the
-   answer label and the settlement transaction. If not, the receipt's state is
-   `no_agreement`, its status is `not_verified`, its message is the exact text
-   `NOT VERIFIED: no usable, verified agreement was reached. Do not act on this automatically; pause or ask a human.`
-   and nothing is settled. The client does not take the server's word for non-payment:
-   its own chain evidence certifies it (`closed_no_charge`).
+5. **Read agreement and billing separately.** The service's policy is to settle only after usable agreement is saved. An agreed
+   answer can be released while settlement remains pending; included and final receipts
+   carry the corresponding transaction state. Without usable agreement, the agent
+   receives NOT VERIFIED guidance and must pause. Read the signed billing fields:
+   `pending` is not a certificate of nonpayment. The paying client uses independent
+   chain evidence to resolve payment status.
 6. **The client verifies the receipt.** Every receipt is Ed25519-signed under a key the
    client compiles in; see [Receipts and verification](receipts.md). The client also binds
    the receipt to the purchase it made (check id, request commitment, payer, amount) and
@@ -81,19 +81,26 @@ input supplied. Pending, failed or NOT VERIFIED results mean pause
 
 ## Timeouts and recovery
 
-A tool call may wait up to 25 seconds (`wait_seconds`). If the answer is not ready, the
-result carries a `check_id` and the agent calls `seconded_receipt` later; the purchase is
-never repeated to collect the original result. The CLI equivalent is
-`seconded-mcp recover --check-id ID`, which opens only the private ledger and the pinned
-API and loads no wallet key. A paid check whose response was lost is still collected the
-same way: you are charged only after both models agree and the answer is saved, and if
-delivery fails you can always fetch it with `seconded_receipt`.
+`wait_seconds` accepts 0 through 25, but the MCP client clamps its requested wait to
+eight seconds. The tool has a separate 45-second default soft deadline; an admitted
+check may continue after either wait ends. If an answer is not ready, the result
+carries a `check_id` for `seconded_receipt`. The CLI equivalent is
+`seconded-mcp recover --check-id ID`.
+
+Retained standard-door recovery replays the same stored request and payment
+authorization without loading a signing key or buying a new check. Original-door or
+archived ownership recovery may require a wallet signing key; the keyless CLI can
+report `wallet_recovery_required` for those cases. Recovery can contact the API and
+chain readers. Fetching remains subject to service availability and retention; the
+[published policy](https://secondedoracle.xyz/privacy) removes finished-check records
+after 90 days from last activity. Keep receipts you need to verify later.
 
 ## Freshness
 
-Agreed answers carry `data_as_of` (the oldest source date per dataset consumed) and
-`data_freshness`, either `current` or `not_verified`, inside the signed answer. Fetching an
-old answer again preserves its original dates; it does not acquire new evidence.
+Newer answers can include signed dataset dates and freshness status; historical
+receipts may omit them. Fetching an old answer does not add new evidence. The client
+preserves its historical dates and may mark formerly current data `not_verified`
+when it expires.
 
 ## What this is not
 

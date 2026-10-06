@@ -19,7 +19,7 @@ import (
 // Version is stamped by the release builder and reported during MCP initialization.
 var Version = ClientVersion
 
-const billingGuarantee = "You are charged only after both models agree and the answer is saved; if delivery fails you can always fetch it with seconded_receipt; no answer → no charge."
+const billingGuarantee = "Service policy settles only after usable agreement is saved. Pending billing is not certified nonpayment. Recover the same purchase with seconded_receipt; fetching depends on service availability and retention."
 
 const instructions = "SECONDED runs paid two-model checks and returns a verdict label. The verdict binds only to the input you sent, not to any action. Each purchase is signed once; recovery re-posts the identical durable credential and body through the standard door. A 202 or timeout stays pending. For invalid_input with next=correct_input, correct the named field before retrying. After other check tool errors or timeouts, call seconded_receipt with no arguments before checking again: a paid check may still be running. Never ask the user for a private key or seed phrase. Checks pay on Base mainnet (USDC) unless a check names another network; they pay on Arc or Robinhood mainnet, or on a testnet (base_sepolia, arc_testnet, robinhood_testnet), only when the check names it. When you have the unsigned transaction, send it as structured transaction data, not prose. Unconfigured network identities refuse payment."
 

@@ -34,7 +34,7 @@ type Answer struct {
 // NotVerifiedMessage is the text no_agreement receipts carried before the server could veto; those still verify.
 const NotVerifiedMessage = "NOT VERIFIED: our two models disagreed. Do not act on this automatically; pause or ask a human."
 
-// Since J10 a no_agreement can also be a veto on a verified fact, so the server says so. These must equal
+// Current no_agreement receipts can also veto a verified fact, so the server says so. These must equal
 // NOT_VERIFIED_MESSAGE and REASONS in server/payments/disagreement.py; tests/receipts enforces it.
 const CurrentNotVerifiedMessage = "NOT VERIFIED: no usable, verified agreement was reached. Do not act on this automatically; pause or ask a human."
 
@@ -283,8 +283,8 @@ type ReceiptVerifier struct {
 	labels map[string]map[int]string
 }
 
-// Base Sepolia, Arc and Robinhood testnet release pin, derived on the approved host from the existing
-// signing key. /v1/keys is advisory and cannot add or replace a release pin.
+// Compiled receipt key pin for supported testnets.
+// /v1/keys is advisory and cannot add or replace it.
 const testnetReceiptKeyHex = "438d9301c477c27fecc3f56da0a7d5a6b3894cef69815bae63b5349dc2cddf0b"
 
 var releaseReceiptKeys = map[string]ed25519.PublicKey{
@@ -342,7 +342,7 @@ func currentReceiptLabels() map[string]map[int]string {
 }
 
 // storedReceiptLabels are catalogues that only receipts from earlier builds carry: the retired products, and
-// Trade Check before J10 replaced its template (options 1 and 2 then meant proceed and do_not_proceed).
+// Legacy Trade Check receipts used a different template (options 1 and 2 meant proceed and do_not_proceed).
 // engine.go re-verifies every stored receipt when listing receipts, so dropping these would fail that listing
 // for any ledger that holds one. A freshly fetched receipt for a product still sold must use releaseLabels.
 var storedReceiptLabels = map[string]map[int]string{

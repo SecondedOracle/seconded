@@ -6,7 +6,16 @@ repository.
 
 ## Unreleased
 
-- [Added] Public repository assembled from the client 0.4.1 source: the Go MCP client with
+- [Fixed] Release and Registry status, development-source provenance, version-aware
+  availability, retention, purchase binding, recovery and tool-interface documentation.
+- [Fixed] Offline verifier rejects duplicate JSON keys, trailing input and ambiguous
+  direct/wrapper shapes; payment descriptions identify signed assertions.
+- [Security] Secret scanning exempts exact reviewed public identifiers and detects bare
+  and 0x-prefixed synthetic private keys.
+- [Added] Two already-public signed v3 receipts: a paid Trade Check and a pending
+  NOT VERIFIED Token Check, with offline regression controls and provenance.
+
+- [Added] Public repository assembled from a development snapshot reporting client 0.4.1: the Go MCP client with
   vendored dependencies, the shipped catalogs (`products.json`, `products-live-v1.json`,
   `privacy-tools.json`, `tools-list.json`), and 22 of the client's test files.
 - [Added] `verifier/`: a standalone offline receipt verifier with a production-signed
@@ -16,7 +25,7 @@ repository.
   examples, issue templates, and a CI workflow that builds the client and runs both test
   suites on `ubuntu-latest`.
 
-## Client 0.4.1 (unreleased build candidate)
+## Client 0.4.1 (published 2026-10-06)
 
 - [Fixed] Wallet payments no longer stall when Base finality lags. Admission accepts fresh,
   depth-confirmed balances agreed by two public readers while retaining all pending

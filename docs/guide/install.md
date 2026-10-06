@@ -2,17 +2,21 @@
 
 ## 1. Build
 
-Go 1.26 is required (`client/go.mod` names the toolchain). Dependencies are vendored, so
-no network access is needed:
+The module requires Go 1.26.6 or newer and selects toolchain Go 1.26.7. For an
+offline build, install or cache that toolchain first. Dependencies are vendored;
+`GOPROXY=off` prevents dependency downloads:
 
 ```sh
 cd client
-go build -o seconded-mcp ./cmd/seconded-mcp
+GOPROXY=off go build -o seconded-mcp ./cmd/seconded-mcp
 ./seconded-mcp --version      # seconded-mcp 0.4.1
 ```
 
-Until a signed release exists this is the only way to get the client. See
-[Release verification](release-verification.md) for what changes once one does.
+You can build this checkout or obtain client 0.4.1 from the published
+[GitHub release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1)
+or [npm package](https://www.npmjs.com/package/@seconded/mcp). These are different source
+snapshots despite reporting the same version; choose the provenance you intend to review.
+See [Release verification](release-verification.md).
 
 ## 2. Create the wallet and connect a host
 
@@ -31,8 +35,8 @@ snippets for each host are recorded in [`examples/host-config`](../../examples/h
 manifest automatically and refuses to run with a stale or altered one.
 
 To print the host snippet again later: `./seconded-mcp host-snippet --host HOST`.
-A different profile directory can be chosen with `--profile /absolute/path`; use the same
-`--profile` in the host command.
+Use `seconded-mcp --profile /absolute/path COMMAND ...`; `--profile` precedes the
+command. Use the same profile in the host command.
 
 ## 3. Fund it
 
@@ -73,19 +77,34 @@ If a host deadline cut a call short, the agent calls `seconded_receipt`. From th
 ./seconded-mcp recover --check-id LOCAL_ID  # collects one
 ```
 
-Recovery loads no wallet key and never buys the check again.
+Retained standard-door recovery replays the same stored request and payment
+authorization without loading a signing key or buying a new check. Original-door or
+archived ownership recovery may require a wallet signing key; the keyless CLI can
+report `wallet_recovery_required` for those cases. Recovery can contact the API and
+chain readers. Fetching remains subject to service availability and retention; the
+[published policy](https://secondedoracle.xyz/privacy) removes finished-check records
+after 90 days from last activity. Keep receipts you need to verify later.
 
 ## Commands
 
 `seconded-mcp --help` prints: `setup, host-snippet, serve, self-check, prove, recover,
-limits, wallet, rollback, export-key, link coinbase, help, version`. `prove` checks that a
-stored receipt is bound to a given input file. `export-key` prints the wallet key to the
-controlling terminal after confirmation and is the only way the key leaves the machine.
+limits, wallet, rollback, export-key, link coinbase, help, version`.
+`prove CHECK_ID INPUT_FILE` checks a stored receipt against supplied input when the
+required local binding is retained. In this snapshot it rejects standard-door records
+after archival clears the canonical request; archived-hash support requires a follow-up
+fix (`client/proof.go`, `client/standard.go`).
+
+`export-key` is the supported client interface for displaying a wallet private key,
+and it requires owner approval at the controlling terminal. This does not protect
+against software running with the same user's access to the file or credential store.
 `link coinbase` is a stub that reports it is not implemented.
 
 ## Keep the clock right
 
-Receipt verification is strict about time: `observed_at <= outcome_at <= valid_until` and
-`outcome_at <= now`, with at most 30 seconds of tolerance on issuance. A machine with a
-lagging clock will reject fresh receipts until it catches up; recover the existing
-purchase afterwards rather than buying again.
+The client rejects receipts issued more than 30 seconds in the future and outcomes
+later than issuance, with additional purchase-time checks. Cross-chain and portfolio
+answers have product-specific observation/expiry rules. A lagging clock can reject a
+fresh receipt; recover the same purchase after correcting the clock.
+
+Setup and funding commands above are instructions, not evidence of a paid canary.
+The offline checks described in [CLAIMS](../CLAIMS.md) did not create or fund a wallet.
