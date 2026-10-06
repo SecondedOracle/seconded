@@ -1,0 +1,131 @@
+{
+  "envelope": {
+    "billing": {
+      "amount_atomic": "250000",
+      "asset": "eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "charged": "pending",
+      "mode": "paid",
+      "network": "eip155:8453",
+      "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a",
+      "payer": "0x3f449246b334d55cbe8e4ce13ebdc1a66c071132",
+      "refund": null,
+      "settlement": "none",
+      "tx": null
+    },
+    "check_id": "8313e6281bb4bb5a9d35bee6116487c4",
+    "checked_by": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "disclaimer": "not_financial_advice_ai_generated",
+    "issued_at": "2026-09-29T23:14:32.820600Z",
+    "key_id": "rk-2026-09-a",
+    "kind": "seconded-receipt",
+    "lane": "N1",
+    "message": "NOT VERIFIED: no usable, verified agreement was reached. Do not act on this automatically; pause or ask a human.",
+    "model_config_fingerprint": "a7cebc14ec70a35b66742ba5b223c2548c6b1475dc0c33a902bb6c56d3400648",
+    "model_config_fingerprints": {
+      "check": "615cf7ac516ff4e74f53300d602185c1015085d535c35b5f0d0562b3790f86cd"
+    },
+    "model_pair_id": "pair-c50c80e0d08b64f8a37bfe97918f26ef",
+    "outcome": "no_agreement",
+    "outcome_at": "2026-09-29T23:14:32.492606Z",
+    "predicate_version": "1",
+    "product": "token_check",
+    "product_schema_version": "1",
+    "reason": "disagreed",
+    "request_commitment": "2e6fc0dc5b3d4f5afbd20ddc40a2c4f7c8e8e876b83724c27a00c2aef3df04eb",
+    "request_digest": null,
+    "seq": 4,
+    "state": "no_agreement",
+    "status": "not_verified",
+    "template_version": "tpl-v1",
+    "tier": "small",
+    "unfreeze_at": null,
+    "v": 3,
+    "verification": {
+      "block": {
+        "chain_id": 84532,
+        "hash": "0xa71e9320ba957fc30ab29c2d8fc5b00fdcc75be05c1f9e549d4f75cdfc27eff2",
+        "number": 47477687
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "decimals",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "eip1967_admin",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "eip1967_implementation",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "impersonation",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "name",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "owner",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "paused",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "sellability",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        },
+        {
+          "fact": "symbol",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "token_list",
+          "reason": "source_unknown",
+          "status": "not_checked"
+        },
+        {
+          "fact": "total_supply",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "verified_source",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "zeppelinos_implementation",
+          "reason": null,
+          "status": "checked"
+        }
+      ],
+      "evidence_sha256": "26633dbe93f2bf117fcc7830dfceb5ff218fc7e952b203343b14c2c2b29c9c12",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  "key_id": "rk-2026-09-a",
+  "sig": "CnzKBmgKdX6QCuIBB05D1O-AMBKiSiJ3EJJVtjd6efIU0JACUMG8a_K9Wjz6-mCidJFgRj91M-nVbtzotSEMCA"
+}

@@ -10,8 +10,8 @@
 // It deliberately does less than the client. The client additionally binds a
 // receipt to the purchase it made (check id, request commitment, payer, amount),
 // validates product-specific answers against the catalog, and tracks receipt
-// sequence across recovery. Those checks need the private purchase ledger; a
-// third party cannot run them, so this verifier does not pretend to.
+// sequence across recovery. Purchase binding needs local records; product
+// semantics can also be checked independently, but are outside this verifier.
 package verifier
 
 import (
@@ -21,12 +21,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"time"
+	"unicode/utf8"
 
 	"seconded.local/verifier/internal/jsoncanonicalizer"
 )
 
-// MaxReceiptBytes bounds the input; the client uses the same response limit.
+// MaxReceiptBytes bounds standalone verifier input to 1 MiB; the client's HTTP
+// response limit is 64 KiB.
 const MaxReceiptBytes = 1 << 20
 
 // Billing is the signed billing block.
@@ -84,18 +87,18 @@ type Report struct {
 
 // States lists every receipt state the client knows how to interpret.
 var States = map[string]string{
-	"released":         "agreed answer; settlement pending or certified nonpayment",
-	"included":         "agreed answer; payment included in a block",
-	"final":            "agreed answer; payment final",
-	"no_agreement":     "NOT VERIFIED: no usable agreement; nothing charged",
-	"trial_delivered":  "agreed answer on a free trial; nothing charged",
-	"refund_owed":      "a refund is owed",
-	"refunded":         "refunded",
-	"content_refused":  "the models refused the content; nothing charged",
-	"service_failed":   "the service failed; nothing charged",
-	"closed_no_charge": "authorization cancelled or expired; certified nonpayment",
-	"frozen_unsettled": "frozen before settlement; nothing charged",
-	"refused":          "the request was refused before admission; nothing charged",
+	"released":         "agreed answer; consult signed billing and payment evidence",
+	"included":         "agreed answer; signer reports payment inclusion",
+	"final":            "agreed answer; signer reports payment finality",
+	"no_agreement":     "NOT VERIFIED: no usable agreement; consult signed billing and payment evidence",
+	"trial_delivered":  "agreed answer; signer reports a free trial",
+	"refund_owed":      "signer reports a refund owed",
+	"refunded":         "signer reports a refund",
+	"content_refused":  "content refused; consult signed billing and payment evidence",
+	"service_failed":   "service failed; consult signed billing and payment evidence",
+	"closed_no_charge": "signer reports certified nonpayment",
+	"frozen_unsettled": "frozen before settlement; consult signed billing and payment evidence",
+	"refused":          "request refused before admission; consult signed billing and payment evidence",
 	"running":          "in progress",
 	"settling":         "settling",
 	"delayed":          "delayed",
@@ -119,6 +122,30 @@ func Verify(data []byte, keys map[string]ed25519.PublicKey) (*Report, error) {
 	if len(data) > MaxReceiptBytes {
 		return nil, fmt.Errorf("%w: larger than %d bytes", ErrInput, MaxReceiptBytes)
 	}
+	if err := checkJSON(data); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInput, err)
+	}
+	var fields map[string]json.RawMessage
+	if json.Unmarshal(data, &fields) != nil || fields == nil {
+		return nil, fmt.Errorf("%w: expected a JSON object", ErrInput)
+	}
+	// Accept one check-reply wrapper with an exact, direct receipt inside it.
+	// Other wrapper fields are unsigned metadata and are never authenticated.
+	if receipt, wrapped := fields["receipt"]; wrapped {
+		for _, key := range []string{"envelope", "sig", "key_id"} {
+			if _, mixed := fields[key]; mixed {
+				return nil, fmt.Errorf("%w: mixed receipt and reply shapes", ErrInput)
+			}
+		}
+		fields = nil
+		if json.Unmarshal(receipt, &fields) != nil || fields == nil {
+			return nil, fmt.Errorf("%w: receipt must be an object", ErrInput)
+		}
+		data = receipt
+	}
+	if len(fields) != 3 || fields["envelope"] == nil || fields["sig"] == nil || fields["key_id"] == nil {
+		return nil, fmt.Errorf("%w: expected exactly {envelope, sig, key_id}", ErrInput)
+	}
 	var wire struct {
 		Envelope  json.RawMessage `json:"envelope"`
 		Signature string          `json:"sig"`
@@ -127,14 +154,7 @@ func Verify(data []byte, keys map[string]ed25519.PublicKey) (*Report, error) {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&wire); err != nil {
-		// Also accept a check reply, which carries the receipt under "receipt".
-		var reply struct {
-			Receipt json.RawMessage `json:"receipt"`
-		}
-		if json.Unmarshal(data, &reply) != nil || len(reply.Receipt) == 0 {
-			return nil, fmt.Errorf("%w: expected {envelope, sig, key_id}", ErrInput)
-		}
-		return Verify(reply.Receipt, keys)
+		return nil, fmt.Errorf("%w: expected {envelope, sig, key_id}", ErrInput)
 	}
 	if len(bytes.TrimSpace(wire.Envelope)) == 0 || bytes.TrimSpace(wire.Envelope)[0] != '{' {
 		return nil, fmt.Errorf("%w: envelope must be a JSON object", ErrInput)
@@ -194,6 +214,72 @@ func Verify(data []byte, keys map[string]ed25519.PublicKey) (*Report, error) {
 		seen[lab] = true
 	}
 	return &Report{KeyID: wire.KeyID, Version: envelope.Version, Envelope: envelope, Canonical: canonical}, nil
+}
+
+// checkJSON rejects ambiguous input before selecting a receipt. Inspect every
+// object, including unsigned wrapper metadata, with bounded depth and work.
+func checkJSON(data []byte) error {
+	if !utf8.Valid(data) {
+		return errors.New("invalid UTF-8")
+	}
+	d := json.NewDecoder(bytes.NewReader(data))
+	d.UseNumber()
+	nodes := 0
+	var walk func(int) error
+	walk = func(depth int) error {
+		nodes++
+		if depth > 64 || nodes > 100000 {
+			return errors.New("JSON complexity limit exceeded")
+		}
+		token, err := d.Token()
+		if err != nil {
+			return err
+		}
+		if delim, ok := token.(json.Delim); ok {
+			switch delim {
+			case '{':
+				seen := map[string]bool{}
+				for d.More() {
+					token, err := d.Token()
+					if err != nil {
+						return err
+					}
+					key, ok := token.(string)
+					if !ok || seen[key] {
+						return errors.New("duplicate object key")
+					}
+					seen[key] = true
+					if err := walk(depth + 1); err != nil {
+						return err
+					}
+				}
+				if end, err := d.Token(); err != nil || end != json.Delim('}') {
+					return errors.New("invalid object ending")
+				}
+			case '[':
+				for d.More() {
+					if err := walk(depth + 1); err != nil {
+						return err
+					}
+				}
+				if end, err := d.Token(); err != nil || end != json.Delim(']') {
+					return errors.New("invalid array ending")
+				}
+			default:
+				return errors.New("unexpected delimiter")
+			}
+		}
+		return nil
+	}
+	if err := walk(0); err != nil {
+		return err
+	}
+	if _, err := d.Token(); err != io.EOF {
+		return errors.New("trailing JSON or malformed data")
+	}
+	// JCS rejects unpaired surrogate escapes and nonfinite numbers too.
+	_, err := Canonical(data)
+	return err
 }
 
 // Canonical returns the RFC 8785 canonical form of one JSON value. It wraps the

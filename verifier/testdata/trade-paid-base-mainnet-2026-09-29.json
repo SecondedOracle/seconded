@@ -1,0 +1,112 @@
+{
+  "envelope": {
+    "answer": {
+      "label_id": "proceed",
+      "option": 3
+    },
+    "billing": {
+      "amount_atomic": "250000",
+      "asset": "eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "charged": "yes",
+      "mode": "paid",
+      "network": "eip155:8453",
+      "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a",
+      "payer": "0x3f449246b334d55cbe8e4ce13ebdc1a66c071132",
+      "refund": null,
+      "settlement": "included",
+      "tx": "0x9472572e3cfe100973002a46b1d943a97ca3839be0c834863654d4a4e4fa1b13"
+    },
+    "check_id": "5ce5fc3259f8fdc19bc67bb19aab49d4",
+    "checked_by": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "disclaimer": "not_financial_advice_ai_generated",
+    "issued_at": "2026-09-29T23:14:17.177484Z",
+    "key_id": "rk-2026-09-a",
+    "kind": "seconded-receipt",
+    "lane": "N1",
+    "model_config_fingerprint": "4977def4c8267b097170520f9d2dc75a2796c8638973aac6df0331af774dbbd2",
+    "model_config_fingerprints": {
+      "check": "d66d811a92c4bc05c220086fe01fdf234411dd1ad4ea66dbfa60c03373e1d4af"
+    },
+    "model_pair_id": "pair-a59ffb95eb088e2decaa9bd08f192996",
+    "outcome": "agreed",
+    "outcome_at": "2026-09-29T23:13:30.445407Z",
+    "predicate_version": "1",
+    "product": "trade_check",
+    "product_schema_version": "1",
+    "request_commitment": "16b553653bc41cd2ca851d20c37a5b240c2d63d5647159b2c84bbd9bc58340c0",
+    "request_digest": null,
+    "seq": 6,
+    "state": "included",
+    "template_version": "tpl-v1",
+    "tier": "small",
+    "unfreeze_at": null,
+    "v": 3,
+    "verification": {
+      "block": {
+        "chain_id": 8453,
+        "hash": "0x4b4b45a6d55f783b89a79df33ea387f0250009ed785858fd3bd858a9e846468c",
+        "number": 51967126
+      },
+      "coverage": [
+        {
+          "fact": "block",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "decode",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "effects",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        },
+        {
+          "fact": "fee",
+          "reason": "source_unknown",
+          "status": "not_checked"
+        },
+        {
+          "fact": "identity",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "owner_control",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        },
+        {
+          "fact": "recipient",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        },
+        {
+          "fact": "simulation",
+          "reason": null,
+          "status": "checked"
+        },
+        {
+          "fact": "slippage",
+          "reason": "source_not_checked",
+          "status": "not_checked"
+        },
+        {
+          "fact": "tokens",
+          "reason": null,
+          "status": "checked"
+        }
+      ],
+      "evidence_sha256": "031c6dd2278a554778f1f31b0017523262866ed28dd84f6c8b0225ef408e85e9",
+      "findings": [],
+      "schema": "seconded-verification/v1"
+    }
+  },
+  "key_id": "rk-2026-09-a",
+  "sig": "YgeT98EoEfThaJCjrgrlEiyDCfdUqpMV49ZAelXZPgqY_Q1tOBDrb7vpznUU7YGWA08C8-TtM4ad9yWvLqTyDg"
+}

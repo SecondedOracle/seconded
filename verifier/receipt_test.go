@@ -175,6 +175,77 @@ func TestReplyWrapperIsAccepted(t *testing.T) {
 	}
 }
 
+func TestReceiptParserRejectsAmbiguousInput(t *testing.T) {
+	priv, keys := testKeys(t)
+	direct := string(sign(t, priv, 1, envelope(1), "rk-test"))
+	reply := `{"status":"pending","receipt":` + direct + `}`
+	for _, valid := range []string{direct, " \n" + direct + "\t", reply} {
+		if _, err := Verify([]byte(valid), keys); err != nil {
+			t.Fatalf("valid control rejected: %v", err)
+		}
+	}
+	cases := map[string]string{
+		"trailing object":             direct + ` {"unsigned":true}`,
+		"trailing scalar":             direct + ` null`,
+		"trailing garbage":            direct + ` broken`,
+		"duplicate direct key":        `{"key_id":"rk-test",` + direct[1:],
+		"escaped duplicate key":       `{"key_\u0069d":"rk-test",` + direct[1:],
+		"duplicate signed key":        strings.Replace(direct, `"state":"final"`, `"state":"final","state":"final"`, 1),
+		"duplicate wrapper receipt":   `{"receipt":` + direct + `,"receipt":` + direct + `}`,
+		"duplicate unsigned metadata": `{"hints":{"x":1,"x":2},"receipt":` + direct + `}`,
+		"trailing wrapper value":      reply + ` []`,
+		"mixed shapes":                `{"envelope":{},"receipt":` + direct + `}`,
+		"nested wrapper":              `{"receipt":` + reply + `}`,
+		"null receipt":                `{"receipt":null}`,
+		"unknown direct field":        `{"extra":true,` + direct[1:],
+		"incorrect field case":        strings.Replace(direct, `"key_id":"rk-test","sig"`, `"KEY_ID":"rk-test","sig"`, 1),
+		"malformed wrapper":           `{"receipt":` + direct + `,}`,
+	}
+	for name, wire := range cases {
+		t.Run(name, func(t *testing.T) {
+			if wire == direct || wire == reply {
+				t.Fatal("negative control did not modify the input")
+			}
+			if _, err := Verify([]byte(wire), keys); !errors.Is(err, ErrInput) {
+				t.Fatalf("want ErrInput, got %v", err)
+			}
+		})
+	}
+}
+
+func TestPublicPaidAndPendingReceipts(t *testing.T) {
+	cases := []struct {
+		file, state, charged string
+	}{
+		{"testdata/trade-paid-base-mainnet-2026-09-29.json", "included", "yes"},
+		{"testdata/token-not-verified-base-sepolia-2026-09-29.json", "no_agreement", "pending"},
+	}
+	for _, c := range cases {
+		data, err := os.ReadFile(c.file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		r, err := Verify(data, ReleaseKeys())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if r.Envelope.State != c.state || r.Envelope.Billing.Charged != c.charged || r.Version != 3 {
+			t.Fatalf("unexpected public receipt: %+v", r.Envelope)
+		}
+		if c.charged == "pending" && (strings.Contains(States[c.state], "nothing charged") || r.Envelope.Billing.Tx != nil) {
+			t.Fatal("pending payment misreported as nonpayment")
+		}
+		// Authentication is still required for both public examples.
+		tampered := strings.Replace(string(data), `"amount_atomic": "250000"`, `"amount_atomic": "250001"`, 1)
+		if tampered == string(data) {
+			t.Fatal("tamper control did not modify the input")
+		}
+		if _, err := Verify([]byte(tampered), ReleaseKeys()); !errors.Is(err, ErrSignature) {
+			t.Fatalf("tampered public receipt accepted: %v", err)
+		}
+	}
+}
+
 func TestKeysFromDocument(t *testing.T) {
 	doc := []byte(`{"network":"eip155:8453","keys":[{"key_id":"rk-2026-09-a","algorithm":"Ed25519","public_key_hex":"` + ReleaseKeysHex["rk-2026-09-a"] + `"}]}`)
 	keys, err := KeysFromDocument(doc)
