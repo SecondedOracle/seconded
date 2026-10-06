@@ -1,0 +1,32 @@
+# gitleaks configuration for this repository.
+#
+# Run:  gitleaks dir . --no-banner --config .github/gitleaks.toml
+#
+# The default ruleset flags every long hex string as a "generic-api-key". This tree
+# legitimately contains public hex: EVM contract and wallet addresses, 32-byte block,
+# transaction and ticket hashes, and the Ed25519 receipt public key. None of these is a
+# credential. The allowlists below are deliberately narrow: 0x-prefixed EVM values, and
+# two exact bare 64-hex values (the compiled receipt public key and a Morpho market id in
+# a test fixture). A bare 64-hex value anywhere else, which is the shape of a raw private
+# key or seed, and every other default rule, is still reported. A planted raw key, AWS
+# key, GitHub token and private-key block were all reported with this config in place
+# when it was written (2026-10-06).
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "0x-prefixed EVM addresses (20 bytes) and hashes (32 bytes) are public identifiers"
+regexTarget = "secret"
+regexes = [
+  '''^0x[0-9a-fA-F]{40}$''',
+  '''^0x[0-9a-fA-F]{64}$''',
+]
+
+[[allowlists]]
+description = "Exact public values: the Ed25519 receipt key pin rk-2026-09-a (docs/guide/receipts.md) and a Morpho market id in client/testdata/lending-candidate-contract.json"
+regexTarget = "secret"
+regexes = [
+  '''^438d9301c477c27fecc3f56da0a7d5a6b3894cef69815bae63b5349dc2cddf0b$''',
+  '''^d7286d06faa48df27315f5ae576581b8fef08626574342f6c478433f0ec9ef30$''',
+]

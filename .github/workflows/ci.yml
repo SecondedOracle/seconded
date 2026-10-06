@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  client:
+    name: client build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: client/go.mod
+          cache-dependency-path: client/go.sum
+      - name: build
+        working-directory: client
+        run: go build ./...
+      - name: vet
+        working-directory: client
+        run: go vet ./...
+      - name: test
+        working-directory: client
+        run: go test ./...
+
+  verifier:
+    name: verifier build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: verifier/go.mod
+      - name: build
+        working-directory: verifier
+        run: go build ./...
+      - name: test
+        working-directory: verifier
+        run: go test ./...
+      - name: verify the shipped fixture end to end
+        working-directory: verifier
+        run: go run ./cmd/seconded-verify testdata/*.json

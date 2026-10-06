@@ -1,0 +1,3 @@
+[mcp_servers.seconded]
+command = "/absolute/path/to/seconded-mcp"
+args = ["serve","--host","codex"]

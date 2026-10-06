@@ -1,0 +1,17 @@
+{
+  "id": "trade_check",
+  "tool": "seconded_trade_check",
+  "use_when": "Before signing a trade, approval, transfer or permit.",
+  "send": "transaction (the exact unsigned tx) or typed_data (an EIP-712 permit); optional typed intent; no prose",
+  "not_for": "The owner's words or rules; no launch check covers them.",
+  "price_usd": {
+    "small": "0.25",
+    "medium": "1.50"
+  },
+  "answer_to_action": {
+    "proceed": "proceed",
+    "do_not_proceed": "STOP and show the owner",
+    "cannot_verify": "pause or ask a human",
+    "NOT VERIFIED": "pause or ask a human"
+  }
+}

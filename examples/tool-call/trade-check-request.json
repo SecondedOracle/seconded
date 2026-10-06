@@ -1,0 +1,25 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "seconded_trade_check",
+    "arguments": {
+      "input": {
+        "transaction": {
+          "chainId": 8453,
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+          "data": "0xa9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000000000000000000000000000004c4b40",
+          "value": "0",
+          "gas": "65000",
+          "maxFeePerGas": "12000000",
+          "maxPriorityFeePerGas": "1000000"
+        }
+      },
+      "max_price_usd": "0.25",
+      "network": "base",
+      "wait_seconds": 25
+    }
+  }
+}

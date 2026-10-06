@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "seconded": {
+      "args": [
+        "serve",
+        "--host",
+        "gemini"
+      ],
+      "command": "/absolute/path/to/seconded-mcp"
+    }
+  }
+}

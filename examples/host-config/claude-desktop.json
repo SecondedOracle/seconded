@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "seconded": {
+      "args": [
+        "serve",
+        "--host",
+        "claude-desktop"
+      ],
+      "command": "/absolute/path/to/seconded-mcp"
+    }
+  }
+}
