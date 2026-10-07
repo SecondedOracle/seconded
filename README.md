@@ -90,7 +90,7 @@ This repository contains the buildable public surface: the Go MCP client, the st
 | Client source | Development snapshot reporting 0.4.2; source-built bytes differ from published release | `client/api.go`, CI workflow, [CLAIMS](docs/CLAIMS.md) |
 | Receipt verifier | Builds; verifies public fixtures; parser and tamper controls | `verifier/receipt_test.go` |
 | Catalog | 12 checks advertised to client 0.4.2; 6 products in testing | Dated GETs, `client/products.json` |
-| Distribution | npm (`@seconded/mcp`) and GitHub releases at 0.4.1; 0.4.2 source snapshot in this repository | [release-verification](docs/guide/release-verification.md) |
+| Distribution | npm (`@seconded/mcp`) and GitHub releases at 0.4.2 (signed; verify with the release guide) | [release-verification](docs/guide/release-verification.md) |
 | Licence | Apache-2.0 | [LICENSE](LICENSE), [NOTICE](NOTICE) |
 
 ---

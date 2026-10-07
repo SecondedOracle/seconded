@@ -4,6 +4,10 @@ Entries use `[Added]`, `[Changed]`, `[Fixed]`, `[Removed]`, `[Security]`. Client
 are the `ClientVersion` constant in `client/api.go`. Earlier history lives in the private
 repository.
 
+## Client 0.4.2 (published 2026-10-06)
+
+Hardening release; no new features. Signed release and npm package published from the neutral publisher account.
+
 ## Unreleased
 
 - [Fixed] Release and Registry status, development-source provenance, version-aware
