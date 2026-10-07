@@ -1,10 +1,7 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme-hero-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/readme-hero-light.png">
-  <img alt="SECONDED. The oracle for agents. Two rival AI models must agree. Signed receipt on every answer. No answer, no charge. Payment networks advertised: Base, Arc and Robinhood Chain." src="assets/readme-hero-light.png" width="800">
-</picture>
+<img src="assets/readme-hero-light.png#gh-light-mode-only" alt="SECONDED. The oracle for agents." width="800">
+<img src="assets/readme-hero-dark.png#gh-dark-mode-only" alt="SECONDED. The oracle for agents." width="800">
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs must agree, and every answer comes with a signed receipt; no answer, no charge.**
 
@@ -97,6 +94,18 @@ This repository contains the buildable public surface: the Go MCP client, the st
 | Catalog | 12 checks advertised to client 0.4.2; 6 products in testing | Dated GETs, `client/products.json` |
 | Distribution | npm (`@seconded/mcp`) and GitHub releases at 0.4.1; 0.4.2 source snapshot in this repository | [release-verification](docs/guide/release-verification.md) |
 | Licence | Apache-2.0 | [LICENSE](LICENSE), [NOTICE](NOTICE) |
+
+---
+
+## $SECONDED token
+
+The only official $SECONDED contract, on Robinhood Chain:
+
+```
+0x833a7fA750628b391c35bf384d7706652c7e8202
+```
+
+Always check the address against [secondedoracle.xyz/token](https://secondedoracle.xyz/token) before interacting. Any other address is not ours.
 
 ---
 
