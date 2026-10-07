@@ -1,7 +1,6 @@
 <div align="center">
 
-<img src="assets/readme-hero-light.png#gh-light-mode-only" alt="SECONDED. The oracle for agents." width="800">
-<img src="assets/readme-hero-dark.png#gh-dark-mode-only" alt="SECONDED. The oracle for agents." width="800">
+<img src="assets/social-preview-1280x640.png" alt="SECONDED: the oracle for agents. Two rival AI models must agree. Signed receipt on every answer." width="720">
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs must agree, and every answer comes with a signed receipt; no answer, no charge.**
 
@@ -16,7 +15,6 @@
 
 ---
 
-SECONDED is the oracle for agents: before an AI agent acts, two AI models from rival labs must agree, and every answer comes with a signed receipt; no answer, no charge.
 
 ### Why it matters
 
