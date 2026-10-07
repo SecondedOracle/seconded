@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/social-preview-1280x640.png" alt="SECONDED: the oracle for agents. Two rival AI models must agree. Signed receipt on every answer." width="720">
+<img src="assets/repo-banner-1600x500.png" alt="SECONDED. The oracle for agents." width="800">
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs must agree, and every answer comes with a signed receipt; no answer, no charge.**
 
