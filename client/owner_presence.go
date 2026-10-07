@@ -9,18 +9,20 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"time"
 )
 
 var errPresenceUnavailable = errors.New("owner_presence_unavailable")
 
-// ConfirmOwnerPresence never treats terminal input as proof of owner presence.
-// On supported Macs authentication occurs in the OS biometric dialog. Headless
-// approval requires an administrator-installed public key and an offline signer.
+// ConfirmOwnerPresence adds biometrics or administrator-configured approval to
+// the caller's existing TTY confirmation. With neither available, that TTY
+// confirmation is the fallback and does not stop an agent with shell access.
 var authenticateOwnerPresence = platformOwnerPresence
+var loadOwnerPresenceApprovalKey = ownerApprovalKey
 
 func ConfirmOwnerPresence(reason string, input io.Reader, output io.Writer) error {
-	return confirmOwnerPresence(reason, input, output, authenticateOwnerPresence, ownerApprovalKey)
+	return confirmOwnerPresence(reason, input, output, authenticateOwnerPresence, loadOwnerPresenceApprovalKey)
 }
 
 func confirmOwnerPresence(reason string, input io.Reader, output io.Writer, presence func(string) error, key func() (ed25519.PublicKey, error)) error {
@@ -32,6 +34,9 @@ func confirmOwnerPresence(reason string, input io.Reader, output io.Writer, pres
 		return ErrTerminalPolicyRequired
 	}
 	public, err := key()
+	if errors.Is(err, os.ErrNotExist) && len(public) == 0 {
+		return nil // The caller already required the six-character TTY confirmation.
+	}
 	if err != nil || len(public) != ed25519.PublicKeySize {
 		return ErrTerminalPolicyRequired
 	}

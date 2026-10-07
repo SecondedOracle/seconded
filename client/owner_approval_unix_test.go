@@ -3,6 +3,7 @@
 package client
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -40,10 +41,10 @@ func TestOfflineApprovalTrustRequiresAdministrator(t *testing.T) {
 	if err := os.WriteFile(path, []byte("0000000000000000000000000000000000000000000000000000000000000000\n"), 0600); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := readOwnerApprovalKey(path); err == nil {
+	if _, err := readOwnerApprovalKey(path); err == nil || errors.Is(err, os.ErrNotExist) {
 		t.Fatal("agent-owned key enabled fallback")
 	}
-	if _, err := readOwnerApprovalKey(filepath.Join(dir, "absent")); err == nil {
-		t.Fatal("absent key enabled fallback")
+	if _, err := readOwnerApprovalKey(filepath.Join(dir, "absent")); !errors.Is(err, os.ErrNotExist) {
+		t.Fatal("absent key did not allow TTY fallback", err)
 	}
 }

@@ -26,6 +26,9 @@ func rootProtected(info os.FileInfo, directory bool) bool {
 func readOwnerApprovalKey(path string) (ed25519.PublicKey, error) {
 	// Resolve system symlinks such as /etc -> /private/etc before checking every
 	// ancestor; none may be replaceable by an unprivileged process.
+	if _, err := os.Lstat(path); os.IsNotExist(err) {
+		return nil, os.ErrNotExist
+	}
 	resolved, err := filepath.EvalSymlinks(path)
 	if err != nil {
 		return nil, errPresenceUnavailable

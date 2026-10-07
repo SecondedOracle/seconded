@@ -78,7 +78,9 @@ func readLedgerFile(f *Files, name string) (Ledger, error) {
 	if e != nil {
 		return l, e
 	}
-	if DecodeStrict(b, &l, 32<<20) != nil || l.Version != 1 || len(l.Entries) > 50000 {
+	// Shipped clients could persist MaxInt64 in this unsigned advisory field.
+	// Decode it exactly, keeping all other strict JSON and ledger checks intact.
+	if checkJSONIntegers(b, 32<<20, "/entries/*/recovery/next_attempt") != nil || decodeStrictChecked(b, &l) != nil || l.Version != 1 || len(l.Entries) > 50000 {
 		return l, ErrStorage
 	}
 	if l.Entries == nil {

@@ -8959,6 +8959,9 @@
                   }
                 ]
               },
+              "metadata_present": {
+                "type": "boolean"
+              },
               "network": {
                 "enum": [
                   "eip155:1",
@@ -9168,6 +9171,9 @@
                 ]
               },
               "unlimited_approval": {
+                "type": "boolean"
+              },
+              "unsupported_extensions": {
                 "type": "boolean"
               }
             },

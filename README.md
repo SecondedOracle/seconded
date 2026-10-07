@@ -8,7 +8,7 @@
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs must agree, and every answer comes with a signed receipt; no answer, no charge.**
 
-![client](https://img.shields.io/badge/client-0.4.1-blue)
+![client](https://img.shields.io/badge/client-0.4.2-blue)
 ![go](https://img.shields.io/badge/go-1.26.7-00ADD8)
 ![receipts](https://img.shields.io/badge/receipts-Ed25519%20%C2%B7%20RFC%208785-success)
 ![chains](https://img.shields.io/badge/pays%20on-Base%20%C2%B7%20Arc%20%C2%B7%20Robinhood%20Chain-informational)
@@ -23,9 +23,9 @@ SECONDED is the oracle for agents: before an AI agent acts, two AI models from r
 
 ### Why it matters
 
-- **Autonomous agents make high-stakes mistakes:** Before an AI agent signs a transaction, executes a trade, or trusts external input, an independent check prevents hallucinations and costly errors.
-- **Rival-lab consensus eliminates single-vendor blind spots:** Every check queries models from competing labs (OpenAI and Anthropic); agreement is required before an answer is accepted.
-- **Cryptographic receipts provide an immutable audit trail:** Every response carries an Ed25519-signed receipt over canonical JSON; if the models disagree or cannot verify the action, you receive a NOT VERIFIED receipt and are not charged.
+- **Autonomous agents make high-stakes mistakes:** Before an AI agent signs a transaction, executes a trade, or trusts external input, it adds an independent check before the agent acts.
+- **Rival-lab consensus reduces single-vendor blind spots:** Every check queries models from competing labs; agreement is required before an answer is accepted.
+- **Signed receipts anyone can verify:** Every response carries an Ed25519-signed receipt over canonical JSON; if the models disagree or cannot verify the action, you receive a NOT VERIFIED receipt and are not charged.
 
 ---
 
@@ -78,7 +78,7 @@ This repository contains the buildable public surface: the Go MCP client, the st
 
 - **[How a check works](docs/guide/how-it-works.md):** The x402 payment flow, rival-model evaluation, and settlement policy.
 - **[Receipts and verification](docs/guide/receipts.md):** Ed25519 signatures, RFC 8785 canonicalization, and verifying receipts offline.
-- **[Tools reference](docs/guide/tools.md):** The 18 MCP tools exposed by client 0.4.1 and testing utilities.
+- **[Tools reference](docs/guide/tools.md):** The 18 MCP tools exposed by client 0.4.2 and testing utilities.
 - **[Pricing and coverage](docs/guide/pricing-and-coverage.md):** Catalog of 12 checks, payment networks (Base, Arc, Robinhood Chain), and pricing tiers.
 - **[Install and run](docs/guide/install.md):** Building from source, setting up the dedicated wallet, and configuring spending limits.
 - **[Security model](docs/guide/security-model.md):** Trust boundaries, hot wallet protections, and verification limits.
@@ -91,11 +91,11 @@ This repository contains the buildable public surface: the Go MCP client, the st
 
 | Component | State on 2026-10-06 | Evidence |
 | --- | --- | --- |
-| Public API (`api.secondedoracle.xyz`) | Public GET endpoints reachable; 3 payment networks and 12 checks advertised to client 0.4.1 | Dated header-aware GETs in [CLAIMS](docs/CLAIMS.md) |
-| Client source | Development snapshot reporting 0.4.1; source-built bytes differ from published release | `client/api.go`, CI workflow, [CLAIMS](docs/CLAIMS.md) |
+| Public API (`api.secondedoracle.xyz`) | Public GET endpoints reachable; 3 payment networks and 12 checks advertised | Dated header-aware GETs in [CLAIMS](docs/CLAIMS.md) |
+| Client source | Development snapshot reporting 0.4.2; source-built bytes differ from published release | `client/api.go`, CI workflow, [CLAIMS](docs/CLAIMS.md) |
 | Receipt verifier | Builds; verifies public fixtures; parser and tamper controls | `verifier/receipt_test.go` |
-| Catalog | 12 checks advertised to client 0.4.1; 6 products in testing | Dated GETs, `client/products.json` |
-| Distribution | npm (`@seconded/mcp`) and GitHub releases at 0.4.1 | [release-verification](docs/guide/release-verification.md) |
+| Catalog | 12 checks advertised to client 0.4.2; 6 products in testing | Dated GETs, `client/products.json` |
+| Distribution | npm (`@seconded/mcp`) and GitHub releases at 0.4.1; 0.4.2 source snapshot in this repository | [release-verification](docs/guide/release-verification.md) |
 | Licence | Apache-2.0 | [LICENSE](LICENSE), [NOTICE](NOTICE) |
 
 ---

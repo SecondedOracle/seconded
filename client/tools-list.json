@@ -14,7 +14,7 @@
   },
   {
     "name": "seconded_set_limits",
-    "description": "Change spending limits at the user's request, without a password. For 'set my daily limit to $20', pass {\"daily_usd\":20}. Chat can only tighten limits or freeze. Any increase, removal, safety-switch weakening or unfreeze requires the human terminal. These changes require the owner to run the terminal command returned on refusal. There is an absolute $25/day chat ceiling, even when the owner has authorized a higher daily limit in the terminal. Omitted fields stay unchanged. The hard $2.50 per-authorization cap always applies, even if per_check_usd is higher or none. Also changes value_gate, dedupe, loop_brake, alerts and frozen switches.",
+    "description": "Change spending limits at the user's request, without a password. For 'set my daily limit to $20', pass {\"daily_usd\":20}. Chat can only tighten limits or freeze. Any increase, removal, safety-switch weakening or unfreeze requires the human terminal. These changes require the owner to run the terminal command returned on refusal. On Macs with Touch ID, owner changes also require biometrics. Otherwise an installed administrator approval key requires an offline signature. Without either, the six-character TTY confirmation does not stop an agent with shell access. There is an absolute $25/day chat ceiling, even when the owner has authorized a higher daily limit in the terminal. Omitted fields stay unchanged. The hard $2.50 per-authorization cap always applies, even if per_check_usd is higher or none. Also changes value_gate, dedupe, loop_brake, alerts and frozen switches.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -216,7 +216,7 @@
   },
   {
     "name": "seconded_trade_check",
-    "description": "Use when: Before signing a trade, approval, transfer or permit.\nChecks: approval/signature scope; intent cap.\nSend: transaction or typed_data; optional typed intent.\nAnswer \u2192 do: proceed: sign exact input; do_not_proceed: STOP. NOT VERIFIED: pause. Re-check changes.\nCost: $0.25/$1.50 S/M.\nNot for: The owner's words or rules; no launch check covers them. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before signing a trade, approval, transfer or permit.\nChecks: approval/signature scope; intent cap.\nSend: transaction or typed_data; optional typed intent.\nAnswer → do: proceed: sign exact input; do_not_proceed: STOP. NOT VERIFIED: pause. Re-check changes.\nCost: $0.25/$1.50 S/M.\nNot for: The owner's words or rules; no launch check covers them. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -459,7 +459,7 @@
   },
   {
     "name": "seconded_stock_token_check",
-    "description": "Use when: Before trading a Robinhood or Coinbase Base stock token.\nSend: input with network (eip155:4663 or eip155:8453), address; ticker and intended_price_usd optional.\nAnswer \u2192 do: official_stock_token: continue checks; not_official_or_out_of_line: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) S only; larger inputs refused. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before trading a Robinhood or Coinbase Base stock token.\nSend: input with network (eip155:4663 or eip155:8453), address; ticker and intended_price_usd optional.\nAnswer → do: official_stock_token: continue checks; not_official_or_out_of_line: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) S only; larger inputs refused. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -536,7 +536,7 @@
   },
   {
     "name": "seconded_token_check",
-    "description": "Use when: Before interacting with a token.\nSend: input with network, address.\nAnswer \u2192 do: issuer_controlled_expected: proceed; issuer can freeze/upgrade. no_checked_warning_signs: proceed with normal checks; any warning_*: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before interacting with a token.\nSend: input with network, address.\nAnswer → do: issuer_controlled_expected: proceed; issuer can freeze/upgrade. no_checked_warning_signs: proceed with normal checks; any warning_*: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -604,7 +604,7 @@
   },
   {
     "name": "seconded_agent_registry_check",
-    "description": "Use when: Before paying or trusting another agent that claims an ERC-8004 identity.\nSend: input with network, agent_id; claimed_owner, claimed_wallet, context optional.\nAnswer \u2192 do: registered_with_feedback/registered_without_feedback: proceed with normal checks; other answers: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.25 small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before paying or trusting another agent that claims an ERC-8004 identity.\nSend: input with network, agent_id; claimed_owner, claimed_wallet, context optional.\nAnswer → do: registered_with_feedback/registered_without_feedback: proceed with normal checks; other answers: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.25 small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -688,7 +688,7 @@
   },
   {
     "name": "seconded_counterparty_check",
-    "description": "Use when: Before relying on an address.\nChecks OFAC SDN addresses, configured deployments and pin lookalikes. No scam/phishing address lists. A no-match is not proof of safety.\nSend: network, address.\nAnswer \u2192 do: listed_warning/deployment_mismatch: STOP; cannot_verify/NOT VERIFIED: pause; matches: get scam/drainer screening before funds.\nCost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before relying on an address.\nChecks OFAC SDN addresses, configured deployments and pin lookalikes. No scam/phishing address lists. A no-match is not proof of safety.\nSend: network, address.\nAnswer → do: listed_warning/deployment_mismatch: STOP; cannot_verify/NOT VERIFIED: pause; matches: get scam/drainer screening before funds.\nCost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -750,7 +750,7 @@
   },
   {
     "name": "seconded_cross_chain_compare",
-    "description": "Use when: Before selecting a chain for a USDC -> EURC swap.\nSend: mode, amount_in, asset_in, asset_out, routes.\nAnswer \u2192 do: comparison_available: inspect gross pool quote only, not total cost; comparison_invalid: STOP. NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) S.\nNot for: Trade execution, bridging, transaction signing, or non-Circle assets. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before selecting a chain for a USDC -> EURC swap.\nSend: mode, amount_in, asset_in, asset_out, routes.\nAnswer → do: comparison_available: inspect gross pool quote only, not total cost; comparison_invalid: STOP. NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) S.\nNot for: Trade execution, bridging, transaction signing, or non-Circle assets. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -865,7 +865,7 @@
   },
   {
     "name": "seconded_scam_check",
-    "description": "Use when: Before acting on an incoming message.\nSend: input with message.\nAnswer \u2192 do: benign: proceed; suspicious: verify independently; malicious: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood)/$1.50/$2.50 S/M/L. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before acting on an incoming message.\nSend: input with message.\nAnswer → do: benign: proceed; suspicious: verify independently; malicious: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood)/$1.50/$2.50 S/M/L. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -935,7 +935,7 @@
   },
   {
     "name": "seconded_lending_check",
-    "description": "Use when: Reviewing one Morpho account and market at a block.\nSend: network, account, market_id.\nAnswer \u2192 do: no_debt/within_lltv_at_block: inspect at-block facts; liquidatable_at_block: show owner. NOT VERIFIED: pause. No loan actions; oracle accuracy and age unknown.\nCost: $0.25 small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Reviewing one Morpho account and market at a block.\nSend: network, account, market_id.\nAnswer → do: no_debt/within_lltv_at_block: inspect at-block facts; liquidatable_at_block: show owner. NOT VERIFIED: pause. No loan actions; oracle accuracy and age unknown.\nCost: $0.25 small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1001,7 +1001,7 @@
   },
   {
     "name": "seconded_job_escrow_check",
-    "description": "Use when: Before funding or taking an agent job.\nChecks: Escrow, payout, refund, judging and admin controls.\nSend: network, escrow_contract, role, intended_amount; order_id optional.\nAnswer \u2192 do: proceed: continue; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nACP providers usually face client judging. No delivery or payout guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before funding or taking an agent job.\nChecks: Escrow, payout, refund, judging and admin controls.\nSend: network, escrow_contract, role, intended_amount; order_id optional.\nAnswer → do: proceed: continue; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nACP providers usually face client judging. No delivery or payout guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1082,7 +1082,7 @@
   },
   {
     "name": "seconded_x402_payment_check",
-    "description": "Use when: Before authorizing an x402 offer. Send: one input object; never input.input. Copy offer fields exactly; do not rename amount. Supply actual pending typed data in top-level signing; never invent signing context. Answer \u2192 do: do_not_proceed: STOP. NOT VERIFIED: pause without authorizing. Cost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Before authorizing an x402 offer. Send: one input object; never input.input. Copy offer fields exactly; do not rename amount. Supply actual pending typed data in top-level signing; never invent signing context. Answer → do: do_not_proceed: STOP. NOT VERIFIED: pause without authorizing. Cost: $0.10 ($0.15 on Robinhood) small only. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1512,7 +1512,7 @@
   },
   {
     "name": "seconded_shielded_route_check",
-    "description": "Use when: Compare bounded shielded route quotes.\nSend: network, asset, amount.\nAnswer \u2192 do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nNo anonymity or legal-compliance guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Compare bounded shielded route quotes.\nSend: network, asset, amount.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nNo anonymity or legal-compliance guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1594,7 +1594,7 @@
   },
   {
     "name": "seconded_route_check",
-    "description": "Use when: Check a proposed public route for bounded linkability evidence.\nSend: from, hops, to, history_blocks.\nAnswer \u2192 do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) small only.\nNo anonymity or legal-compliance guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
+    "description": "Use when: Check a proposed public route for bounded linkability evidence.\nSend: from, hops, to, history_blocks.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) small only.\nNo anonymity or legal-compliance guarantee. New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {

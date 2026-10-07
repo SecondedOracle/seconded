@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -115,5 +116,35 @@ func (r *approvalReader) Read(p []byte) (int, error) {
 func TestPresenceErrorIsPolicyRefusal(t *testing.T) {
 	if !errors.Is(confirmOwnerPresence("test", strings.NewReader(""), io.Discard, func(string) error { return errors.New("cancelled") }, func() (ed25519.PublicKey, error) { t.Fatal("downgraded"); return nil, nil }), ErrTerminalPolicyRequired) {
 		t.Fatal("wrong error")
+	}
+}
+
+func TestOwnerPresenceFallbackPlatforms(t *testing.T) {
+	for _, platform := range []string{"linux", "windows", "mac without biometrics"} {
+		t.Run(platform, func(t *testing.T) {
+			err := confirmOwnerPresence("already TTY-confirmed action", strings.NewReader(""), io.Discard,
+				func(string) error { return errPresenceUnavailable },
+				func() (ed25519.PublicKey, error) { return nil, os.ErrNotExist })
+			if err != nil {
+				t.Fatal("TTY fallback unavailable", err)
+			}
+		})
+	}
+}
+
+func TestInstalledOwnerKeyNeverDowngrades(t *testing.T) {
+	public, _, _ := ed25519.GenerateKey(rand.Reader)
+	for _, tc := range []struct {
+		key ed25519.PublicKey
+		err error
+	}{
+		{public, nil}, {nil, errPresenceUnavailable}, {nil, errors.New("permission denied")}, {public[:3], nil},
+	} {
+		err := confirmOwnerPresence("action", strings.NewReader("abcdef\n"), io.Discard,
+			func(string) error { return errPresenceUnavailable },
+			func() (ed25519.PublicKey, error) { return tc.key, tc.err })
+		if !errors.Is(err, ErrTerminalPolicyRequired) {
+			t.Fatal("installed/broken key bypass", err)
+		}
 	}
 }

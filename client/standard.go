@@ -299,12 +299,34 @@ func (l Ledger) requireRecovery() error {
 	}
 	return nil
 }
+
+// retryExpiry saturates before adding clock skew, including for old local data.
+func retryExpiry(validBefore int64) int64 {
+	return max(0, min(validBefore, int64(1<<63-1)-30)+30)
+}
+
+func (e Entry) retryAt() int64 {
+	if e.Recovery == nil {
+		return 0
+	}
+	expiry := retryExpiry(e.ValidBefore)
+	next := e.Recovery.NextAttempt
+	// Keep modest post-expiry backoff, including the writer's second round-up.
+	// Excessive legacy deadlines fall back to the fixed expiry boundary, never
+	// a moving now+60 deadline that would postpone recovery on every read.
+	now := time.Now().Unix()
+	if next > expiry && next > min(now, int64(1<<63-1)-61)+61 {
+		return expiry
+	}
+	return next
+}
+
 func (a *API) replay(ctx context.Context, e Entry, wait int) (CheckReply, error) {
 	r := e.Recovery
 	if r == nil || r.Validate(e) != nil || r.URL != a.url+standardDoor {
 		return CheckReply{}, ErrStorage
 	}
-	if r.Format == "seconded-door-archive/v1" || (r.State == "resolved" && !receiptNeedsCollection(e.Receipt)) || time.Now().Unix() < r.NextAttempt {
+	if r.Format == "seconded-door-archive/v1" || (r.State == "resolved" && !receiptNeedsCollection(e.Receipt)) || time.Now().Unix() < e.retryAt() {
 		return CheckReply{}, errors.New("presentation_indeterminate")
 	}
 	status, b, h, err := a.request(ctx, "POST", standardDoor, json.RawMessage(r.BodyBytes), map[string]string{"PAYMENT-SIGNATURE": r.PaymentSignature, "Prefer": "wait=" + strconv.Itoa(wait)})
@@ -348,13 +370,10 @@ func (r *RecoveryRecord) recoveryReply(status int, b []byte, h http.Header, err 
 	if int64(reply.Hints.PollAfter) > delay {
 		delay = int64(reply.Hints.PollAfter)
 	}
-	// Unsigned timing cannot hold recovery beyond authorization expiry plus
-	// clock skew. Expired authorizations retain the minimum retry interval;
-	// only verified receipts can resolve the payment or permit a new purchase.
-	deadline := int64(1<<63 - 1)
-	if validBefore <= deadline-30 {
-		deadline = max(now+1, validBefore+30)
-	}
+	// Retain up to a minute of server backoff after expiry to avoid hammering an
+	// overloaded service. Only verified receipts can resolve the payment or
+	// permit a new purchase; unsigned timing only schedules the next attempt.
+	deadline := max(retryExpiry(validBefore), min(now, int64(1<<63-1)-60)+60)
 	delay = min(delay, deadline-now)
 	r.NextAttempt = now + delay
 	return reply, parseErr

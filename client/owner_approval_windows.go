@@ -1,6 +1,9 @@
 package client
 
-import "crypto/ed25519"
+import (
+	"crypto/ed25519"
+	"os"
+)
 
-// Windows fails closed until an administrator-protected trust store is supplied.
-func ownerApprovalKey() (ed25519.PublicKey, error) { return nil, errPresenceUnavailable }
+// Windows has no administrator-protected approval key; use the caller's TTY confirmation.
+func ownerApprovalKey() (ed25519.PublicKey, error) { return nil, os.ErrNotExist }

@@ -21,14 +21,20 @@ var ErrInvalid = errors.New("invalid_response")
 // Check JSON before decoding: encoding/json alone accepts duplicate keys and
 // repairs invalid Unicode, both of which can change the signed interpretation.
 func checkJSON(data []byte, limit int) error {
+	return checkJSONIntegers(data, limit, "")
+}
+
+// wideIntegerPath is reserved for unsigned local ledger retry timestamps.
+// Signed/wire JSON continues to require exactly representable JCS integers.
+func checkJSONIntegers(data []byte, limit int, wideIntegerPath string) error {
 	if len(data) > limit || !utf8.Valid(data) {
 		return ErrInvalid
 	}
 	d := json.NewDecoder(bytes.NewReader(data))
 	d.UseNumber()
 	nodes := 0
-	var walk func(int) error
-	walk = func(depth int) error {
+	var walk func(int, string) error
+	walk = func(depth int, path string) error {
 		nodes++
 		if depth > 64 || nodes > 100000 {
 			return ErrInvalid
@@ -39,7 +45,8 @@ func checkJSON(data []byte, limit int) error {
 		}
 		if n, ok := t.(json.Number); ok && !strings.ContainsAny(string(n), ".eE") {
 			v, ok := new(big.Int).SetString(string(n), 10)
-			if !ok || new(big.Int).Abs(v).Cmp(big.NewInt(9007199254740991)) > 0 {
+			wide := wideIntegerPath != "" && path == wideIntegerPath && ok && v.IsInt64() && v.Sign() >= 0
+			if !ok || (!wide && new(big.Int).Abs(v).Cmp(big.NewInt(9007199254740991)) > 0) {
 				return ErrInvalid
 			}
 		}
@@ -57,7 +64,8 @@ func checkJSON(data []byte, limit int) error {
 						return ErrInvalid
 					}
 					seen[key] = true
-					if e = walk(depth + 1); e != nil {
+					escaped := strings.ReplaceAll(strings.ReplaceAll(key, "~", "~0"), "/", "~1")
+					if e = walk(depth+1, path+"/"+escaped); e != nil {
 						return e
 					}
 				}
@@ -67,7 +75,7 @@ func checkJSON(data []byte, limit int) error {
 				}
 			case '[':
 				for d.More() {
-					if e := walk(depth + 1); e != nil {
+					if e := walk(depth+1, path+"/*"); e != nil {
 						return e
 					}
 				}
@@ -81,7 +89,7 @@ func checkJSON(data []byte, limit int) error {
 		}
 		return nil
 	}
-	if err := walk(0); err != nil {
+	if err := walk(0, ""); err != nil {
 		return err
 	}
 	if _, err := d.Token(); err != io.EOF {
@@ -98,6 +106,10 @@ func DecodeStrict(data []byte, dst any, limit int) error {
 	if err := checkJSON(data, limit); err != nil {
 		return err
 	}
+	return decodeStrictChecked(data, dst)
+}
+
+func decodeStrictChecked(data []byte, dst any) error {
 	if err := exactShape(data, reflect.TypeOf(dst)); err != nil {
 		return err
 	}

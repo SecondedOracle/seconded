@@ -25,6 +25,14 @@ repository.
   examples, issue templates, and a CI workflow that builds the client and runs both test
   suites on `ubuntu-latest`.
 
+## Client 0.4.2 (hardening release)
+
+- [Fixed] Bounded wallet recovery: clamps stuck reservations and heals legacy ledger entries without releasing outstanding payment obligations early.
+- [Changed] Owner presence: falls back to human terminal confirmation when biometrics are unavailable and no administrator approval key is installed; rejected approvals and invalid installed keys still fail closed.
+- [Fixed] Installation no longer waits indefinitely on the reviewed lockup path; client crypto dependencies updated.
+- [Added] Expanded reason vocabulary: decodes 23 additional server-side refusal and abstention reasons and four Token Check STOP warning labels.
+- [Changed] Address Screening description: documents bounded list coverage.
+
 ## Client 0.4.1 (published 2026-10-06)
 
 - [Fixed] Wallet payments no longer stall when Base finality lags. Admission accepts fresh,

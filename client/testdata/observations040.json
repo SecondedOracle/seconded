@@ -1862,188 +1862,7 @@
     "answer": {
       "check_observations": {
         "decision": "not_verified",
-        "do_not_route": [
-          {
-            "asset": "ETH",
-            "bridge": "op_exit",
-            "bridge_public": true,
-            "chain": 1,
-            "compliance": {
-              "asp": false,
-              "currently_verified": null,
-              "ppoi": true,
-              "screening": null
-            },
-            "cost_assumptions": [
-              "Historical whole-receipt gas repriced at current fees; not a simulation.",
-              "Approximately 10% of unshield gas as broadcaster premium; no live offer."
-            ],
-            "cost_decimals": 18,
-            "custody_address": "0xfa7093cdd9ee6932b4eb2c9e1cde7ce00b1fa4b9",
-            "custody_balance_atomic": null,
-            "destination_network": "eip155:1",
-            "eligible": false,
-            "eligible_depositors": null,
-            "estimate_only": false,
-            "exit_quotes": [],
-            "gas_legs": [],
-            "id": 12,
-            "implementation_hash": null,
-            "minimum_output_atomic": null,
-            "missing_legs": [
-              "origin_bridge_deposit",
-              "destination_shield",
-              "destination_unshield",
-              "destination_wrap",
-              "destination_approval",
-              "complete_bridge_estimate"
-            ],
-            "output_amount_atomic": null,
-            "output_asset": "ETH",
-            "output_decimals": 18,
-            "output_value_usd": null,
-            "privacy_endpoint": "screened_pool",
-            "privacy_notice": null,
-            "protocol_cost_atomic": "49937500000000",
-            "quote_basis": null,
-            "quote_expired": false,
-            "quote_expires_at": null,
-            "relay_mode": "unknown",
-            "relay_premium_asset": "ETH",
-            "relay_premium_estimate_native": null,
-            "risks": [
-              "unreviewed"
-            ],
-            "screening_api": "unknown",
-            "screening_requirement": {
-              "eligibility_verified": false,
-              "label": "safest (screened pool; you must pass PPOI/ASP \u2014 steps listed)",
-              "steps": [
-                "Select PPOI list providers and a POI node in the wallet privacy engine.",
-                "Synchronize trees and check deposit provenance against the selected lists.",
-                "Observe the provider standby period (initially documented as one hour).",
-                "Generate and verify spendability proofs; obtain an acceptable current broadcaster offer."
-              ]
-            },
-            "security_review_complete": false,
-            "selected_bridge": null,
-            "shielded_destination": true,
-            "slippage_bps": null,
-            "swap_cost_atomic": null,
-            "swap_time_seconds": null,
-            "thin_crowd": null,
-            "time_excludes": [
-              "proof generation",
-              "holding time",
-              "screening standby",
-              "finality"
-            ],
-            "time_seconds": null,
-            "total_cost_atomic": null,
-            "total_cost_usd": null,
-            "unknowns": [
-              "unavailable",
-              "pause_unknown",
-              "crowd_unknown",
-              "asset_unsupported",
-              "gas_unknown",
-              "relay_unknown",
-              "bridge_unknown",
-              "time_unknown"
-            ],
-            "venue": "Railgun"
-          },
-          {
-            "asset": "ETH",
-            "bridge": "op_exit",
-            "bridge_public": true,
-            "chain": 1,
-            "compliance": {
-              "asp": true,
-              "currently_verified": null,
-              "ppoi": false,
-              "screening": null
-            },
-            "cost_assumptions": [
-              "Historical whole-receipt gas repriced at current fees; not a simulation.",
-              "Self-submitted withdrawal; zero relayer premium."
-            ],
-            "cost_decimals": 18,
-            "custody_address": "0xf241d57c6debae225c0f2e6ea1529373c9a9c9fb",
-            "custody_balance_atomic": null,
-            "destination_network": "eip155:1",
-            "eligible": false,
-            "eligible_depositors": null,
-            "estimate_only": false,
-            "exit_quotes": [],
-            "gas_legs": [],
-            "id": 13,
-            "implementation_hash": null,
-            "minimum_output_atomic": null,
-            "missing_legs": [
-              "origin_bridge_deposit",
-              "destination_shield",
-              "destination_unshield",
-              "complete_bridge_estimate",
-              "protocol_fees"
-            ],
-            "output_amount_atomic": null,
-            "output_asset": "ETH",
-            "output_decimals": 18,
-            "output_value_usd": null,
-            "privacy_endpoint": "screened_pool",
-            "privacy_notice": null,
-            "protocol_cost_atomic": null,
-            "quote_basis": null,
-            "quote_expired": false,
-            "quote_expires_at": null,
-            "relay_mode": "unknown",
-            "relay_premium_asset": "ETH",
-            "relay_premium_estimate_native": null,
-            "risks": [
-              "unreviewed"
-            ],
-            "screening_api": "unknown",
-            "screening_requirement": {
-              "eligibility_verified": false,
-              "label": "safest (screened pool; you must pass PPOI/ASP \u2014 steps listed)",
-              "steps": [
-                "Check the selected ASP policy and supported pool.",
-                "Have the deposit approved into its association set.",
-                "Obtain the inclusion witness and current on-chain ASP root.",
-                "Build and verify the withdrawal proof; excluded deposits are not approved."
-              ]
-            },
-            "security_review_complete": false,
-            "selected_bridge": null,
-            "shielded_destination": true,
-            "slippage_bps": null,
-            "swap_cost_atomic": null,
-            "swap_time_seconds": null,
-            "thin_crowd": null,
-            "time_excludes": [
-              "proof generation",
-              "holding time",
-              "screening standby",
-              "finality"
-            ],
-            "time_seconds": null,
-            "total_cost_atomic": null,
-            "total_cost_usd": null,
-            "unknowns": [
-              "unavailable",
-              "pause_unknown",
-              "crowd_unknown",
-              "asset_unsupported",
-              "gas_unknown",
-              "relay_unknown",
-              "bridge_unknown",
-              "time_unknown",
-              "fees_unknown"
-            ],
-            "venue": "Privacy Pools"
-          }
-        ],
+        "do_not_route": [],
         "evidence": {
           "coverage": {
             "crowd": {
@@ -2265,9 +2084,7 @@
               "privacy_endpoint": "screened_pool",
               "public_bridge": true,
               "reviewed": false,
-              "risks": [
-                "unreviewed"
-              ],
+              "risks": [],
               "screening": null,
               "seconds": null,
               "shielded_destination": true,
@@ -2306,9 +2123,7 @@
               "privacy_endpoint": "screened_pool",
               "public_bridge": true,
               "reviewed": false,
-              "risks": [
-                "unreviewed"
-              ],
+              "risks": [],
               "screening": null,
               "seconds": null,
               "shielded_destination": true,
@@ -2342,7 +2157,7 @@
           },
           "version": "shielded-route/v1"
         },
-        "evidence_sha256": "68e1e33f37d9351949e066b465fd5a2e532cdcb38a22083b23c1eacfab54dba3",
+        "evidence_sha256": "04f92fbe9fb6126759e1623ccf6d759ed5729b8774d018ab8f1173fd3b008d5a",
         "execution_allowed": false,
         "not_private": [
           {
@@ -2742,9 +2557,7 @@
             "relay_mode": "unknown",
             "relay_premium_asset": "ETH",
             "relay_premium_estimate_native": null,
-            "risks": [
-              "unreviewed"
-            ],
+            "risks": [],
             "screening_api": "unknown",
             "screening_requirement": {
               "eligibility_verified": false,
@@ -2831,9 +2644,7 @@
             "relay_mode": "unknown",
             "relay_premium_asset": "ETH",
             "relay_premium_estimate_native": null,
-            "risks": [
-              "unreviewed"
-            ],
+            "risks": [],
             "screening_api": "unknown",
             "screening_requirement": {
               "eligibility_verified": false,
@@ -2881,7 +2692,7 @@
           "safest": []
         },
         "reasons": [
-          "no_complete_quote"
+          "unavailable"
         ]
       },
       "data_as_of": {},
@@ -2921,7 +2732,7 @@
           "status": "partial"
         }
       ],
-      "evidence_sha256": "68e1e33f37d9351949e066b465fd5a2e532cdcb38a22083b23c1eacfab54dba3",
+      "evidence_sha256": "04f92fbe9fb6126759e1623ccf6d759ed5729b8774d018ab8f1173fd3b008d5a",
       "findings": [],
       "schema": "seconded-verification/v1"
     }
@@ -2931,98 +2742,7 @@
     "answer": {
       "check_observations": {
         "decision": "not_verified",
-        "do_not_route": [
-          {
-            "asset": "USDC",
-            "bridge": "op_exit",
-            "bridge_public": true,
-            "chain": 1,
-            "compliance": {
-              "asp": false,
-              "currently_verified": null,
-              "ppoi": true,
-              "screening": null
-            },
-            "cost_assumptions": [
-              "Historical whole-receipt gas repriced at current fees; not a simulation.",
-              "Approximately 10% of unshield gas as broadcaster premium; no live offer."
-            ],
-            "cost_decimals": 6,
-            "custody_address": "0xfa7093cdd9ee6932b4eb2c9e1cde7ce00b1fa4b9",
-            "custody_balance_atomic": null,
-            "destination_network": "eip155:1",
-            "eligible": false,
-            "eligible_depositors": null,
-            "estimate_only": false,
-            "exit_quotes": [],
-            "gas_legs": [],
-            "id": 12,
-            "implementation_hash": null,
-            "minimum_output_atomic": null,
-            "missing_legs": [
-              "origin_bridge_deposit",
-              "origin_approval",
-              "destination_shield",
-              "destination_unshield",
-              "destination_approval",
-              "complete_bridge_estimate"
-            ],
-            "output_amount_atomic": null,
-            "output_asset": "USDC",
-            "output_decimals": 6,
-            "output_value_usd": null,
-            "privacy_endpoint": "screened_pool",
-            "privacy_notice": null,
-            "protocol_cost_atomic": "4994",
-            "quote_basis": null,
-            "quote_expired": false,
-            "quote_expires_at": null,
-            "relay_mode": "unknown",
-            "relay_premium_asset": "ETH",
-            "relay_premium_estimate_native": null,
-            "risks": [
-              "unreviewed"
-            ],
-            "screening_api": "unknown",
-            "screening_requirement": {
-              "eligibility_verified": false,
-              "label": "safest (screened pool; you must pass PPOI/ASP \u2014 steps listed)",
-              "steps": [
-                "Select PPOI list providers and a POI node in the wallet privacy engine.",
-                "Synchronize trees and check deposit provenance against the selected lists.",
-                "Observe the provider standby period (initially documented as one hour).",
-                "Generate and verify spendability proofs; obtain an acceptable current broadcaster offer."
-              ]
-            },
-            "security_review_complete": false,
-            "selected_bridge": null,
-            "shielded_destination": true,
-            "slippage_bps": null,
-            "swap_cost_atomic": null,
-            "swap_time_seconds": null,
-            "thin_crowd": null,
-            "time_excludes": [
-              "proof generation",
-              "holding time",
-              "screening standby",
-              "finality"
-            ],
-            "time_seconds": null,
-            "total_cost_atomic": null,
-            "total_cost_usd": null,
-            "unknowns": [
-              "unavailable",
-              "pause_unknown",
-              "crowd_unknown",
-              "asset_unsupported",
-              "gas_unknown",
-              "relay_unknown",
-              "bridge_unknown",
-              "time_unknown"
-            ],
-            "venue": "Railgun"
-          }
-        ],
+        "do_not_route": [],
         "evidence": {
           "coverage": {
             "crowd": {
@@ -3318,9 +3038,7 @@
               "privacy_endpoint": "screened_pool",
               "public_bridge": true,
               "reviewed": false,
-              "risks": [
-                "unreviewed"
-              ],
+              "risks": [],
               "screening": null,
               "seconds": null,
               "shielded_destination": true,
@@ -3353,7 +3071,7 @@
           },
           "version": "shielded-route/v1"
         },
-        "evidence_sha256": "c0b2b21ded071addd8d48f5225585adedd978b398cd4d97d8b9068545453e1ab",
+        "evidence_sha256": "f4b35cec9baa68e963ae21acc8d8dde65a26ff840508d601aff0aeefc73034bc",
         "execution_allowed": false,
         "not_private": [
           {
@@ -3900,9 +3618,7 @@
             "relay_mode": "unknown",
             "relay_premium_asset": "ETH",
             "relay_premium_estimate_native": null,
-            "risks": [
-              "unreviewed"
-            ],
+            "risks": [],
             "screening_api": "unknown",
             "screening_requirement": {
               "eligibility_verified": false,
@@ -3949,7 +3665,7 @@
           "safest": []
         },
         "reasons": [
-          "no_complete_quote"
+          "unavailable"
         ]
       },
       "data_as_of": {},
@@ -3989,7 +3705,7 @@
           "status": "partial"
         }
       ],
-      "evidence_sha256": "c0b2b21ded071addd8d48f5225585adedd978b398cd4d97d8b9068545453e1ab",
+      "evidence_sha256": "f4b35cec9baa68e963ae21acc8d8dde65a26ff840508d601aff0aeefc73034bc",
       "findings": [],
       "schema": "seconded-verification/v1"
     }

@@ -9,13 +9,13 @@ offline build, install or cache that toolchain first. Dependencies are vendored;
 ```sh
 cd client
 GOPROXY=off go build -o seconded-mcp ./cmd/seconded-mcp
-./seconded-mcp --version      # seconded-mcp 0.4.1
+./seconded-mcp --version      # seconded-mcp 0.4.2
 ```
 
-You can build this checkout or obtain client 0.4.1 from the published
+You can build this checkout (reporting client 0.4.2) or obtain client 0.4.1 from the published
 [GitHub release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1)
-or [npm package](https://www.npmjs.com/package/@seconded/mcp). These are different source
-snapshots despite reporting the same version; choose the provenance you intend to review.
+or [npm package](https://www.npmjs.com/package/@seconded/mcp). These represent different source
+snapshots; choose the provenance you intend to review.
 See [Release verification](release-verification.md).
 
 Once the public repository is published, the Go install paths will be:

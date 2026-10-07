@@ -56,7 +56,7 @@ type Result struct {
 func pending(e Entry) Result {
 	after := 2
 	if e.Recovery != nil {
-		after = max(after, int(e.Recovery.NextAttempt-time.Now().Unix()))
+		after = max(after, int(e.retryAt()-time.Now().Unix()))
 	}
 	return Result{CheckedSubject: e.CheckedSubject, SubjectInstruction: subjectInstruction, CheckedBy: []string{}, Status: "pending", CheckID: e.CheckID, Product: e.Product, Tier: e.Tier, Price: Dollars(e.Amount), Charged: "not_yet_known", Receipt: "none", Next: "call_receipt_after", After: after, Notices: []string{}, Disclaimer: disclaimer(e.Product), Message: fmt.Sprintf("Pending — call seconded_receipt with check_id %s in ~%d s. An admitted check continues server-side; receipt recovery does not buy another check.", e.CheckID, after)}
 }
@@ -602,7 +602,7 @@ func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 			entry.acceptReply(CheckReply{Receipt: *entry.Receipt, Hints: Hints{NewQuoteAllowed: entry.Recovery.NewPurchaseAllowed}})
 		}
 		// An owed refund is collected until the operator records it as refunded (docs/runbooks/refunds.md).
-		if receiptNeedsCollection(entry.Receipt) && (entry.Recovery == nil || time.Now().Unix() >= entry.Recovery.NextAttempt) {
+		if receiptNeedsCollection(entry.Receipt) && time.Now().Unix() >= entry.retryAt() {
 			if s == nil {
 				s, e = g.recoverySigner(*entry)
 				if e != nil {

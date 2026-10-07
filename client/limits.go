@@ -131,7 +131,7 @@ var ErrTerminalPolicyRequired = errors.New("terminal_policy_required")
 type terminalPolicyError struct{ command string }
 
 func (e *terminalPolicyError) Error() string {
-	return "This policy change requires the wallet owner. Run this in your terminal: " + e.command + ". Type the wallet address's last 6 characters when prompted, then approve the independent owner-presence check (biometrics or an administrator-enabled offline signature). Chat can only tighten limits or freeze. Raising or removing any limit, weakening a safety switch, unfreezing, and switching wallets are terminal-only human actions."
+	return "This policy change requires the wallet owner. Run this in your terminal: " + e.command + ". Type the wallet address's last 6 characters when prompted. On Macs with Touch ID, owner changes also require biometrics. Otherwise an installed administrator approval key requires an offline signature. Without either, the six-character TTY confirmation does not stop an agent with shell access. Chat can only tighten limits or freeze. Raising or removing any limit, weakening a safety switch, unfreezing, and switching wallets require terminal confirmation."
 }
 func (e *terminalPolicyError) Unwrap() error { return ErrTerminalPolicyRequired }
 

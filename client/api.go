@@ -93,7 +93,7 @@ type Requirement struct {
 
 // QuoteBinding is the "seconded" object server/payments/quotes.py mint_quote() returns;
 // tests/contract/client-fixtures.json pins it to the server's output.
-const ClientVersion = "0.4.1"
+const ClientVersion = "0.4.2"
 
 var semanticVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$`)
 
@@ -468,7 +468,7 @@ func (a *API) Collect(ctx context.Context, e Entry, signer Signer) (CheckReply, 
 		if archived.Validate(e) != nil || archived.URL != a.url+standardDoor {
 			return CheckReply{}, ErrStorage
 		}
-		if !receiptNeedsCollection(e.Receipt) || time.Now().Unix() < archived.NextAttempt {
+		if !receiptNeedsCollection(e.Receipt) || time.Now().Unix() < e.retryAt() {
 			return CheckReply{}, errors.New("presentation_indeterminate")
 		}
 		// The local recovery handle differs from the signed server admission ID.

@@ -1,6 +1,6 @@
 # Tools reference
 
-The 0.4.1 client exposes **18 MCP tools**: 12 paid checks and 6 utility tools. The exact
+The 0.4.2 client exposes **18 MCP tools**: 12 paid checks and 6 utility tools. The exact
 `tools/list` response, including every input schema, is recorded in
 `client/tools-list.json`; `go run ./internal/cataloggen` from `client/` prints the same
 schemas from the compiled catalog without creating a profile.
