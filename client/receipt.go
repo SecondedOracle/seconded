@@ -254,7 +254,7 @@ func (r *SignedReceipt) UnmarshalJSON(data []byte) error {
 		Signature string          `json:"sig"`
 		KeyID     string          `json:"key_id"`
 	}
-	if DecodeStrict(data, &wire, ResponseLimit) != nil || DecodeStrict(wire.Envelope, &r.Envelope, ResponseLimit) != nil || !comparisonWirePresent(wire.Envelope) {
+	if DecodeStrict(data, &wire, ResponseLimit) != nil || DecodeStrict(wire.Envelope, &r.Envelope, ResponseLimit) != nil || !comparisonWirePresent(wire.Envelope) || !validDegenProduct(r.Envelope) {
 		return ErrInvalid
 	}
 	r.Signature = wire.Signature
@@ -322,6 +322,7 @@ var releaseLabels = currentReceiptLabels()
 
 func currentReceiptLabels() map[string]map[int]string {
 	labels := map[string]map[int]string{
+		"degen_check":          {1: "no_red_flags", 2: "red_flags"},
 		"portfolio_check":      {1: "portfolio_attention_required", 2: "portfolio_no_additional_attention", 3: "cannot_verify"},
 		"lending_check":        {1: "cannot_verify", 2: "no_debt", 3: "within_lltv_at_block", 4: "liquidatable_at_block"},
 		"cross_chain_compare":  {1: "comparison_available", 2: "comparison_invalid", 3: "cannot_verify"},
@@ -357,8 +358,12 @@ func (v ReceiptVerifier) knownAnswer(product string, a Answer, stored bool) bool
 	if !validDataFreshness(a) {
 		return false
 	}
-	if !validTradeAnswer(product, a) || !valid040Answer(product, a) || !validPortfolioAnswer(product, a) || !validLendingAnswer(product, a) || a.Option < 1 || !validComparisonAnswer(product, a) || !validStockFacts(product, a) || (a.RegistryObservations != nil && product != "agent_registry_check") {
+	if !validTradeAnswer(product, a) || !valid040Answer(product, a) || !validPortfolioAnswer(product, a) || !validLendingAnswer(product, a) || (a.Option < 1 && product != degenProduct) || !validComparisonAnswer(product, a) || !validStockFacts(product, a) || (a.RegistryObservations != nil && product != "agent_registry_check") {
 		return false
+	}
+	// Degen alone has a paid option-zero deliverable, validated above.
+	if product == degenProduct && a.Option == 0 {
+		return a.LabelID == "models_disagree"
 	}
 	if label := v.labels[product][a.Option]; label != "" && label == a.LabelID {
 		return true
@@ -606,7 +611,7 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 	if s.Answer != nil && !validRegistryBinding(s.Answer.RegistryObservations, s.Verification, e) {
 		return ErrInvalid
 	}
-	if !validTradeBinding(s) || !valid040Binding(s) || !validPortfolioBinding(s, e, now) || !validLendingBinding(s, e) || !validComparisonBinding(s, e, now) {
+	if !validDegenBinding(s, e) || !validTradeBinding(s) || !valid040Binding(s) || !validPortfolioBinding(s, e, now) || !validLendingBinding(s, e) || !validComparisonBinding(s, e, now) {
 		return ErrInvalid
 	}
 	if s.State == "refused" && s.Reason == "" {
@@ -628,14 +633,15 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 			return ErrInvalid
 		}
 	}
+	degenDisagreement := s.Product == degenProduct && s.Outcome == "models_disagree"
 	switch s.State {
 	case "released":
-		if s.Outcome != "agreed" || s.Answer == nil || s.OutcomeAt == nil || b.Tx != nil || b.Refund != nil ||
+		if (s.Outcome != "agreed" && !degenDisagreement) || s.Answer == nil || s.OutcomeAt == nil || b.Tx != nil || b.Refund != nil ||
 			!((b.Charged == "pending" && b.Settlement == "unknown") || (b.Charged == "no" && b.Settlement == "nonpayment_certified")) {
 			return ErrInvalid
 		}
 	case "included", "final":
-		if s.Outcome != "agreed" || s.Answer == nil || s.OutcomeAt == nil || b.Charged != "yes" || b.Tx == nil || b.Settlement != s.State {
+		if (s.Outcome != "agreed" && !degenDisagreement) || s.Answer == nil || s.OutcomeAt == nil || b.Charged != "yes" || b.Tx == nil || b.Settlement != s.State {
 			return ErrInvalid
 		}
 	case "no_agreement":
@@ -654,7 +660,7 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 	case "refund_owed", "refunded":
 		// A refund receipt asserts no settlement of its own. billing.tx is the original payment when the server
 		// recorded one: a paid check whose answer was lost has it, a payment found for an uncharged check may not.
-		if s.Answer != nil || s.Outcome != "" || b.Charged != s.State || b.Refund == nil || b.Settlement != "none" {
+		if s.Answer != nil || (s.Outcome != "" && !degenDisagreement) || b.Charged != s.State || b.Refund == nil || b.Settlement != "none" {
 			return ErrInvalid
 		}
 	case "content_refused", "service_failed":
@@ -672,7 +678,7 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 			return ErrInvalid
 		}
 	case "running", "settling", "delayed", "unavailable":
-		if s.Answer != nil || !oneOf(s.Outcome, "", "pending", "agreed", "none") || b.Charged != "pending" || !oneOf(b.Settlement, "none", "unknown") {
+		if s.Answer != nil || (!oneOf(s.Outcome, "", "pending", "agreed", "none") && !degenDisagreement) || b.Charged != "pending" || !oneOf(b.Settlement, "none", "unknown") {
 			return ErrInvalid
 		}
 	default:
@@ -686,7 +692,7 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 		if s.Seq == old.Seq && r.Signature != e.Receipt.Signature {
 			return ErrInvalid
 		}
-		if (e.Product == portfolioProduct || e.Product == comparisonProduct || e.Product == "lending_check") && old.Answer != nil {
+		if (e.Product == degenProduct || e.Product == portfolioProduct || e.Product == comparisonProduct || e.Product == "lending_check") && old.Answer != nil {
 			before, errA := canonicalValue(old.Answer)
 			after, errB := canonicalValue(answerBeforeExpiry(old.Answer, s.Answer))
 			if errA != nil || errB != nil || string(before) != string(after) {

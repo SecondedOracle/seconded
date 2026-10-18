@@ -87,6 +87,9 @@ func resultFor(e Entry) Result {
 	switch s.State {
 	case "included", "final", "released":
 		r.Status = "agreed"
+		if s.Product == degenProduct && s.Outcome == "models_disagree" {
+			r.Status = "models_disagree"
+		}
 		r.Verdict = s.Answer
 		r.Next = ""
 		r.After = 0
@@ -160,6 +163,10 @@ func resultFor(e Entry) Result {
 	r.TradeFacts = tradeFactsText(r.Verdict)
 	r.StockFacts = stockFactsText(r.Verdict)
 	r.ObservationFacts = observationFactsText(r.Verdict)
+	if page := r.Verdict.DegenAnswer(); page != nil {
+		r.Disclaimer = page.Disclaimer
+		r.Next = "review_degen_check"
+	}
 	if r.Verdict != nil && r.Verdict.PortfolioReport != nil {
 		facts, expired := portfolioText(r.Verdict.PortfolioReport, time.Now().Unix())
 		r.PortfolioFacts, r.PortfolioExpired = facts, &expired

@@ -4,6 +4,14 @@ Entries use `[Added]`, `[Changed]`, `[Fixed]`, `[Removed]`, `[Security]`. Client
 are the `ClientVersion` constant in `client/api.go`. Earlier history lives in the private
 repository.
 
+## Client 0.4.3 (prepared, unpublished)
+
+- [Added] `seconded_degen_check` for Pons V2 tokens on Robinhood Chain. The bundled catalog marks Degen Check unavailable; purchases depend on the server's availability gate. Its small-tier price is $0.10 when offered.
+- [Added] Verification and recovery of signed Degen facts and model opinions, including chargeable `models_disagree` answers and stale historical results. Disagreement and stale results do not authorize an action.
+- [Changed] The client lists 19 MCP tools and clarifies Token Check's identity-and-controls scope. The twelve existing available checks keep their prices; the six products in testing remain in testing.
+- [Fixed] Release catalogs and listings match the client tool surface while distinguishing Degen client support from enabled sales.
+- [Added] Separate, unpublished AgentKit integration candidates: an action provider for available checks and a receipt guard for transaction/permit signing. These are not included in the MCPB or `@seconded/mcp` package.
+
 ## Client 0.4.2 (published 2026-10-06)
 
 Hardening release; no new features. Signed release and npm package published from the neutral publisher account.

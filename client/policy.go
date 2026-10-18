@@ -156,6 +156,13 @@ func cataloguePrices(data []byte) map[string]map[string]int64 {
 	return prices
 }
 
+// Degen sales can reopen without shipping a new client. Its bundled status is
+// descriptive; the server checks live availability before issuing a challenge.
+// Other unavailable or in-testing products remain disabled locally.
+func productCanRequestQuote(id, status string) bool {
+	return status == "available" || (id == "degen_check" && status == "unavailable")
+}
+
 func offeredProductTiers(data []byte) map[string]int {
 	var guide struct {
 		Products []struct {
@@ -167,13 +174,13 @@ func offeredProductTiers(data []byte) map[string]int {
 		panic(err)
 	}
 	known := map[string]int{
-		"portfolio_check": 1, "cross_chain_compare": 1, "trade_check": 2, "stock_token_check": 1, "token_check": 1,
+		"degen_check": 1, "portfolio_check": 1, "cross_chain_compare": 1, "trade_check": 2, "stock_token_check": 1, "token_check": 1,
 		"agent_registry_check": 1, "counterparty_check": 1, "lending_check": 1, "hidden_prompt_check": 3, "scam_check": 3,
 	}
 	offered := map[string]int{}
 	known = deploymentProductTiers(known)
 	for _, p := range guide.Products {
-		if sold, ok := known[p.ID]; ok && p.Status == "available" {
+		if sold, ok := known[p.ID]; ok && productCanRequestQuote(p.ID, p.Status) {
 			offered[p.ID] = sold
 		}
 	}

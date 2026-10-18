@@ -36,6 +36,15 @@ func (o *CheckObservations) UnmarshalJSON(data []byte) error {
 	if DecodeStrict(data, &value, ResponseLimit) != nil {
 		return ErrInvalid
 	}
+	if _, present := value["degen_answer"]; present {
+		observations, err := decodeDegenObservations(data)
+		if err != nil {
+			return err
+		}
+		value["degen_answer"] = observations.Answer
+		*o = value
+		return nil
+	}
 	for _, product := range registered040Products {
 		if observationShapes[product].valid(value) {
 			*o = value
@@ -128,6 +137,9 @@ func validPaidReviewers(value map[string]any) bool {
 func valid040Answer(product string, a Answer) bool {
 	if a.PaidReviewers != nil && (product != "agent_registry_check" || !validPaidReviewers(*a.PaidReviewers)) {
 		return false
+	}
+	if product == degenProduct {
+		return validDegenAnswer(product, a)
 	}
 	if !oneOf(product, registered040Products...) {
 		return a.CheckObservations == nil
@@ -324,6 +336,9 @@ func valid040Binding(s ReceiptEnvelope) bool {
 		return true
 	}
 	a := *s.Answer
+	if s.Product == degenProduct {
+		return validDegenAnswer(s.Product, a)
+	}
 	if !valid040Answer(s.Product, a) {
 		return false
 	}

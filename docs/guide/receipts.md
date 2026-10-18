@@ -1,5 +1,10 @@
 # Receipts and verification
 
+Client 0.4.3 adds Degen receipts with signed facts and both model opinions. A
+signed `models_disagree` Degen answer may be charged; it does not authorize an
+action. Stale historical results also do not authorize an action. See the
+[candidate notes](client-0.4.3.md); the existing check contracts below remain.
+
 Check receipts, including signed refusal receipts, authenticate their canonical
 envelope. Public metadata, payment challenges, and some transport or validation
 errors are not signed receipts. The offline verifier checks the receipt signature;

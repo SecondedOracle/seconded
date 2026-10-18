@@ -1,5 +1,15 @@
 # Claims register
 
+## Prepared 0.4.3 source update
+
+This candidate advances client source and discovery to 0.4.3: 19 tools, twelve
+available bundled products, and Degen Check support with status `unavailable`.
+The curated public test subset and public module name are preserved. Offline
+client build/vet/tests and verifier tests passed on the preparation host; no
+live purchase or signed 0.4.3 installation was tested. Dated measurements below
+are historical 0.4.2 evidence, not a current production or distribution claim.
+See [the candidate notes](guide/client-0.4.3.md).
+
 This register records principal claims, their sources and how they were checked.
 Vendor or maintainer statements are identified separately. This checkout includes a
 signed refusal for an offline smoke test. The official documentation also publishes

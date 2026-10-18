@@ -1,9 +1,18 @@
 # Tools reference
 
-The 0.4.2 client exposes **18 MCP tools**: 12 paid checks and 6 utility tools. The exact
+The prepared 0.4.3 client exposes **19 MCP tools**: 13 check interfaces and 6 utility tools. The exact
 `tools/list` response, including every input schema, is recorded in
 `client/tools-list.json`; `go run ./internal/cataloggen` from `client/` prints the same
 schemas from the compiled catalog without creating a profile.
+
+## Degen Check candidate support
+
+`seconded_degen_check` accepts `input.network: eip155:4663` and a Pons V2 token
+`input.address`. Its bundled status is `unavailable`; the server must offer a
+quote before any purchase. The small-tier price is $0.10 when offered.
+Signed `models_disagree` answers can be charged. Review the facts, both opinions
+and freshness; disagreement and stale results do not authorize an action.
+See [client 0.4.3](client-0.4.3.md) for the preparation and verification boundary.
 
 ## Utility tools (free, local or public API)
 

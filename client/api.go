@@ -93,7 +93,7 @@ type Requirement struct {
 
 // QuoteBinding is the "seconded" object server/payments/quotes.py mint_quote() returns;
 // tests/contract/client-fixtures.json pins it to the server's output.
-const ClientVersion = "0.4.2"
+const ClientVersion = "0.4.3"
 
 var semanticVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$`)
 
@@ -383,7 +383,7 @@ func (a *API) Quote(ctx context.Context, r Request) (Quote, error) {
 func parseQuote(status int, b []byte, r Request) (Quote, error) {
 	var q Quote
 	if status != 200 {
-		return q, publicAPIError(status, b)
+		return q, productAPIError(r.Product, status, b)
 	}
 	if DecodeStrict(b, &q, ResponseLimit) != nil {
 		return q, ErrInvalid
@@ -409,7 +409,7 @@ func (a *API) Challenge(ctx context.Context, r Request) (Challenge, error) {
 func parseChallenge(status int, b []byte, paymentRequired string, r Request, now int64) (Challenge, error) {
 	var c Challenge
 	if status != 402 {
-		return c, publicAPIError(status, b)
+		return c, productAPIError(r.Product, status, b)
 	}
 	if DecodeStrict(b, &c, ResponseLimit) != nil {
 		return c, ErrInvalid
@@ -549,4 +549,13 @@ func publicAPIError(status int, body []byte) error {
 		return errors.New(wire.Error)
 	}
 	return ErrInvalid
+}
+
+// Catalog mismatches are prepayment diagnostics, never settlement evidence.
+func productAPIError(product string, status int, body []byte) error {
+	err := publicAPIError(status, body)
+	if product == degenProduct && err != nil && oneOf(err.Error(), "unknown_product", "product_unknown", "product_in_testing") {
+		return errors.New("degen_not_available")
+	}
+	return err
 }

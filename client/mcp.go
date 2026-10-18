@@ -66,7 +66,7 @@ func productGuides() []ProductGuide {
 func Tools() []Tool {
 	ids := []string{}
 	for _, p := range productGuides() {
-		if p.Status == "available" && productOffered(p.ID) {
+		if productCanRequestQuote(p.ID, p.Status) && productOffered(p.ID) {
 			ids = append(ids, p.ID)
 		}
 	}
@@ -82,7 +82,7 @@ func Tools() []Tool {
 		{"seconded_wallet", "Show the dedicated check wallet address, balances per network and how to fund it, or freeze new authorizations. Wallet switching is terminal-only: seconded-mcp wallet --human --switch back (or newer). Both keys are preserved. Base funding normally becomes available after about a minute, when both readers agree on recent state; Robinhood also uses recent agreement. Final payment confirmation is separate. Pending amounts cannot fund checks yet. Unavailable balances are null, never assumed zero. Never returns a private key; export is a separate human-run CLI command.", schema(map[string]any{"action": map[string]any{"type": "string", "enum": []string{"status", "freeze"}}}), map[string]bool{"readOnlyHint": false, "destructiveHint": false, "openWorldHint": true}},
 	}
 	for _, p := range productGuides() {
-		if p.Status != "available" || !productOffered(p.ID) {
+		if !productCanRequestQuote(p.ID, p.Status) || !productOffered(p.ID) {
 			continue
 		}
 		properties := map[string]any{
@@ -117,7 +117,7 @@ func catalogue() any {
 }
 func toolProduct(name string) string {
 	for _, p := range productGuides() {
-		if p.Tool == name && p.Status == "available" && productOffered(p.ID) {
+		if p.Tool == name && productCanRequestQuote(p.ID, p.Status) && productOffered(p.ID) {
 			return p.ID
 		}
 	}
@@ -347,8 +347,9 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 
 // Only fixed public codes and locally authored guidance may cross the error boundary.
 var publicErrorMessages = map[string]string{
-	"nonpayment_limited": "This wallet has a certified unpaid check in the last 24 hours. Wait for the returned retry interval and recover the receipt before trying again.",
-	"first_paid_small_required": "Complete one paid check at this product's small tier before buying a larger tier. Recover the receipt before trying again.",
+	"degen_not_available":                                  "Degen Check is not available yet on this server.",
+	"nonpayment_limited":                                   "This wallet has a certified unpaid check in the last 24 hours. Wait for the returned retry interval and recover the receipt before trying again.",
+	"first_paid_small_required":                            "Complete one paid check at this product's small tier before buying a larger tier. Recover the receipt before trying again.",
 	"agreed_abstain_label":                                 "The judges agreed that the check could not be verified. Pause and ask a human before acting.",
 	"bridge_classification_unverified":                     "A route contract has no verified bridge classification. Pause and ask a human before acting.",
 	"counterparty_list_future_or_inconsistent_source_date": "The counterparty list source dates are inconsistent. Pause and ask a human before acting.",

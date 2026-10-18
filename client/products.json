@@ -312,7 +312,7 @@
       "name": "Token Check",
       "status": "available",
       "tool": "seconded_token_check",
-      "description": "Use when: Before interacting with a token.\nSend: input with network, address.\nAnswer → do: issuer_controlled_expected: proceed; issuer can freeze/upgrade. no_checked_warning_signs: proceed with normal checks; any warning_*: STOP and show owner. NOT VERIFIED: pause or ask a human.\nCost: $0.10 ($0.15 on Robinhood) small only.",
+      "description": "Check an official token (a stablecoin or tokenized asset) before an agent uses it. Use when: checking token identity and controls. Send: network and token address. Answer → do: review warnings; issuer_controlled_expected: issuer can freeze/upgrade; NOT VERIFIED: pause. Cost: $0.10 ($0.15 on Robinhood).",
       "use_when": "Before interacting with a token.",
       "send": "network, address",
       "input_schema": {
@@ -1477,6 +1477,48 @@
         }
       },
       "product": "route_check"
+    },
+    {
+      "id": "degen_check",
+      "name": "Degen Check",
+      "status": "unavailable",
+      "tool": "seconded_degen_check",
+      "description": "Check a new Pons launch before you buy it. Use when: reviewing a Pons V2 token. Send: Robinhood Chain network and token address. Answer → do: review facts and both opinions; NOT VERIFIED: pause. Cost: $0.10 small only.",
+      "use_when": "Before interacting with a new Pons V2 token on Robinhood Chain.",
+      "send": "network, address",
+      "price_usd": {
+        "small": "0.10"
+      },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "address"
+        ],
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "eip155:4663"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          }
+        }
+      },
+      "answer_to_action": {
+        "no_red_flags": "Review the measured facts and both opinions.",
+        "red_flags": "Review the reported flags.",
+        "NOT VERIFIED": "Pause or ask a human."
+      },
+      "example_input": {
+        "network": "eip155:4663",
+        "address": "0x833a7fA750628b391c35bf384d7706652c7e8202"
+      },
+      "product": "degen_check"
     }
   ],
   "unavailable_products": [

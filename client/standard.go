@@ -100,7 +100,7 @@ func (a *API) standardChallenge(ctx context.Context, r Request) (Challenge, erro
 		return Challenge{}, err
 	}
 	if status != 402 {
-		return Challenge{}, publicAPIError(status, b)
+		return Challenge{}, productAPIError(r.Product, status, b)
 	}
 	var c StandardChallenge
 	if DecodeStrict(b, &c, ResponseLimit) != nil {

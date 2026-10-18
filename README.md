@@ -2,9 +2,9 @@
 
 <img src="assets/repo-banner-1600x500.png" alt="SECONDED. The oracle for agents." width="800">
 
-**The oracle for agents: before an AI agent acts, two AI models from rival labs must agree, and every answer comes with a signed receipt; no answer, no charge.**
+**The oracle for agents: before an AI agent acts, two AI models from rival labs check the input, and every answer comes with a signed receipt; no answer, no charge.**
 
-![client](https://img.shields.io/badge/client-0.4.2-blue)
+![client](https://img.shields.io/badge/client-0.4.3_candidate-blue)
 ![go](https://img.shields.io/badge/go-1.26.7-00ADD8)
 ![receipts](https://img.shields.io/badge/receipts-Ed25519%20%C2%B7%20RFC%208785-success)
 ![chains](https://img.shields.io/badge/pays%20on-Base%20%C2%B7%20Arc%20%C2%B7%20Robinhood%20Chain-informational)
@@ -13,14 +13,21 @@
 
 </div>
 
+> Prepared client source 0.4.3; unpublished. The client lists 19 tools, including
+> Degen Check support with bundled status `unavailable`. Degen can return a
+> chargeable signed `models_disagree` answer. The dated 0.4.2 status below is
+> historical; see [the candidate notes](docs/guide/client-0.4.3.md).
+
+
+
 ---
 
 
 ### Why it matters
 
 - **Autonomous agents make high-stakes mistakes:** Before an AI agent signs a transaction, executes a trade, or trusts external input, it adds an independent check before the agent acts.
-- **Rival-lab consensus reduces single-vendor blind spots:** Every check queries models from competing labs; agreement is required before an answer is accepted.
-- **Signed receipts anyone can verify:** Every response carries an Ed25519-signed receipt over canonical JSON; if the models disagree or cannot verify the action, you receive a NOT VERIFIED receipt and are not charged.
+- **Rival-lab consensus reduces single-vendor blind spots:** Every check queries models from competing labs; standard checks require agreement before an answer is accepted. Degen Check can also deliver a chargeable signed disagreement.
+- **Signed receipts anyone can verify:** Every response carries an Ed25519-signed receipt over canonical JSON; standard checks that disagree or cannot verify the action return NOT VERIFIED; inspect signed billing for the payment state. Degen disagreement is a separate chargeable answer.
 
 ---
 
@@ -73,7 +80,7 @@ This repository contains the buildable public surface: the Go MCP client, the st
 
 - **[How a check works](docs/guide/how-it-works.md):** The x402 payment flow, rival-model evaluation, and settlement policy.
 - **[Receipts and verification](docs/guide/receipts.md):** Ed25519 signatures, RFC 8785 canonicalization, and verifying receipts offline.
-- **[Tools reference](docs/guide/tools.md):** The 18 MCP tools exposed by client 0.4.2 and testing utilities.
+- **[Tools reference](docs/guide/tools.md):** The 19 MCP tools in the prepared 0.4.3 client and testing utilities.
 - **[Pricing and coverage](docs/guide/pricing-and-coverage.md):** Catalog of 12 checks, payment networks (Base, Arc, Robinhood Chain), and pricing tiers.
 - **[Install and run](docs/guide/install.md):** Building from source, setting up the dedicated wallet, and configuring spending limits.
 - **[Security model](docs/guide/security-model.md):** Trust boundaries, hot wallet protections, and verification limits.
