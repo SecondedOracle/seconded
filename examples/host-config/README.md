@@ -2,9 +2,10 @@
 
 `seconded-mcp host-snippet --host HOST` prints the configuration for one host and, on
 standard error, the instruction for where it goes. The files in this directory are the
-recorded outputs for every host the 0.4.1 client knows (`generic`, `claude-code`,
+recorded outputs for every host the shipped client knows (`generic`, `claude-code`,
 `claude-desktop`, `cursor`, `codex`, `gemini`). Replace `/absolute/path/to/seconded-mcp`
 with the real path of your binary; hosts need an absolute path.
+These outputs still match the client identified in [README Status](../../README.md#status).
 
 | Host | File | Where it goes |
 | --- | --- | --- |

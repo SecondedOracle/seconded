@@ -1,13 +1,15 @@
 # Verify a receipt offline
 
-The verifier needs Go, the receipt, and nothing else. It makes no network calls.
+Use the standalone `seconded-verify` command for receipt files. The MCP client has no
+`verify` subcommand. The verifier needs the Go toolchain named in `verifier/go.mod`
+and the receipt; verification itself makes no network calls. Run each block below
+from the repository root; subshells keep your working directory there.
 
 ```sh
-cd verifier
-go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json
+(cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json)
 ```
 
-Recorded output (2026-10-06, Go 1.26.7):
+Recorded output (rechecked 2026-10-19, Go 1.26.7):
 
 ```text
 OK    testdata/refused-base-mainnet-2026-10-06.json
@@ -27,12 +29,14 @@ to service availability and retention. Keep a local copy. Save one to a file and
 command. An agreed receipt prints the product, the answer label, both labs under
 `checked_by`, and the settlement transaction under `billing.tx` when present. An agreed answer
 may arrive before settlement; a signature is not independent chain-finality evidence.
+A signed Degen disagreement prints `models disagree; answer delivered` and retains
+its signed billing fields. It is not described as agreement or permission to act.
 
 ## Compare the compiled pin with the key the service publishes
 
 ```sh
-curl -s https://api.secondedoracle.xyz/v1/keys -o keys.json
-cd verifier && go run ./cmd/seconded-verify -keys ../keys.json testdata/refused-base-mainnet-2026-10-06.json
+curl -fsS https://api.secondedoracle.xyz/v1/keys -o keys.json
+(cd verifier && go run ./cmd/seconded-verify -keys ../keys.json testdata/refused-base-mainnet-2026-10-06.json)
 ```
 
 `-keys` replaces the compiled pin for that run with the keys in the document. If the
@@ -46,8 +50,8 @@ Change a signed envelope value and the signature fails. Reformatting whitespace 
 changing unsigned wrapper metadata preserves the signature:
 
 ```sh
-sed 's/"charged": "no"/"charged": "yes"/' testdata/refused-base-mainnet-2026-10-06.json > /tmp/tampered.json
-go run ./cmd/seconded-verify /tmp/tampered.json
+sed 's/"charged": "no"/"charged": "yes"/' verifier/testdata/refused-base-mainnet-2026-10-06.json > /tmp/tampered.json
+(cd verifier && go run ./cmd/seconded-verify /tmp/tampered.json)
 ```
 
 ```text
@@ -62,9 +66,8 @@ The exit status is 1 whenever any receipt on the command line fails.
 Both were already published in the [official documentation](https://secondedoracle.xyz/docs#example-receipts):
 
 ```sh
-cd verifier
-go run ./cmd/seconded-verify testdata/trade-paid-base-mainnet-2026-09-29.json
-go run ./cmd/seconded-verify -json testdata/token-not-verified-base-sepolia-2026-09-29.json
+(cd verifier && go run ./cmd/seconded-verify testdata/trade-paid-base-mainnet-2026-09-29.json)
+(cd verifier && go run ./cmd/seconded-verify -json testdata/token-not-verified-base-sepolia-2026-09-29.json)
 ```
 
 The Trade receipt signs `charged=yes`, amount `250000` atomic units ($0.25),

@@ -4,19 +4,28 @@ Entries use `[Added]`, `[Changed]`, `[Fixed]`, `[Removed]`, `[Security]`. Client
 are the `ClientVersion` constant in `client/api.go`. Earlier history lives in the private
 repository.
 
-## Client 0.4.3 (prepared, unpublished)
+Current release and availability: [README Status](README.md#status).
+Entries below are historical release records; counts describe each release at that time.
+
+## Public repository documentation and verifier update (2026-10-19)
+
+- [Fixed] The standalone verifier describes signed Degen disagreements without calling them agreed answers, with signed outcome and tamper regression controls.
+- [Fixed] Installation, billing, pricing, contribution terms and release provenance reflect the published client. The frozen client runtime and catalogs are unchanged.
+- [Changed] Current release and availability facts have one status section; older measurements are labeled as history.
+
+## Client 0.4.3 (published 2026-10-18)
 
 - [Added] `seconded_degen_check` for Pons V2 tokens on Robinhood Chain. The bundled catalog marks Degen Check unavailable; purchases depend on the server's availability gate. Its small-tier price is $0.10 when offered.
 - [Added] Verification and recovery of signed Degen facts and model opinions, including chargeable `models_disagree` answers and stale historical results. Disagreement and stale results do not authorize an action.
 - [Changed] The client lists 19 MCP tools and clarifies Token Check's identity-and-controls scope. The twelve existing available checks keep their prices; the six products in testing remain in testing.
 - [Fixed] Release catalogs and listings match the client tool surface while distinguishing Degen client support from enabled sales.
-- [Added] Separate, unpublished AgentKit integration candidates: an action provider for available checks and a receipt guard for transaction/permit signing. These are not included in the MCPB or `@seconded/mcp` package.
+- [Added] Separate experimental AgentKit integrations: an action provider for available checks and a receipt guard for transaction/permit signing. These are not included in the MCPB or `@seconded/mcp` package, and this release entry does not claim a separate distribution is available.
 
-## Client 0.4.2 (published 2026-10-06)
+## Historical client 0.4.2 publication (2026-10-06)
 
 Hardening release; no new features. Signed release and npm package published from the neutral publisher account.
 
-## Unreleased
+## Historical public repository assembly (2026-10-06)
 
 - [Fixed] Release and Registry status, development-source provenance, version-aware
   availability, retention, purchase binding, recovery and tool-interface documentation.
@@ -37,7 +46,7 @@ Hardening release; no new features. Signed release and npm package published fro
   examples, issue templates, and a CI workflow that builds the client and runs both test
   suites on `ubuntu-latest`.
 
-## Client 0.4.2 (hardening release)
+## Historical client 0.4.2 hardening changes
 
 - [Fixed] Bounded wallet recovery: clamps stuck reservations and heals legacy ledger entries without releasing outstanding payment obligations early.
 - [Changed] Owner presence: falls back to human terminal confirmation when biometrics are unavailable and no administrator approval key is installed; rejected approvals and invalid installed keys still fail closed.
@@ -45,7 +54,7 @@ Hardening release; no new features. Signed release and npm package published fro
 - [Added] Expanded reason vocabulary: decodes 23 additional server-side refusal and abstention reasons and four Token Check STOP warning labels.
 - [Changed] Address Screening description: documents bounded list coverage.
 
-## Client 0.4.1 (published 2026-10-06)
+## Historical client 0.4.1 (published 2026-10-06)
 
 - [Fixed] Wallet payments no longer stall when Base finality lags. Admission accepts fresh,
   depth-confirmed balances agreed by two public readers while retaining all pending

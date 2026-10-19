@@ -2,9 +2,10 @@
 
 SECONDED answers one question for an AI agent: *may I act on this?* The agent sends a
 bounded, typed input (an unsigned transaction, a token address, a message, an x402 offer),
-pays a small fixed price over x402, and gets back a signed receipt. The answer is accepted
-only if two models from rival labs agree on it; otherwise the receipt says NOT VERIFIED.
-Settlement is the service policy described below; pending billing is not certified nonpayment.
+pays a small fixed price over x402, and gets back a signed receipt. Standard checks require
+agreement between models from rival labs; otherwise they return NOT VERIFIED. Degen Check
+also delivers signed disagreements, which can be charged and do not authorize an action.
+The [billing policy](#billing-policy) distinguishes these outcomes from payment finality.
 
 ```mermaid
 sequenceDiagram
@@ -13,7 +14,7 @@ sequenceDiagram
     participant S as api.secondedoracle.xyz
     participant M as Two models (OpenAI, Anthropic)
     participant L as Chain (Base, Arc or Robinhood)
-    A->>C: tools/call seconded_trade_check {input}
+    A->>C: tools/call a check {input}
     C->>C: canonicalize input, check limits, choose payment network
     C->>S: POST /v1/x402/checks (no payment yet)
     S-->>C: 402 challenge: price, payTo, nonce, validity
@@ -24,7 +25,10 @@ sequenceDiagram
     alt both agree
         S->>L: settle the authorization
         S-->>C: signed agreed receipt, answer label; settlement may be pending
-    else no usable agreement
+    else Degen returns a usable signed disagreement
+        S->>L: settle the authorization
+        S-->>C: signed models_disagree answer; settlement may be pending
+    else standard disagreement or no usable answer
         S-->>C: signed receipt: no_agreement, NOT VERIFIED, billing pending
     end
     C->>C: verify signature under the compiled key pin, bind to the purchase
@@ -53,16 +57,38 @@ sequenceDiagram
    facts, two independent readers must agree at one pinned block) and gives it to two
    models from different labs. Receipts record which labs under `checked_by`; the values the
    client accepts are `OpenAI` and `Anthropic` (`client/receipt.go`).
-5. **Read agreement and billing separately.** The service's policy is to settle only after usable agreement is saved. An agreed
-   answer can be released while settlement remains pending; included and final receipts
-   carry the corresponding transaction state. Without usable agreement, the agent
-   receives NOT VERIFIED guidance and must pause. Read the signed billing fields:
-   `pending` is not a certificate of nonpayment. The paying client uses independent
-   chain evidence to resolve payment status.
+5. **Read outcome and billing separately.** Standard checks settle after an agreed answer
+   is saved; Degen can also settle after a signed disagreement is saved. Either answer
+   can be released while settlement remains pending. A standard disagreement returns
+   NOT VERIFIED with no answer. Degen disagreement carries facts and both opinions but
+   still tells the agent to pause. Read the signed billing fields and the policy below:
+   `pending` is not a certificate of nonpayment.
 6. **The client verifies the receipt.** Every receipt is Ed25519-signed under a key the
    client compiles in; see [Receipts and verification](receipts.md). The client also binds
    the receipt to the purchase it made (check id, request commitment, payer, amount) and
    maps the answer label to an action through the catalog's `answer_to_action`.
+
+## Billing policy
+
+| Result | Service settlement policy | What the agent should do |
+| --- | --- | --- |
+| Standard check, usable agreed answer saved | Charge the quoted price. | Follow that label's action for the exact checked input. |
+| Standard disagreement (`no_agreement`) or no usable answer | No charge under service policy; unresolved signed billing may remain `pending`. | Pause or ask a human. |
+| Degen signed `models_disagree` answer saved | May charge the quoted price for the signed facts and both opinions. | Pause or ask a human; disagreement does not authorize an action. |
+
+`released`, `included` and `final` describe delivery and reported settlement, not
+agreement by themselves. Read `outcome`, the answer and signed `billing` together.
+The paying client resolves payment status using independent chain evidence. A receipt
+signature authenticates the service's assertion; it does not independently prove settlement.
+
+The frozen catalog's generic agreement-only `usage` text describes standard checks.
+It omits the Degen exception; the released client's product-specific receipt handling
+supports that exception. This guide qualifies the text without changing the release catalog.
+
+The live catalog's generic usage text also mentions `POST /v1/checks`. The released
+client's payment flow uses `POST /v1/x402/checks`, as shown above (`client/standard.go`).
+The alternate endpoint has not been exercised in this documentation check; catalog
+prose alone does not establish its current purchase behavior.
 
 ## What the agent is told to do
 
@@ -75,9 +101,10 @@ The catalog, not the model, decides what each label means. For Trade Check:
 | `cannot_verify` | Pause or ask a human. |
 | NOT VERIFIED | Pause or ask a human. |
 
-Only an agreed signed receipt authorizes the listed next step, and only for the exact
+For Trade Check, only an agreed signed receipt authorizes the listed next step, and only for the exact
 input supplied. Pending, failed or NOT VERIFIED results mean pause
 (`client/products.json`, `usage`).
+Degen disagreement and stale historical results also mean pause, even when charged.
 
 ## Timeouts and recovery
 

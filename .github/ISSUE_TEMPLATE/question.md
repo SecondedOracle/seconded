@@ -6,6 +6,7 @@ labels: question
 assignees: ''
 ---
 
-Before asking, the catalogs in `client/products.json` and `client/tools-list.json` are
-the source of truth for prices, inputs and tool names, and `docs/guide/` explains the
-rest. If the answer is not there, ask away.
+Before asking, read the Status section in `README.md` and the pricing guide at
+`docs/guide/pricing-and-coverage.md`. The catalogs in
+`client/products.json` and `client/tools-list.json` define the bundled inputs and tool
+names; live availability can differ. If the answer is not there, ask away.

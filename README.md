@@ -4,7 +4,7 @@
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs check the input, and every answer comes with a signed receipt; no answer, no charge.**
 
-![client](https://img.shields.io/badge/client-0.4.3_candidate-blue)
+![client](https://img.shields.io/badge/client-0.4.3-blue)
 ![go](https://img.shields.io/badge/go-1.26.7-00ADD8)
 ![receipts](https://img.shields.io/badge/receipts-Ed25519%20%C2%B7%20RFC%208785-success)
 ![chains](https://img.shields.io/badge/pays%20on-Base%20%C2%B7%20Arc%20%C2%B7%20Robinhood%20Chain-informational)
@@ -13,10 +13,14 @@
 
 </div>
 
-> Prepared client source 0.4.3; unpublished. The client lists 19 tools, including
-> Degen Check support with bundled status `unavailable`. Degen can return a
-> chargeable signed `models_disagree` answer. The dated 0.4.2 status below is
-> historical; see [the candidate notes](docs/guide/client-0.4.3.md).
+> See [Status](#status) for the published release, tool counts and measured live availability.
+> Standard checks require agreement; Degen can also return a chargeable signed
+> `models_disagree` answer. See [the release notes](docs/guide/client-0.4.3.md)
+> and [billing policy](docs/guide/how-it-works.md#billing-policy).
+
+**Verify a receipt**<br>
+Use the [Go verifier](examples/verify-receipt/) with Go 1.26.6+ from the repository root.<br>
+`(cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json)`
 
 
 
@@ -50,7 +54,7 @@ To connect the client to Claude Code, Claude Desktop, Cursor, or Gemini, consult
 You can verify signed receipts independently without an account, API key, or network access using the standalone verifier:
 
 ```sh
-cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json
+(cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json)
 ```
 
 The verifier checks the Ed25519 signature against the pinned key and prints the canonical envelope details:
@@ -67,7 +71,7 @@ OK    testdata/refused-base-mainnet-2026-10-06.json
 You can also test with the committed paid trade check and token disagreement receipts:
 
 ```sh
-cd verifier && go run ./cmd/seconded-verify testdata/trade-paid-base-mainnet-2026-09-29.json testdata/token-not-verified-base-sepolia-2026-09-29.json
+(cd verifier && go run ./cmd/seconded-verify testdata/trade-paid-base-mainnet-2026-09-29.json testdata/token-not-verified-base-sepolia-2026-09-29.json)
 ```
 
 See [docs/guide/receipts.md](docs/guide/receipts.md) for details on receipt structure and verification.
@@ -80,8 +84,8 @@ This repository contains the buildable public surface: the Go MCP client, the st
 
 - **[How a check works](docs/guide/how-it-works.md):** The x402 payment flow, rival-model evaluation, and settlement policy.
 - **[Receipts and verification](docs/guide/receipts.md):** Ed25519 signatures, RFC 8785 canonicalization, and verifying receipts offline.
-- **[Tools reference](docs/guide/tools.md):** The 19 MCP tools in the prepared 0.4.3 client and testing utilities.
-- **[Pricing and coverage](docs/guide/pricing-and-coverage.md):** Catalog of 12 checks, payment networks (Base, Arc, Robinhood Chain), and pricing tiers.
+- **[Tools reference](docs/guide/tools.md):** MCP checks and utilities, their arguments and result formats.
+- **[Pricing and coverage](docs/guide/pricing-and-coverage.md):** Product prices, subject chains and payment networks (Base, Arc, Robinhood Chain).
 - **[Install and run](docs/guide/install.md):** Building from source, setting up the dedicated wallet, and configuring spending limits.
 - **[Security model](docs/guide/security-model.md):** Trust boundaries, hot wallet protections, and verification limits.
 - **[Release verification](docs/guide/release-verification.md):** Verifying published release manifests and binary provenance.
@@ -91,14 +95,18 @@ This repository contains the buildable public surface: the Go MCP client, the st
 
 ## Status
 
-| Component | State on 2026-10-06 | Evidence |
+| Component | State on 2026-10-19 | Evidence |
 | --- | --- | --- |
-| Public API (`api.secondedoracle.xyz`) | Public GET endpoints reachable; 3 payment networks and 12 checks advertised | Dated header-aware GETs in [CLAIMS](docs/CLAIMS.md) |
-| Client source | Development snapshot reporting 0.4.2; source-built bytes differ from published release | `client/api.go`, CI workflow, [CLAIMS](docs/CLAIMS.md) |
+| Public API (`api.secondedoracle.xyz`) | Products and keys endpoints reachable; 3 mainnet payment networks advertised | Header-aware GETs in [CLAIMS](docs/CLAIMS.md#current-measurements) |
+| Client source | Public source reporting 0.4.3; released runtime preserved with a public module rename and selected tests | `client/api.go`, [source provenance](docs/guide/client-0.4.3.md#source-provenance) |
 | Receipt verifier | Builds; verifies public fixtures; parser and tamper controls | `verifier/receipt_test.go` |
-| Catalog | 12 checks advertised to client 0.4.2; 6 products in testing | Dated GETs, `client/products.json` |
-| Distribution | npm (`@seconded/mcp`) and GitHub releases at 0.4.2 (signed; verify with the release guide) | [release-verification](docs/guide/release-verification.md) |
+| Catalog and tools | 19 MCP tools: 13 check interfaces and 6 utilities. Bundle: 12 available checks plus Degen `unavailable`. Live: all 13 available to client 0.4.3. Six other products remain in testing. | [Measured counts](docs/CLAIMS.md#catalog-facts), [bundled versus live catalog](docs/guide/pricing-and-coverage.md#catalog-versions-and-availability) |
+| Distribution | npm `@seconded/mcp` latest is 0.4.3; signed GitHub release v0.4.3; both published 2026-10-18 | [npm](https://www.npmjs.com/package/@seconded/mcp/v/0.4.3), [v0.4.3 release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.3), [release verification](docs/guide/release-verification.md) |
 | Licence | Apache-2.0 | [LICENSE](LICENSE), [NOTICE](NOTICE) |
+
+Release tags and downloads live in [seconded-mcp-releases](https://github.com/SecondedOracle/seconded-mcp-releases), separately from this source repository.
+Availability is an advertisement, not evidence of a successful paid check on every network.
+The separately packaged npm distribution has a [licensing metadata discrepancy](docs/guide/release-verification.md#distribution-boundaries).
 
 ---
 

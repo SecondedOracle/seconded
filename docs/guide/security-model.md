@@ -11,7 +11,7 @@ findings.
 | Receipt public key `rk-2026-09-a` | `client/receipt.go` | Every receipt. A server key document cannot replace it. |
 | API origin `https://api.secondedoracle.xyz` | `client/api.go` | The client talks to this origin over web PKI (the local trust store) plus the receipt-key pin check at start. |
 | Payment pins per network: chain id, asset contract, `payTo`, EIP-712 domain | `client/chains.go`, `client/products.json` | A 402 challenge that names a different asset, amount scheme or payee is refused before signing. |
-| Two independent RPC readers per chain | `client/chains.go` | Balances, finality and chain facts the client relies on must agree between two operators at one block. |
+| Two independent RPC readers per chain | `client/chains.go` | Balances, finality and chain facts the client relies on must agree between two providers at one block. |
 | Publisher SSH key for releases | set by the release builder (`client/release_digest.go`) | Setup verifies the signed `SHA-256SUMS` beside the binary before any wallet exists. A source build has no key compiled in and must use `--manual-fingerprint`. |
 
 ## The wallet

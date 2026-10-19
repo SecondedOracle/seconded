@@ -1,14 +1,14 @@
 # Release verification
 
-Client 0.4.1 was published on 2026-10-06 as the npm package
-[`@seconded/mcp`](https://www.npmjs.com/package/@seconded/mcp) and the GitHub release
-[`SecondedOracle/seconded-mcp-releases` tag `v0.4.1`](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
+Use the published release linked in [README Status](../../README.md#status).
+Release tags and assets are hosted in `SecondedOracle/seconded-mcp-releases`;
+this repository contains the public source and independent receipt verifier.
 The release contains five native binaries, an MCPB bundle, build information,
 `SHA-256SUMS` and its OpenSSH signature. Verify the signed manifest and the selected
 artifact before running it. Release binaries are built from private release source
-and verified by the signed manifest. This public tree uses renamed module paths,
-which change build digests, and retains earlier development-snapshot differences;
-see the source-provenance note in the [README](../../README.md).
+and verified by the signed manifest. This public tree uses a renamed module path
+and a selected test subset. See the exact [source provenance](client-0.4.3.md#source-provenance);
+building the public source does not reproduce release binary hashes.
 
 ## What a release contains
 
@@ -59,24 +59,32 @@ cd client && go build -o seconded-mcp ./cmd/seconded-mcp
 ./seconded-mcp setup --manual-fingerprint --release-sha256 "$(shasum -a 256 seconded-mcp | cut -d' ' -f1)"
 ```
 
-## Distribution status
+## Distribution boundaries
 
-npm and GitHub: 0.4.1 published. Official MCP Registry: active
-`xyz.secondedoracle/seconded-mcp` entry at 0.3.3 and older
-`io.github.SecondedOracle/seconded-mcp` entry at 0.3.0, observed 2026-10-06.
-Homebrew: the expected public tap was not found in the review. Smithery: publication
-status not verified.
+Publication and latest-version facts live in [README Status](../../README.md#status).
+The npm launcher requires Node 20 or newer. For this release, a version-pinned
+invocation is `npx --yes @seconded/mcp@0.4.3 serve --host generic`.
+Use top-level `--help` for command discovery and the
+[standalone verifier](../../examples/verify-receipt/) for receipt files.
 
-The npm launcher requires Node 20 or newer. A version-pinned invocation is
-`npx --yes @seconded/mcp@0.4.1 serve --host generic`. The documented Homebrew formula
-and Smithery templates do not by themselves establish a public installation channel.
+The source in this repository is Apache-2.0. The separately packaged npm distribution
+still declares `license: UNLICENSED` in registry metadata measured on 2026-10-19.
+That discrepancy needs clarification by the package publisher; this repository does
+not establish a licence grant for a separate artifact or silently replace its metadata.
 
-Public metadata checked on 2026-10-06:
+The npm browser page can return HTTP 403 in automated checks. The
+[registry document](https://registry.npmjs.org/@seconded%2Fmcp) provides package versions
+and publication timestamps; an HTML access failure is not evidence that a release is absent.
 
-- [npm package metadata](https://registry.npmjs.org/@seconded%2Fmcp).
-- [GitHub release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1).
-- [Official MCP Registry search](https://registry.modelcontextprotocol.io/v0.1/servers?search=secondedoracle).
+### Historical distribution observations (2026-10-06)
 
-The reviewed npm metadata contains a local archive-path disclosure. This checkout does
-not package or republish that release. Distribution metadata cleanup requires a
-separate maintainer action; no signing-key disclosure was established.
+The [claims register](../CLAIMS.md#historical-distribution-observations-2026-10-06)
+preserves older npm, GitHub and MCP Registry observations. Homebrew and Smithery
+availability has not been re-established here; templates alone do not prove publication.
+The Registry search timed out again on 2026-10-19, so its listing status must
+be checked independently before recommending that installation channel.
+
+Historical npm metadata contains publisher-identity and local archive-path disclosures.
+The published package README also retains template text. These are external publication
+issues; this checkout does not package or republish npm artifacts. Cleanup requires
+package-publisher action. No private signing-key disclosure was established by the audit.

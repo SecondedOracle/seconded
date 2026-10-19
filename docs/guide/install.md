@@ -9,27 +9,38 @@ offline build, install or cache that toolchain first. Dependencies are vendored;
 ```sh
 cd client
 GOPROXY=off go build -o seconded-mcp ./cmd/seconded-mcp
-./seconded-mcp --version      # seconded-mcp 0.4.2
+./seconded-mcp --version      # compare with README Status
 ```
 
-You can build this checkout (reporting client 0.4.2) or obtain client 0.4.1 from the published
-[GitHub release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.1)
-or [npm package](https://www.npmjs.com/package/@seconded/mcp). These represent different source
-snapshots; choose the provenance you intend to review.
-See [Release verification](release-verification.md).
+Run the block from a clone of this repository; subsequent wallet examples assume you
+remain in `client/`. For signed binaries or npm, use the distribution links in
+[README Status](../../README.md#status) and follow [Release verification](release-verification.md).
+The public source uses a renamed module and selected tests; see
+[source provenance](client-0.4.3.md#source-provenance).
 
-Once the public repository is published, the Go install paths will be:
+The Makefile requires an explicit version for this snapshot. From `client/`:
 
 ```sh
-go install github.com/SecondedOracle/seconded/client/cmd/seconded-mcp@latest
+make VERSION=0.4.3 build
+./dist/seconded-mcp --version  # seconded-mcp 0.4.3
+```
+
+Plain `make build` retains the historical `0.1.0-test2` default. Use the command above
+to stamp the release version; the direct Go build uses the source version constant.
+
+Do not use `go install .../client/cmd/seconded-mcp@latest` for this client release.
+Module installation omits the vendored keyring patch that macOS needs (`SetProvider`),
+so it fails to compile there. The clone build above uses that patch. This restriction
+does not apply to the standalone verifier, which has no external module dependencies:
+
+```sh
 go install github.com/SecondedOracle/seconded/verifier/cmd/seconded-verify@latest
 ```
 
-These install commands require network access and place executables in `GOBIN`
-(or `$(go env GOPATH)/bin` by default). They build the public modules; renamed
-module paths change build digests. Published release binaries instead come from
-private release source and are verified against its signed manifest. The source
-build and setup examples here use the local `./seconded-mcp` executable.
+That verifier install requires network access and places the executable in `GOBIN`
+(or `$(go env GOPATH)/bin` by default). To verify with this checkout's exact source,
+use the [offline verifier example](../../examples/verify-receipt/).
+The source-build setup examples below use the local `./seconded-mcp` executable.
 
 ## 2. Create the wallet and connect a host
 
@@ -102,6 +113,10 @@ after 90 days from last activity. Keep receipts you need to verify later.
 
 `seconded-mcp --help` prints: `setup, host-snippet, serve, self-check, prove, recover,
 limits, wallet, rollback, export-key, link coinbase, help, version`.
+Use this top-level help. In this release `prove --help` and `recover --help` return
+`operation_failed`; they do not provide subcommand help.
+For receipt files, use **`seconded-verify`**, the [standalone verifier](../../examples/verify-receipt/).
+The client has no `verify` subcommand. Recovery and input proofs serve different purposes:
 `prove CHECK_ID INPUT_FILE` checks a stored receipt against supplied input when the
 required local binding is retained. In this snapshot it rejects standard-door records
 after archival clears the canonical request; archived-hash support requires a follow-up

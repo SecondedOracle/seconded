@@ -1,9 +1,9 @@
 # Receipts and verification
 
-Client 0.4.3 adds Degen receipts with signed facts and both model opinions. A
+Degen receipts carry signed facts and both model opinions. A
 signed `models_disagree` Degen answer may be charged; it does not authorize an
 action. Stale historical results also do not authorize an action. See the
-[candidate notes](client-0.4.3.md); the existing check contracts below remain.
+[release notes](client-0.4.3.md) and [billing policy](how-it-works.md#billing-policy).
 
 Check receipts, including signed refusal receipts, authenticate their canonical
 envelope. Public metadata, payment challenges, and some transport or validation
@@ -56,7 +56,7 @@ release that carries both the old and the new key.
 | --- | --- |
 | `state` | Answer-bearing states include `released`, `included`, `final` and free-trial `trial_delivered`. Included payments and released answers with unknown settlement still require collection. `no_agreement` withholds an answer and can retain `charged: pending`. Refusal, failure, certified-nonpayment and refund states have distinct billing fields; do not infer final payment status from the state name alone. |
 | `outcome` | Records agreement, disagreement or the applicable failure outcome; nonterminal or other states can carry null or a pending/none value as defined by the client contract. |
-| `answer.label_id`, `answer.option` | The agreed label and its one-based index in the product's label list. Map it through the catalog's `answer_to_action`. |
+| `answer.label_id`, `answer.option` | For agreement, the label and its one-based index in the product's label list. Degen disagreement instead uses `label_id=models_disagree`, `option=0`, with `outcome=models_disagree`; it means pause. Map agreed labels through the catalog's `answer_to_action`. |
 | `checked_by` | The service's signed attribution to known labs, OpenAI and Anthropic; it does not independently prove which remote model ran. |
 | `model_config_fingerprint` | The service's signed digest of the configuration it reports using. Equal digests identify the same reported configuration under the hash assumption; they do not independently prove which remote model ran. |
 | `billing` | `mode` (`paid` or `free-trial`), `charged` (`yes`, `no`, `pending`, `refund_owed`, `refunded`), `network`, `asset`, `amount_atomic`, `payer`, `pay_to`, `tx` (the settlement transaction when there is one), `settlement`, `refund`. |
@@ -67,10 +67,14 @@ release that carries both the old and the new key.
 
 ## Two verifiers, two jobs
 
-**`verifier/`** is for anyone. It checks that the signature verifies under the pinned key
-the receipt names, that the version prefix matches, and that the envelope is structurally
-a receipt (known state, parseable timestamps, `checked_by` naming known labs, a
+**`seconded-verify` in `verifier/`** is the standalone command for verifying a receipt file.
+The MCP client has no `verify` subcommand. The standalone tool checks that the signature
+verifies under the pinned key the receipt names, that the version prefix matches,
+and that the envelope is structurally a receipt (known state, parseable timestamps,
+`checked_by` naming known labs, a
 verification block exactly on v3). It needs no account and no network.
+Its state description reads the signed outcome: delivery or final settlement alone
+does not establish agreement. Unknown or absent outcomes use neutral delivery wording.
 
 By default the verifier uses its compiled receipt key. `-keys` explicitly replaces
 those defaults for that run. It reports the signed envelope, not the surrounding HTTP
@@ -93,8 +97,7 @@ verifier intentionally omits these semantic checks.
 ## Verify one now
 
 ```sh
-cd verifier
-go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json
+(cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json)
 ```
 
 The fixture is the reply the production service returned on 2026-10-06 when refusing a

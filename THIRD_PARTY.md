@@ -24,3 +24,18 @@ and [provenance](verifier/internal/jsoncanonicalizer/README.md).
 
 The purego module includes Go-derived code with its own retained BSD notices;
 see [internal/fakecgo](client/vendor/github.com/ebitengine/purego/internal/fakecgo).
+
+## Vendored documentation links
+
+The vendored source and attribution are preserved from the released client. Some
+upstream documentation links have aged: the shellescape gocover badge/coverage links,
+purego's rules_go issue link and the godbus workflow badge returned 404 in the
+2026-10-19 audit. The godbus contribution guide references `README.markdown`, while
+the vendored file is [README.md](client/vendor/github.com/godbus/dbus/v5/README.md).
+The Sourcegraph badge timed out; the Decred SignMessage and Zalando security-form
+fragments were not confirmed in returned HTML. Those checks do not establish that
+the underlying packages or services are unavailable.
+
+Use the module identities and retained licence files above for attribution. Repairing
+upstream link text belongs in a reviewed dependency-documentation refresh; it does
+not require or justify changing the frozen runtime sources.

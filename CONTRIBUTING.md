@@ -23,12 +23,15 @@ documentation. The service itself is not developed here.
 ## Building and testing
 
 ```sh
-cd client   && go build ./... && go test ./...
-cd verifier && go build ./... && go test ./...
+(cd client && go build ./... && go test ./... && go vet ./...)
+(cd verifier && go build ./... && go test ./...)
 ```
 
 The client vendors its dependencies, so both commands run with `GOPROXY=off`.
 The `go.mod` files name the Go toolchain they were tested with.
+Run the block from the repository root; each subshell returns there automatically.
+For an executable with an explicit version stamp, see the
+[source-build instructions](docs/guide/install.md#1-build).
 
 ## Pull requests
 
@@ -40,6 +43,7 @@ The `go.mod` files name the Go toolchain they were tested with.
 
 ## Licence
 
-There is no licence file in this repository yet. Until one is added, contributions are
-accepted on the understanding that the maintainers may publish them under the licence
-eventually chosen for the repository.
+This repository is licensed under [Apache-2.0](LICENSE). Contributions submitted for
+inclusion are under those terms, as described in section 5 of the licence, unless
+explicitly stated otherwise. Preserve [NOTICE](NOTICE) and third-party attribution;
+see [THIRD_PARTY.md](THIRD_PARTY.md) for dependency licences.
