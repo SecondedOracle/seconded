@@ -80,7 +80,7 @@ func report(asJSON bool, path string, r *verifier.Report, err error) {
 			out["key_id"] = r.KeyID
 			out["version"] = r.Version
 			out["state"] = e.State
-			out["state_meaning"] = verifier.States[e.State]
+			out["state_meaning"] = e.StateMeaning()
 			out["outcome"] = e.Outcome
 			out["product"] = e.Product
 			out["check_id"] = e.CheckID
@@ -110,7 +110,7 @@ func report(asJSON bool, path string, r *verifier.Report, err error) {
 	}
 	fmt.Printf("OK    %s\n", path)
 	fmt.Printf("      signature   Ed25519 by %s over receipt v%d (%d canonical bytes)\n", r.KeyID, r.Version, len(r.Canonical))
-	fmt.Printf("      state       %s: %s\n", e.State, verifier.States[e.State])
+	fmt.Printf("      state       %s: %s\n", e.State, e.StateMeaning())
 	fmt.Printf("      product     %s   check_id %s   issued_at %s\n", str(e.Product), str(e.CheckID), e.IssuedAt)
 	fmt.Printf("      checked_by  %s\n", labs)
 	if e.Answer != nil {

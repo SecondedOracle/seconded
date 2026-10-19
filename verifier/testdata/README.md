@@ -28,4 +28,6 @@ purchaser data was obtained.
 The tests in `../receipt_test.go` also sign synthetic receipts with throwaway keys
 generated at test time. Those never leave the test process and prove nothing about the
 service; they exercise the verifier's negative paths (tampering, wrong key, wrong
-version prefix).
+version prefix). Signed synthetic Degen outcomes also exercise agreed/disagreement
+descriptions through both CLI output formats, including rejection of a changed outcome.
+These synthetic receipts test the standalone reporting boundary, not the full product schema.

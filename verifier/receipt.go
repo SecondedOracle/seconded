@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -85,13 +86,14 @@ type Report struct {
 	Canonical []byte // the exact bytes the signature covers, without the prefix
 }
 
-// States lists every receipt state the client knows how to interpret.
+// States lists every receipt state the client knows how to interpret. State
+// alone does not establish model agreement; use Envelope.StateMeaning for that.
 var States = map[string]string{
-	"released":         "agreed answer; consult signed billing and payment evidence",
-	"included":         "agreed answer; signer reports payment inclusion",
-	"final":            "agreed answer; signer reports payment finality",
+	"released":         "answer delivered; consult signed billing and payment evidence",
+	"included":         "answer delivered; signer reports payment inclusion",
+	"final":            "answer delivered; signer reports payment finality",
 	"no_agreement":     "NOT VERIFIED: no usable agreement; consult signed billing and payment evidence",
-	"trial_delivered":  "agreed answer; signer reports a free trial",
+	"trial_delivered":  "answer delivered; signer reports a free trial",
 	"refund_owed":      "signer reports a refund owed",
 	"refunded":         "signer reports a refund",
 	"content_refused":  "content refused; consult signed billing and payment evidence",
@@ -103,6 +105,26 @@ var States = map[string]string{
 	"settling":         "settling",
 	"delayed":          "delayed",
 	"unavailable":      "temporarily unavailable",
+}
+
+// StateMeaning describes the signed state and outcome without inferring agreement
+// from delivery or settlement. Unknown outcomes retain neutral wording. This is
+// reporting, not validation of product semantics or independent payment evidence.
+func (e Envelope) StateMeaning() string {
+	meaning := States[e.State]
+	if e.Outcome == nil {
+		return meaning
+	}
+	switch e.State {
+	case "released", "included", "final", "trial_delivered":
+		switch *e.Outcome {
+		case "agreed":
+			return strings.Replace(meaning, "answer delivered", "agreed answer", 1)
+		case "models_disagree":
+			return strings.Replace(meaning, "answer delivered", "models disagree; answer delivered", 1)
+		}
+	}
+	return meaning
 }
 
 // Labs lists the model providers a receipt may name in checked_by.

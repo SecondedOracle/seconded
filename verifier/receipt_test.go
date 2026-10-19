@@ -9,6 +9,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -276,5 +278,123 @@ func TestCanonicalMatchesRFC8785(t *testing.T) {
 	}
 	if _, err := Canonical([]byte(`{"a":1,}`)); err == nil {
 		t.Fatal("invalid JSON accepted")
+	}
+}
+
+func TestDeliveredOutcomeDescriptions(t *testing.T) {
+	priv, keys := testKeys(t)
+	for _, state := range []string{"released", "included", "final", "trial_delivered"} {
+		for _, outcome := range []string{"agreed", "models_disagree", "", "future_outcome"} {
+			t.Run(state+"/"+outcome, func(t *testing.T) {
+				e := envelope(3)
+				e["state"], e["product"] = state, "degen_check"
+				e["outcome"] = outcome
+				if outcome == "" {
+					e["outcome"] = nil
+				}
+				if outcome == "models_disagree" {
+					e["answer"] = map[string]any{"option": 0, "label_id": "models_disagree"}
+				}
+				r, err := Verify(sign(t, priv, 3, e, "rk-test"), keys)
+				if err != nil {
+					t.Fatal(err)
+				}
+				meaning := r.Envelope.StateMeaning()
+				if strings.Contains(meaning, "agreed answer") != (outcome == "agreed") {
+					t.Fatalf("agreement must follow signed outcome %q: %s", outcome, meaning)
+				}
+				if strings.Contains(meaning, "models disagree") != (outcome == "models_disagree") {
+					t.Fatalf("disagreement must follow signed outcome %q: %s", outcome, meaning)
+				}
+				if outcome != "agreed" && !strings.Contains(meaning, "answer delivered") {
+					t.Fatalf("missing neutral delivery description: %s", meaning)
+				}
+			})
+		}
+	}
+}
+
+// Exercise both public CLI formats with synthetic signed outcomes. These fixtures
+// test reporting and authentication, not the full Degen product schema.
+func TestCLIOutcomeAndTamperControls(t *testing.T) {
+	dir := t.TempDir()
+	cli := filepath.Join(dir, "seconded-verify")
+	if out, err := exec.Command("go", "build", "-o", cli, "./cmd/seconded-verify").CombinedOutput(); err != nil {
+		t.Fatalf("build verifier: %v\n%s", err, out)
+	}
+	priv, keys := testKeys(t)
+	keyFile := filepath.Join(dir, "keys.json")
+	doc := fmt.Sprintf(`{"keys":[{"key_id":"rk-test","algorithm":"Ed25519","public_key_hex":"%x"}]}`, []byte(keys["rk-test"]))
+	if err := os.WriteFile(keyFile, []byte(doc), 0600); err != nil {
+		t.Fatal(err)
+	}
+	for _, outcome := range []string{"agreed", "models_disagree"} {
+		t.Run(outcome, func(t *testing.T) {
+			e := envelope(3)
+			e["product"], e["outcome"] = "degen_check", outcome
+			label, option := "no_red_flags", 1
+			meaning := "agreed answer; signer reports payment finality"
+			if outcome == "models_disagree" {
+				label, option = "models_disagree", 0
+				meaning = "models disagree; answer delivered; signer reports payment finality"
+			}
+			e["answer"] = map[string]any{"option": option, "label_id": label}
+			wire := sign(t, priv, 3, e, "rk-test")
+			file := filepath.Join(dir, outcome+".json")
+			if err := os.WriteFile(file, wire, 0600); err != nil {
+				t.Fatal(err)
+			}
+			for _, asJSON := range []bool{false, true} {
+				args := []string{"-keys", keyFile}
+				if asJSON {
+					args = append(args, "-json")
+				}
+				out, err := exec.Command(cli, append(args, file)...).CombinedOutput()
+				if err != nil {
+					t.Fatalf("valid receipt: %v\n%s", err, out)
+				}
+				if asJSON {
+					var result map[string]any
+					if err := json.Unmarshal(out, &result); err != nil {
+						t.Fatal(err)
+					}
+					if result["verified"] != true || result["outcome"] != outcome || result["state_meaning"] != meaning || result["label_id"] != label {
+						t.Fatalf("incorrect JSON report: %s", out)
+					}
+				} else if !strings.Contains(string(out), "final: "+meaning) || !strings.Contains(string(out), fmt.Sprintf("label %s (option %d)", label, option)) {
+					t.Fatalf("incorrect text report: %s", out)
+				}
+			}
+			if _, err := exec.Command(cli, file).CombinedOutput(); err == nil {
+				t.Fatal("production pins accepted a synthetic test key")
+			}
+			// A signed outcome cannot be changed to the opposite report.
+			opposite := "models_disagree"
+			if outcome == opposite {
+				opposite = "agreed"
+			}
+			tampered := strings.Replace(string(wire), `"outcome":"`+outcome+`"`, `"outcome":"`+opposite+`"`, 1)
+			if tampered == string(wire) {
+				t.Fatal("tamper control did not change the signed outcome")
+			}
+			if _, err := Verify([]byte(tampered), keys); !errors.Is(err, ErrSignature) {
+				t.Fatalf("tampered outcome: want ErrSignature, got %v", err)
+			}
+			if err := os.WriteFile(file, []byte(tampered), 0600); err != nil {
+				t.Fatal(err)
+			}
+			out, err := exec.Command(cli, "-json", "-keys", keyFile, file).CombinedOutput()
+			var exit *exec.ExitError
+			if !errors.As(err, &exit) || exit.ExitCode() != 1 {
+				t.Fatalf("tamper exit: want 1, got %v\n%s", err, out)
+			}
+			var result map[string]any
+			if err := json.Unmarshal(out, &result); err != nil {
+				t.Fatal(err)
+			}
+			if result["verified"] != false || result["error"] != ErrSignature.Error() || result["state_meaning"] != nil {
+				t.Fatalf("tampered receipt produced a trusted description: %s", out)
+			}
+		})
 	}
 }
