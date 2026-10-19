@@ -84,7 +84,5 @@ availability has not been re-established here; templates alone do not prove publ
 The Registry search timed out again on 2026-10-19, so its listing status must
 be checked independently before recommending that installation channel.
 
-Historical npm metadata contains publisher-identity and local archive-path disclosures.
-The published package README also retains template text. These are external publication
-issues; this checkout does not package or republish npm artifacts. Cleanup requires
-package-publisher action. No private signing-key disclosure was established by the audit.
+The published npm package README retains template text. This checkout does not package
+or republish npm artifacts.
