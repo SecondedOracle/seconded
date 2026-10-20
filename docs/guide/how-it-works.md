@@ -74,16 +74,16 @@ sequenceDiagram
 | --- | --- | --- |
 | Standard check, usable agreed answer saved | Charge the quoted price. | Follow that label's action for the exact checked input. |
 | Standard disagreement (`no_agreement`) or no usable answer | No charge under service policy; unresolved signed billing may remain `pending`. | Pause or ask a human. |
-| Degen signed `models_disagree` answer saved | May charge the quoted price for the signed facts and both opinions. | Pause or ask a human; disagreement does not authorize an action. |
+| Degen signed `models_disagree` answer saved | Costs $0.10 for the saved signed facts and both opinions. | Pause or ask a human; disagreement does not authorize an action. |
 
 `released`, `included` and `final` describe delivery and reported settlement, not
 agreement by themselves. Read `outcome`, the answer and signed `billing` together.
 The paying client resolves payment status using independent chain evidence. A receipt
 signature authenticates the service's assertion; it does not independently prove settlement.
 
-The frozen catalog's generic agreement-only `usage` text describes standard checks.
-It omits the Degen exception; the released client's product-specific receipt handling
-supports that exception. This guide qualifies the text without changing the release catalog.
+The 0.4.4 initialization instructions and bundled catalog share the same billing text.
+Standard checks charge only after agreement and a saved answer; standard disagreement
+is signed and free. Degen costs $0.10 for a saved signed answer, including disagreement.
 
 The live catalog's generic usage text also mentions `POST /v1/checks`. The released
 client's payment flow uses `POST /v1/x402/checks`, as shown above (`client/standard.go`).

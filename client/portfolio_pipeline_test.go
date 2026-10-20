@@ -30,7 +30,7 @@ func TestPortfolioPipelineReceipt(t *testing.T) {
 	if err := json.Unmarshal(data, &f); err != nil {
 		t.Fatal(err)
 	}
-	if ClientVersion != "0.4.3" {
+	if ClientVersion != "0.4.4" {
 		t.Fatal("stable client required")
 	}
 	scope, err := portfolioRequestScope(f.Request)

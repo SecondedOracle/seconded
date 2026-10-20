@@ -21,6 +21,9 @@ type Engine struct {
 	Chain ChainReader
 }
 type Result struct {
+	ServiceError            string            `json:"service_error,omitempty"`
+	ServiceReason           string            `json:"service_reason,omitempty"`
+	DiagnosticTrust         string            `json:"diagnostic_trust,omitempty"`
 	TradeFacts              []string          `json:"trade_facts,omitempty"`
 	CheckedSubject          *CheckedSubject   `json:"checked_subject"`
 	SubjectInstruction      string            `json:"subject_instruction"`
@@ -62,6 +65,10 @@ func pending(e Entry) Result {
 }
 func resultFor(e Entry) Result {
 	r := pending(e)
+	if e.Recovery != nil && e.Recovery.ServiceError != "" {
+		r.ServiceError, r.ServiceReason = e.Recovery.ServiceError, e.Recovery.ServiceReason
+		r.DiagnosticTrust = "unsigned"
+	}
 	if e.RecoveryRequired {
 		r.Reason = "presentation_indeterminate"
 		r.Message += " Payment may have been sent; do not submit another check."
@@ -72,6 +79,10 @@ func resultFor(e Entry) Result {
 		r.Charged = "no"
 	}
 	if e.Receipt == nil {
+		if e.State == "RELEASED" {
+			r.Status, r.Reason, r.Next, r.After = "refused", "nonpayment_certified", "retry_check", 0
+			r.Message = "Independent chain evidence confirms no payment. You may start another check; no purchase receipt was recovered."
+		}
 		return r
 	}
 	s := e.Receipt.Envelope
@@ -585,7 +596,7 @@ func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 			s.Close()
 		}
 	}()
-	if g.Chain != nil && len(l.Entries) > 0 {
+	if id == "" && g.Chain != nil && len(l.Entries) > 0 {
 		g.reconcileNetworks(ctx, &l, l.Entries[0].Payer)
 	}
 	out := []Result{}
@@ -617,18 +628,44 @@ func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 				}
 			}
 			reply, err := g.API.Collect(ctx, *entry, s)
+			// Persist the scheduled retry even on transport or identity failure.
+			// Collect has not accepted any receipt or released a reservation.
+			if id != "" || identityFailure(err) {
+				if e = l.Save(g.Files); e != nil {
+					return nil, e
+				}
+			}
 			if identityFailure(err) {
 				return nil, err
 			}
 			if err == nil && !g.unchangedPending(reply, *entry) {
 				if g.API.verifier.Verify(reply.Receipt, *entry, time.Now()) != nil || validateReplyState(reply) != nil {
+					if id == "" {
+						if e = l.Save(g.Files); e != nil {
+							return nil, e
+						}
+					}
 					return nil, errors.New("api_identity_mismatch")
 				}
 				entry.acceptReply(reply)
+				// A verified requested receipt must survive any subsequent slow
+				// or failed chain read, including process interruption.
+				if id != "" {
+					if e = l.Save(g.Files); e != nil {
+						return nil, e
+					}
+				}
 				// A newly collected FINAL receipt can provide the locator that
 				// was unavailable during the pre-collection chain check.
-				g.reconcileFinalReceipt(ctx, &l, entry)
+				if id == "" {
+					g.reconcileFinalReceipt(ctx, &l, entry)
+				}
 			}
+		}
+		if id != "" {
+			// Foreground recovery checks only this entry, within a small time
+			// budget. Other wallet reservations await their own certificates.
+			g.reconcileReceiptEntry(ctx, &l, entry)
 		}
 		// Also minimize records resolved by earlier client versions, after re-verification.
 		entry.archiveRecovery()
@@ -726,11 +763,22 @@ func (g *Engine) chainFor(network string) (ChainReader, error) {
 
 // Recheck only this Robinhood entry after verified FINAL delivery. A failed
 // independent certificate preserves the reservation; the signed receipt alone
-// never marks it spent. The caller's final ledger save commits both together.
+// never marks it spent. Listing commits this evidence with its final ledger save.
 func (g *Engine) reconcileFinalReceipt(ctx context.Context, ledger *Ledger, entry *Entry) {
 	if g.Chain == nil || entry.State != "OUTSTANDING" || !robinhoodNetwork(normalizedNetwork(entry.Network)) || entry.Receipt == nil || entry.Receipt.Envelope.State != "final" {
 		return
 	}
+	g.reconcileReceiptEntry(ctx, ledger, entry)
+}
+
+// Receipt retrieval never waits on unrelated networks or entries. The same
+// independent evidence and anchor guards still decide this reservation.
+func (g *Engine) reconcileReceiptEntry(ctx context.Context, ledger *Ledger, entry *Entry) {
+	if g.Chain == nil || entry.State != "OUTSTANDING" {
+		return
+	}
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
 	chain, err := g.chainFor(entry.Network)
 	if err != nil {
 		return

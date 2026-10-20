@@ -7,6 +7,15 @@ repository.
 Current release and availability: [README Status](README.md#status).
 Entries below are historical release records; counts describe each release at that time.
 
+## Client 0.4.4 (published 2026-10-20 UTC)
+
+Published on npm as `@seconded/mcp@0.4.4` and on GitHub as [v0.4.4](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.4). Release assets are signed; verify `SHA-256SUMS.sig` with `allowed_signers` and check the artifact hashes using the [release verification guide](docs/guide/release-verification.md).
+
+- [Changed] Label Degen availability as a bundled offline snapshot and state its $0.10 signed-disagreement billing exception alongside free standard disagreement.
+- [Fixed] Reject malformed utility input before wallet access, surface unsigned 503 diagnostics, and unblock new purchases after independently certified nonpayment.
+- [Fixed] Add proof/recovery help, specific error reasons, a profile-level missing-ledger message and an exact billing-parity regression.
+- [Changed] Preserve Asset Check's token/stock-token selector and explicit quote payment networks: 13 products through 12 check tools and six utilities, with unchanged prices.
+
 ## Public repository documentation and verifier update (2026-10-19)
 
 - [Fixed] The standalone verifier describes signed Degen disagreements without calling them agreed answers, with signed outcome and tamper regression controls.

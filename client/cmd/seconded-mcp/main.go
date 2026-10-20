@@ -55,6 +55,18 @@ func main() {
 			os.Exit(1)
 		}
 		switch e.Error() {
+		case "unknown_check":
+			fmt.Fprintln(os.Stderr, "unknown_check: No check with that ID exists in this profile. Run recover without --check-id to list checks.")
+		case "no_local_records":
+			fmt.Fprintln(os.Stderr, "no_local_record: No local receipt records exist in this profile.")
+		case "no_local_record":
+			fmt.Fprintln(os.Stderr, "no_local_record: No local receipt record exists for that check in this profile.")
+		case "invalid_input":
+			fmt.Fprintln(os.Stderr, "invalid_input: Correct the command arguments or request JSON. Run prove --help or recover --help for usage.")
+		case "input_file_unavailable":
+			fmt.Fprintln(os.Stderr, "input_file_unavailable: The request JSON file could not be read.")
+		case "proof_verification_failed":
+			fmt.Fprintln(os.Stderr, "proof_verification_failed: The saved receipt could not verify this exact request. Recover the receipt and check the original input.")
 		case "release_digest_mismatch":
 			fmt.Fprintln(os.Stderr, "release_digest_mismatch: This executable does not match the trusted release checksum. Stop and download the matching release again.")
 		case "release_signature_unavailable":
@@ -96,6 +108,16 @@ func run(args []string) error {
 	if len(args) == 1 && (args[0] == "--version" || args[0] == "version") {
 		fmt.Println("seconded-mcp " + version)
 		return nil
+	}
+	if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+		switch args[0] {
+		case "recover":
+			fmt.Println("Usage: seconded-mcp [--profile /absolute/directory] recover [--check-id ID]\nRecover saved checks without a new payment authorization. Omit --check-id to list recent and pending checks. ID is 32 lowercase hexadecimal characters.")
+			return nil
+		case "prove":
+			fmt.Println("Usage: seconded-mcp [--profile /absolute/directory] prove CHECK_ID REQUEST.json\nVerify a saved receipt against the original request locally, without a wallet key or network call. CHECK_ID is 32 lowercase hexadecimal characters. REQUEST.json contains product, input and options.network.")
+			return nil
+		}
 	}
 	exe, e := os.Executable()
 	if e != nil {
@@ -257,7 +279,7 @@ func run(args []string) error {
 		f.SetOutput(io.Discard)
 		id := f.String("check-id", "", "local recovery/check ID; omit to list pending purchases")
 		if f.Parse(args[1:]) != nil || f.NArg() != 0 {
-			return client.ErrInvalid
+			return errors.New("invalid_input")
 		}
 		files, err := client.OpenFiles(dir)
 		if err != nil {
@@ -271,12 +293,18 @@ func run(args []string) error {
 		g := &client.Engine{Files: files, API: api}
 		result, err := g.Receipts(context.Background(), *id)
 		if err != nil {
+			if errors.Is(err, client.ErrNotFound) {
+				if *id != "" {
+					return errors.New("unknown_check")
+				}
+				return errors.New("no_local_records")
+			}
 			return err
 		}
 		return json.NewEncoder(os.Stdout).Encode(map[string]any{"checks": result})
 	case "prove":
 		if len(args) != 3 {
-			return client.ErrInvalid
+			return errors.New("invalid_input")
 		}
 		files, err := client.OpenFiles(dir)
 		if err != nil {
@@ -284,18 +312,24 @@ func run(args []string) error {
 		}
 		input, err := os.Open(args[2])
 		if err != nil {
-			return err
+			return errors.New("input_file_unavailable")
 		}
 		defer input.Close()
 		raw, err := io.ReadAll(io.LimitReader(input, client.MessageLimit+1))
 		if err != nil {
-			return err
+			return errors.New("input_file_unavailable")
 		}
 		var request client.Request
 		if client.DecodeStrict(raw, &request, client.MessageLimit) != nil {
-			return client.ErrInvalid
+			return errors.New("invalid_input")
 		}
 		if err = client.ProveLocalReceipt(files, args[1], request); err != nil {
+			if errors.Is(err, client.ErrNotFound) {
+				return errors.New("no_local_record")
+			}
+			if errors.Is(err, client.ErrInvalid) || err.Error() == "receipt_salt_unavailable" {
+				return errors.New("proof_verification_failed")
+			}
 			return err
 		}
 		return json.NewEncoder(os.Stdout).Encode(map[string]any{"check_id": args[1], "input_binding_verified": true})

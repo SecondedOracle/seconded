@@ -3,7 +3,7 @@
 Degen receipts carry signed facts and both model opinions. A
 signed `models_disagree` Degen answer may be charged; it does not authorize an
 action. Stale historical results also do not authorize an action. See the
-[release notes](client-0.4.3.md) and [billing policy](how-it-works.md#billing-policy).
+[release notes](client-0.4.4.md) and [billing policy](how-it-works.md#billing-policy).
 
 Check receipts, including signed refusal receipts, authenticate their canonical
 envelope. Public metadata, payment challenges, and some transport or validation

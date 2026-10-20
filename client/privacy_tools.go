@@ -24,6 +24,10 @@ type privacyGuide struct {
 
 var privacyGuideCache = sync.OnceValue(decodePrivacyGuides)
 
+const privacyPaidLinkageNotice = " A paid privacy check links its paying wallet to the check and stored result. Do not pay from a wallet you want to keep unlinked."
+const privacyLocalRouteNotice = " Default for privacy-sensitive amounts: use this deterministic client-local comparator. Do not invoke the paid model-judged route check with an exact amount without the user's explicit opt-in. SECONDED compares bounded shielded-route candidates and flags public/linkable legs plus a pool-balance ratio; it does not execute a purchase, measure a true anonymity set, or guarantee that buyer, amount, asset or timing is unlinkable."
+const privacyReceivePlanNotice = " Plan only; safe movement is not enforced. SECONDED can prepare a one-time receive workflow locally and scan public ERC-5564/Umbra announcements without sending view/spend keys or address filters; ownership matching and safe movement remain client-controlled and are not enforced. If a paid private-receive scan is used, its paying wallet is linked to the check and stored result; do not pay from a wallet you want to keep unlinked."
+
 func decodePrivacyGuides() []privacyGuide {
 	var result []privacyGuide
 	decoder := json.NewDecoder(bytes.NewReader(privacyGuideJSON))
@@ -39,6 +43,12 @@ func privacyGuides() []privacyGuide {
 	for i := range rows {
 		rows[i].Status = toolAvailability(rows[i].Status)
 		rows[i].Description += " No anonymity or legal-compliance guarantee."
+		switch rows[i].ID {
+		case "privacy_shielded_route":
+			rows[i].Description += privacyLocalRouteNotice + privacyPaidLinkageNotice
+		case "private_receive_prepare":
+			rows[i].Description += privacyReceivePlanNotice
+		}
 		rows[i].InputSchema = privacyClone(rows[i].InputSchema)
 	}
 	return rows

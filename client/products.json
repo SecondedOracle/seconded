@@ -1272,12 +1272,12 @@
         "amount": "1",
         "priority": "cheapest"
       },
-      "use_when": "Compare bounded shielded route quotes.",
+      "use_when": "Default privacy-sensitive amounts to the local comparator. Use the paid model check only with explicit opt-in; its paying wallet links to the check and stored result—do not pay from a wallet to keep unlinked.",
       "send": "network, asset, amount",
-      "description": "Use when: Compare bounded shielded route quotes.\nSend: network, asset, amount.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nNo anonymity or legal-compliance guarantee.",
-      "coverage": "Public route quotes only; execution is never authorized. The existing seconded_privacy_shielded_route remains a client-local planning tool. Two agreeing readers and two independent judges; unknown is not a pass.",
+      "description": "Use when: Default privacy-sensitive amounts to the local comparator. Use the paid model check only with explicit opt-in; its paying wallet links to the check and stored result—do not pay from a wallet to keep unlinked.\nSend: network, asset, amount.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.25 small only.\nNo anonymity or legal-compliance guarantee.",
+      "coverage": "Public route quotes only; execution is never authorized. The existing seconded_privacy_shielded_route remains a client-local planning tool. Two agreeing readers and two independent judges; unknown is not a pass. The paying wallet is linked to this check and its stored result; do not pay from a wallet you want to keep unlinked. SECONDED compares bounded shielded-route candidates and flags public/linkable legs plus a pool-balance ratio; it does not execute a purchase, measure a true anonymity set, or guarantee that buyer, amount, asset or timing is unlinkable.",
       "answer_to_action": {
-        "proceed": "Continue only within the verified coverage and stated limits",
+        "proceed": "Comparison only; review public/linkable legs. Never treat it as purchase execution or an anonymity-set measurement.",
         "do_not_proceed": "STOP and show the owner",
         "not_verified": "Pause; required evidence is unknown",
         "NOT VERIFIED": "Pause or ask a human; no charge"
@@ -1457,7 +1457,7 @@
       "use_when": "Check a proposed public route for bounded linkability evidence.",
       "send": "from, hops, to, history_blocks",
       "description": "Use when: Check a proposed public route for bounded linkability evidence.\nSend: from, hops, to, history_blocks.\nAnswer → do: proceed: review route; do_not_proceed: STOP; NOT VERIFIED: pause.\nCost: $0.10 ($0.15 on Robinhood) small only.\nNo anonymity or legal-compliance guarantee.",
-      "coverage": "Typed connected hops, reviewed contracts, public history and list screening; no privacy or compliance guarantee. Two agreeing readers and two independent judges; unknown is not a pass.",
+      "coverage": "Typed connected hops, reviewed contracts, public history and list screening; no privacy or compliance guarantee. Two agreeing readers and two independent judges; unknown is not a pass. The paying wallet is linked to this check and its stored result; do not pay from a wallet you want to keep unlinked.",
       "answer_to_action": {
         "proceed": "Continue only within the verified coverage and stated limits",
         "do_not_proceed": "STOP and show the owner",
@@ -1481,9 +1481,9 @@
     {
       "id": "degen_check",
       "name": "Degen Check",
-      "status": "unavailable",
+      "status": "available",
       "tool": "seconded_degen_check",
-      "description": "Check a new Pons launch before you buy it. Use when: reviewing a Pons V2 token. Send: Robinhood Chain network and token address. Answer → do: review facts and both opinions; NOT VERIFIED: pause. Cost: $0.10 small only.",
+      "description": "Check a new Pons launch before you buy it. Use when: reviewing a Pons V2 token. Send: Robinhood Chain network and token address (Robinhood only). Answer → do: review facts and both opinions; models_disagree: review the signed disagreement; NOT VERIFIED: pause. Cost: $0.10 small only, including signed disagreement.",
       "use_when": "Before interacting with a new Pons V2 token on Robinhood Chain.",
       "send": "network, address",
       "price_usd": {
@@ -1512,7 +1512,8 @@
       "answer_to_action": {
         "no_red_flags": "Review the measured facts and both opinions.",
         "red_flags": "Review the reported flags.",
-        "NOT VERIFIED": "Pause or ask a human."
+        "NOT VERIFIED": "Pause or ask a human.",
+        "models_disagree": "Review the facts and both opinions; this signed disagreement costs $0.10. It is not an agreed verdict or permission to buy."
       },
       "example_input": {
         "network": "eip155:4663",
@@ -1585,7 +1586,8 @@
     "Only an agreed signed receipt authorizes the listed next step for the exact supplied input. Pending, failed or NOT VERIFIED results mean pause.",
     "Never treat a verdict as financial advice, an investment recommendation or a guarantee.",
     "seconded_wallet shows status or freezes new authorizations.",
-    "You are charged only after both models agree and the answer is saved; if delivery fails you can always fetch it with seconded_receipt; no answer → no charge."
+    "Standard checks charge only after both models agree and the answer is saved; a disagreement is signed and free. Degen Check costs $0.10 for a saved signed answer, including a signed disagreement (models_disagree). If delivery fails, fetch the saved answer with seconded_receipt; no answer → no charge.",
+    "Availability is from the bundled offline snapshot, not a live server probe. A quote or check evaluates current server availability. Degen Check covers Robinhood Chain only."
   ],
   "pricing": "Per-product price_usd maps Small/Medium/Large to USD amounts.",
   "network": "eip155:8453",
@@ -1609,5 +1611,6 @@
       "asset": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
       "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a"
     }
-  ]
+  ],
+  "availability_source": "bundled_snapshot"
 }

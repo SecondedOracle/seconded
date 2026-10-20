@@ -19,7 +19,7 @@ import (
 // Version is stamped by the release builder and reported during MCP initialization.
 var Version = ClientVersion
 
-const billingGuarantee = "You are charged only after both models agree and the answer is saved; if delivery fails you can always fetch it with seconded_receipt; no answer → no charge."
+const billingGuarantee = "Standard checks charge only after both models agree and the answer is saved; a disagreement is signed and free. Degen Check costs $0.10 for a saved signed answer, including a signed disagreement (models_disagree). If delivery fails, fetch the saved answer with seconded_receipt; no answer → no charge."
 
 const instructions = "SECONDED runs paid two-model checks and returns a verdict label. The verdict binds only to the input you sent, not to any action. Each purchase is signed once; recovery re-posts the identical durable credential and body through the standard door. A 202 or timeout stays pending. For invalid_input with next=correct_input, correct the named field before retrying. After other check tool errors or timeouts, call seconded_receipt with no arguments before checking again: a paid check may still be running. Never ask the user for a private key or seed phrase. Checks pay on Base mainnet (USDC) unless a check names another network; they pay on Arc or Robinhood mainnet, or on a testnet (base_sepolia, arc_testnet, robinhood_testnet), only when the check names it. When you have the unsigned transaction, send it as structured transaction data, not prose. Unconfigured network identities refuse payment."
 
@@ -77,13 +77,19 @@ func Tools() []Tool {
 		{"seconded_get_limits", "Use when the owner asks about limits or affordability needs missing budget information. Shows current limits and safety switches; null means no user limit. Not a required preflight; every check enforces limits.", schema(map[string]any{}), ro()},
 		{"seconded_set_limits", "Change spending limits at the user's request, without a password. For 'set my daily limit to $20', pass {\"daily_usd\":20}. Chat can only tighten limits or freeze. Any increase, removal, safety-switch weakening or unfreeze requires the human terminal. These changes require the owner to run the terminal command returned on refusal. On Macs with Touch ID, owner changes also require biometrics. Otherwise an installed administrator approval key requires an offline signature. Without either, the six-character TTY confirmation does not stop an agent with shell access. There is an absolute $25/day chat ceiling, even when the owner has authorized a higher daily limit in the terminal. Omitted fields stay unchanged. The hard $2.50 per-authorization cap always applies, even if per_check_usd is higher or none. Also changes value_gate, dedupe, loop_brake, alerts and frozen switches.", limitToolSchema(), map[string]bool{"readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}},
 		{"seconded_products", "Use when tool descriptions do not identify the needed check or input shape. With complete input for a matching check, call it directly. Lists prices, examples and answer meanings.", schema(map[string]any{}), ro()},
-		{"seconded_quote", "Use when a price preview is requested or needed to decide affordability. Quotes price only; does not assess the action. A fully specified bounded check can be called directly.", schema(map[string]any{"product": product, "input": input, "network": map[string]any{"type": "string", "enum": []string{"base_sepolia", "arc_testnet", "robinhood_testnet", "base", "arc", "robinhood"}, "description": "Payment network to quote; omitted uses the default."}}, "product", "input"), ro()},
+		{"seconded_quote", "Use when a price preview is requested or needed to decide affordability. Quotes price only; does not assess the action. A fully specified bounded check can be called directly. For Asset Check use raw product token_check or stock_token_check, with input excluding kind.", schema(map[string]any{"product": product, "input": input, "network": map[string]any{"type": "string", "enum": []string{"base_sepolia", "arc_testnet", "robinhood_testnet", "base", "arc", "robinhood"}, "description": "Payment network to quote; omitted uses the default."}}, "product", "input"), ro()},
 		{"seconded_receipt", "Recover a check or recent checks by fetching status only. With no check_id, lists the " + strconv.Itoa(recentReceipts) + " newest checks and any older check still awaiting its receipt, newest first. A result's verification holds the receipt's signed findings and coverage. Never creates a new payment authorization; standard recovery may re-post the identical credential, while legacy recovery signs a read-only ownership proof. After any check error or timeout, call this before checking again. The answer wait can end while payment is pending: continue receipt-only recovery separately until final payment, certified nonpayment, or manual review. Certified nonpayment says not charged and permits retrying the check.", schema(map[string]any{"check_id": map[string]any{"type": "string", "pattern": "^[0-9a-f]{32}$"}}), ro()},
 		{"seconded_wallet", "Show the dedicated check wallet address, balances per network and how to fund it, or freeze new authorizations. Wallet switching is terminal-only: seconded-mcp wallet --human --switch back (or newer). Both keys are preserved. Base funding normally becomes available after about a minute, when both readers agree on recent state; Robinhood also uses recent agreement. Final payment confirmation is separate. Pending amounts cannot fund checks yet. Unavailable balances are null, never assumed zero. Never returns a private key; export is a separate human-run CLI command.", schema(map[string]any{"action": map[string]any{"type": "string", "enum": []string{"status", "freeze"}}}), map[string]bool{"readOnlyHint": false, "destructiveHint": false, "openWorldHint": true}},
 	}
 	for _, p := range productGuides() {
 		if !productCanRequestQuote(p.ID, p.Status) || !productOffered(p.ID) {
 			continue
+		}
+		if p.ID == "token_check" {
+			continue
+		}
+		if p.ID == "stock_token_check" {
+			p.Tool, p.Description, p.InputSchema = assetCheckTool, assetCheckDescription, assetCheckSchema()
 		}
 		properties := map[string]any{
 			"input": p.InputSchema, "max_price_usd": map[string]any{"type": "string", "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing."},
@@ -96,6 +102,11 @@ func Tools() []Tool {
 				"typed_data": map[string]any{"type": "object", "description": "Exact pending eth_signTypedData_v4 object; no signature or secret. Client decodes and binds it to input."},
 				"allowance":  map[string]any{"type": "string", "description": "Any additional approval granted by the pending signing operation, in atomic units."},
 			}, "owner", "typed_data")
+		}
+		if p.Tool == assetCheckTool && !deploymentPaymentNetwork("eip155:8453") {
+			properties["network"] = map[string]any{"type": "string",
+				"enum":        []string{"base_sepolia", "arc_testnet", "robinhood_testnet"},
+				"description": "Testnet payment chain. Omitted means base_sepolia."}
 		}
 		tools = append(tools, Tool{p.Tool, p.Description + " New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.", schema(properties, "input"),
 			map[string]bool{"readOnlyHint": false, "destructiveHint": false, "idempotentHint": false, "openWorldHint": true}})
@@ -142,6 +153,12 @@ func (g *Engine) attachUpdateNotice(result any, now time.Time) any {
 }
 
 func (g *Engine) Call(ctx context.Context, name string, args json.RawMessage) (result any, err error) {
+	if name == assetCheckTool {
+		name, args, err = resolveAssetCheck(args)
+		if err != nil {
+			return toolFailure(nil, err), err
+		}
+	}
 	if err := validateToolInput(name, args); err != nil {
 		return toolFailure(nil, err), err
 	}
@@ -755,7 +772,8 @@ func ServeWithSetup(ctx context.Context, in io.Reader, out io.Writer, g *Engine,
 					continue
 				}
 			}
-			known := false
+			// Callable legacy product aliases outlive their advertised menu entries.
+			known := toolProduct(p.Name) != ""
 			for _, t := range Tools() {
 				if t.Name == p.Name {
 					known = true

@@ -145,6 +145,10 @@ type PurchaseAssociation struct {
 // RecoveryRecord stays inside the private atomic ledger. It never enters MCP
 // output. Raw body bytes and the encoded credential are reused exactly.
 type RecoveryRecord struct {
+	// Transient, unsigned diagnostics never authorize replacement or alter the
+	// durable ledger format read by previously released clients.
+	ServiceError           string              `json:"-"`
+	ServiceReason          string              `json:"-"`
 	BodySHA256             string              `json:"body_sha256,omitempty"`
 	CanonicalRequestSHA256 string              `json:"canonical_request_sha256,omitempty"`
 	Format                 string              `json:"format"`
@@ -161,6 +165,18 @@ type RecoveryRecord struct {
 	ServerCheckID          string              `json:"server_check_id,omitempty"`
 	NextAttempt            int64               `json:"next_attempt,omitempty"`
 	NewPurchaseAllowed     bool                `json:"new_purchase_allowed"`
+}
+
+func validServiceDiagnostic(code, reason string) bool {
+	if code == "" {
+		return reason == ""
+	}
+	if code == "store_unavailable" {
+		return reason == ""
+	}
+	return code == "verification_unavailable" && oneOf(reason, "", "block_disagreement", "stale_block",
+		"payment_readers", "chain_id", "malformed_evidence", "domain_separator", "payer_code_disagreement",
+		"token_implementation", "decimals", "balance_unavailable", "state_disagreement", "retry_exhausted")
 }
 
 func standardCanonical(r Request, a StandardRequirement) ([]byte, error) {
@@ -210,6 +226,9 @@ func newRecovery(origin string, r Request, a StandardRequirement, auth Authoriza
 	return &RecoveryRecord{BodyBytes: string(body), PaymentSignatureSHA256: hex.EncodeToString(headerHash[:]), Format: "seconded-door-recovery/v2", URL: origin + standardDoor, Body: body, PaymentSignature: header, Accepted: a, Quote: a.Extra.Seconded, CanonicalRequest: string(canon), Association: assoc, State: "unresolved"}, nil
 }
 func (r RecoveryRecord) Validate(e Entry) error {
+	if !validServiceDiagnostic(r.ServiceError, r.ServiceReason) {
+		return ErrStorage
+	}
 	if !validComparisonEntry(e) || !validPortfolioEntry(e) {
 		return ErrStorage
 	}
@@ -293,6 +312,11 @@ func (r RecoveryRecord) Validate(e Entry) error {
 }
 func (l Ledger) requireRecovery() error {
 	for _, e := range l.Entries {
+		// RELEASED is set only by independent chain nonpayment evidence. Keep
+		// receipt recovery available, but it no longer reserves a purchase.
+		if e.State == "RELEASED" {
+			continue
+		}
 		if e.RecoveryRequired || (e.Recovery != nil && (e.Recovery.State != "resolved" || !e.Recovery.NewPurchaseAllowed)) {
 			return errors.New("presentation_indeterminate")
 		}
@@ -334,6 +358,17 @@ func (a *API) replay(ctx context.Context, e Entry, wait int) (CheckReply, error)
 }
 
 func (r *RecoveryRecord) recoveryReply(status int, b []byte, h http.Header, err error, validBefore int64) (CheckReply, error) {
+	r.ServiceError, r.ServiceReason = "", ""
+	if err == nil && status == http.StatusServiceUnavailable {
+		var diagnostic struct {
+			Error  string `json:"error"`
+			Reason string `json:"reason"`
+		}
+		if checkJSON(b, ResponseLimit) == nil && json.Unmarshal(b, &diagnostic) == nil &&
+			validServiceDiagnostic(diagnostic.Error, diagnostic.Reason) {
+			r.ServiceError, r.ServiceReason = diagnostic.Error, diagnostic.Reason
+		}
+	}
 	// One attempt per tool call is the bounded recovery budget. Persist a lower
 	// bound for the next attempt so restarts cannot evade bounded server backoff.
 	// Round up because persisted deadlines have second precision: truncating
@@ -385,6 +420,7 @@ func (e *Entry) acceptReply(reply CheckReply) {
 		return
 	}
 	r := e.Recovery
+	r.ServiceError, r.ServiceReason = "", ""
 	r.ServerCheckID = reply.Receipt.Envelope.CheckID
 	r.NewPurchaseAllowed = reply.Hints.NewQuoteAllowed
 	e.Commitment = reply.Receipt.Envelope.Commitment

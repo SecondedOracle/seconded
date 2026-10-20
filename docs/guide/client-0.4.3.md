@@ -1,5 +1,6 @@
-# Client 0.4.3
+# Client 0.4.3 (historical release)
 
+For the current preparation, see [Client 0.4.4](client-0.4.4.md).
 Publication, distribution links and current counts are recorded in
 [README Status](../../README.md#status). These notes describe the released client.
 

@@ -2,10 +2,18 @@
 
 ## Current measurements
 
+Client 0.4.4 is published on npm and GitHub, with signed release assets. The labelled bundled snapshot contains 13 available product contracts exposed through 12 check tools and six utilities. Asset Check combines token and stock-token inputs; quotes expose payment-network selection. Billing text includes the Degen $0.10 signed-disagreement exception. See [0.4.4 provenance](guide/client-0.4.4.md#source-provenance).
+
+Anonymous reads on 2026-10-20 UTC confirmed npm [`@seconded/mcp@0.4.4`](https://registry.npmjs.org/@seconded%2Fmcp/0.4.4), also selected by `latest`, and the non-draft, non-prerelease [GitHub v0.4.4 release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.4), published at 01:27:17Z. The npm tarball SHA-256 is `ad9deba5372cc6802745ad2086ccd3a5715b9338b44c4b86d1cb37c5d788b6b1` and matches the registry's integrity metadata.
+
+`SHA-256SUMS.sig` verifies over `SHA-256SUMS` using the release repository's `allowed_signers`, with Ed25519 fingerprint `SHA256:qciU/JIVSCg1Ry+7Jbl0xoEhyLFgd8NBnqBj+mr40Ss`; a modified manifest fails verification. The signed manifest authenticates the downloaded `build-info.json`. See [release verification](guide/release-verification.md) for commands and independent signer authentication. These distribution checks do not measure native installation, paid execution or settlement.
+
+## Retained distribution measurements (2026-10-19)
+
 [README Status](../README.md#status) is the current release/count summary. This register
 records the supporting measurements and preserves older observations under historical labels.
 [Source provenance](guide/client-0.4.3.md#source-provenance) maps the public client to
-the released source; documentation and standalone verifier fixes do not alter that client.
+the prior released source. The 0.4.4 source changes are described separately above.
 
 On 2026-10-19, unauthenticated GETs confirmed the published distribution and the live
 catalog selected by `SECONDED-CLIENT-VERSION: 0.4.3`. The client built, passed its public
@@ -15,14 +23,14 @@ No wallet was created, no paid check was purchased, and no chain settlement was 
 
 | Measurement | Observed value | Evidence |
 | --- | --- | --- |
-| npm distribution | Latest 0.4.3, published 2026-10-18T15:37:41.840Z | [Registry metadata](https://registry.npmjs.org/@seconded%2Fmcp) |
+| npm distribution | At that measurement: 0.4.3, published 2026-10-18T15:37:41.840Z | [Registry metadata](https://registry.npmjs.org/@seconded%2Fmcp) |
 | Signed GitHub release | v0.4.3, published 2026-10-18T13:10:32Z, non-draft/non-prerelease | [Release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.3); signed manifest and build-info checked |
 | Versioned live catalog | All bundled product IDs advertised as available; testing products remain not purchasable | [Products API](https://api.secondedoracle.xyz/v1/products) with the client-version header above; counts below |
 | Unversioned live catalog | Eight legacy checks, including Lending at $0.50 | Same endpoint without the header; not the current client's advertised catalog |
 | Bundled versus live contracts | Prices and payment-network entries match; descriptions, some validation constraints and Degen status differ | [Catalog explanation](guide/pricing-and-coverage.md#catalog-versions-and-availability) |
 | Separate npm licence metadata | `UNLICENSED`, despite this source repository's Apache-2.0 licence | [Distribution boundaries](guide/release-verification.md#distribution-boundaries); no licence grant for separate artifacts inferred |
 
-Exact response-body SHA-256 values from the current measurement (mutable endpoints):
+Exact response-body SHA-256 values retained from the prior measurement (mutable endpoints):
 
 | Response | SHA-256 on 2026-10-19 |
 | --- | --- |
@@ -46,9 +54,9 @@ not a guarantee of future availability or a universal security verdict.
 | Claim | Evidence | Verified |
 | --- | --- | --- |
 | An agent pays per check over x402 | `client/standard.go` posts to `/v1/x402/checks` and accepts only the x402 `exact` scheme against the pinned asset and `payTo`; `client/api.go` sends `SECONDED-CLIENT-VERSION`. | 2026-10-06, by reading the source; the client builds. |
-| Standard checks require rival-lab agreement; Degen can return signed disagreement | `client/receipt.go`: an agreed receipt must name labs in `checked_by` drawn from `OpenAI` and `Anthropic` without repeats; a `no_agreement` receipt must carry the fixed NOT VERIFIED message and no answer. Degen permits `outcome=models_disagree` with `answer.label_id=models_disagree`, `option=0` (`client/degen.go`). The generic catalog agreement-only text omits this exception; see [billing policy](guide/how-it-works.md#billing-policy). | 2026-10-19. The client-side contract is verified by reading the source; the server's behaviour is a vendor statement, not observable from this repository. |
+| Standard checks require rival-lab agreement; Degen can return signed disagreement | `client/receipt.go`: an agreed receipt must name labs in `checked_by` drawn from `OpenAI` and `Anthropic` without repeats; a `no_agreement` receipt must carry the fixed NOT VERIFIED message and no answer. Degen permits `outcome=models_disagree` with `answer.label_id=models_disagree`, `option=0` (`client/degen.go`). The 0.4.4 catalog usage includes this exception; see [billing policy](guide/how-it-works.md#billing-policy). | 2026-10-19. The client-side contract is verified by reading the source; the server's behaviour is a vendor statement, not observable from this repository. |
 | Every answer carries an Ed25519-signed receipt | `client/receipt.go` `verify()`: `ed25519.Verify` over the version prefix plus the RFC 8785 canonical envelope. `verifier/` reproduces it. | 2026-10-06: `cd verifier && go run ./cmd/seconded-verify testdata/refused-base-mainnet-2026-10-06.json` printed `OK ... Ed25519 by rk-2026-09-a over receipt v1 (807 canonical bytes)`, exit 0. |
-| Standard agreement and Degen signed disagreement can be charged; pending billing is unresolved | The product-specific [billing policy](guide/how-it-works.md#billing-policy) qualifies generic catalog `usage`. `client/receipt.go` requires pending billing for `no_agreement`; chain evidence resolves nonpayment. The public disagreement signs `charged=pending`, `settlement=none`, `tx=null`. | 2026-10-19: both public v3 fixtures verify offline; the Degen outcome contract was inspected in source. A receipt signature authenticates the billing assertion, not independent nonpayment/finality. |
+| Standard agreement and Degen signed disagreement can be charged; pending billing is unresolved | The product-specific [billing policy](guide/how-it-works.md#billing-policy) matches the 0.4.4 catalog `usage`. `client/receipt.go` requires pending billing for `no_agreement`; chain evidence resolves nonpayment. The public disagreement signs `charged=pending`, `settlement=none`, `tx=null`. | 2026-10-19: both public v3 fixtures verify offline; the Degen outcome contract was inspected in source. A receipt signature authenticates the billing assertion, not independent nonpayment/finality. |
 | Three mainnet payment networks advertised | `client/chains.go`, `client/products.json` and the current versioned GET list 8453, 5042 and 4663. | 2026-10-19: live and bundled network entries match. No three-network paid canary or settlement test. |
 
 ## Keys, addresses, versions
@@ -58,7 +66,7 @@ not a guarantee of future availability or a universal security verdict.
 | Receipt key `rk-2026-09-a` is `438d9301c477c27fecc3f56da0a7d5a6b3894cef69815bae63b5349dc2cddf0b` | `client/receipt.go` `releaseReceiptKeys`; `verifier/keys.go`. | 2026-10-06: the production-signed fixture verifies under exactly this key and fails under any other (`verifier/receipt_test.go`). |
 | Pay-to address `0x010ab46d566cde25cca0ee55eb105e781c7bcf3a` on all three mainnets | `client/products.json` `networks[].pay_to`; `client/policy.go` `PayTo`; the 2026-09-30 capture; the fixture's `billing.pay_to`. | 2026-10-06, four sources agree; on-chain activity not inspected from here. |
 | Payment assets: USDC `0x8335…2913` on Base, USDC `0x3600…0000` on Arc, USDG `0x5fc5…d168` on Robinhood Chain | `client/chains.go` `chainPins`; `client/products.json` `networks[].asset`. | 2026-10-06, both files agree. |
-| Current client source and release provenance | `client/api.go` reports the version in [README Status](../README.md#status); [source mapping](guide/client-0.4.3.md#source-provenance) identifies the release commit and intentional public export differences. | 2026-10-19: source-built executable reports 0.4.3. Module renaming/source packaging changes binary digests; no release-byte equivalence claim. |
+| Historical 0.4.3 source and release provenance | `client/api.go` reports the version in [README Status](../README.md#status); [source mapping](guide/client-0.4.3.md#source-provenance) identifies the release commit and intentional public export differences. | 2026-10-19: source-built executable reports 0.4.3. Module renaming/source packaging changes binary digests; no release-byte equivalence claim. |
 | At least two configured RPC provider labels per chain | `client/chains.go` pins Base, Arc and Robinhood endpoint sets; quorum guards require agreeing readers. | 2026-10-06, source inspection. Actual provider independence and endpoint availability were not independently measured. |
 
 ## Historical source snapshot (2026-10-06)
@@ -71,7 +79,7 @@ not a guarantee of future availability or a universal security verdict.
 
 | Claim | Evidence | Verified |
 | --- | --- | --- |
-| 13 check interfaces, 6 utility tools, 19 MCP tools | `client/products.json` has 13 entries in `products`; `client/tools-list.json` has 19 tools. Twelve bundled checks are available; Degen is bundled as `unavailable` but advertised live as `available`. | 2026-10-19, parsed both local JSON files and the header-aware live response; checked unique IDs and matching product sets. |
+| Historical 0.4.3: 13 check interfaces, 6 utility tools, 19 MCP tools | At that source snapshot, `client/products.json` had 13 entries in `products` and `client/tools-list.json` had 19 tools. Twelve bundled checks were available; Degen was bundled as `unavailable` but advertised live as `available`. | 2026-10-19, parsed both local JSON files and the header-aware live response; checked unique IDs and matching product sets. |
 | Prices per tier and the $0.15 Robinhood override | `client/products.json` and the current versioned GET, `price_usd` and `price_usd_by_network`; [price table](guide/pricing-and-coverage.md#paid-checks). | 2026-10-19: all thirteen IDs, tier prices and network overrides agree. Degen has no Robinhood surcharge. Advertisement only; no purchase. |
 | Historical: the 2026-09-30 live catalog listed 7 checks at $0.25 small for the lookup checks | `client/products-live-v1.json`. | 2026-10-06 with `jq`: 7 products; `stock_token_check`, `token_check`, `counterparty_check`, `cross_chain_compare`, `scam_check` at small `0.25`. |
 | Historical (2026-10-06): the 0.4.1 header selected lower prices than the unversioned response | Dated [0.4.1](guide/evidence/products-client-0.4.1-2026-10-06.json) and [unversioned](guide/evidence/products-unversioned-2026-10-06.json) GET captures. The >=0.4.0 threshold is attributed to release notes in `CHANGELOG.md`. | 2026-10-06: twelve versus eight advertised checks; Lending $0.25 versus $0.50. Five legacy small-tier lookups $0.10 versus $0.25 (Robinhood $0.15 override). |
@@ -163,3 +171,7 @@ tree; hashes identify the observed response bodies, not immutable endpoint conte
 | Published build information | `984e5dbdb321486d2c859944491fcdbc3f89e7dc1fbba4384ae1f76445021638` |
 | Official documentation with receipt examples | `93ae0e1b21709c9417b2319d100789d239a62026ea69ec6d003c875dce2518d5` |
 | Privacy policy | `ef627c87d6b2136ff16937ead35671fe4065d4155e6fad818fd2a59e73b2082f` |
+
+## Client 0.4.4 offline verification
+
+The public client has 127 passing test/subtest events and six skips; the verifier has 45 passing events and no skips. All three committed public receipt fixtures verify. The selected client tests include billing-text parity; native keychain, private pipeline and signed-install qualification remain separate. Distribution and checksum-signature checks are recorded above; native installation, paid execution and settlement were not measured.

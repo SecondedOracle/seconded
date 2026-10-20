@@ -151,6 +151,9 @@ func (l *Ledger) Duplicate(product, digest string, now int64, dedupe bool) *Entr
 		if e.Product != product || e.InputDigest != digest {
 			continue
 		}
+		if e.State == "RELEASED" && e.Receipt == nil {
+			continue
+		}
 		if e.RecoveryRequired || e.State == "RESERVED" || e.State == "OUTSTANDING" {
 			return e
 		}

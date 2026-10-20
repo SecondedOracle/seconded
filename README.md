@@ -4,7 +4,7 @@
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs check the input, and every answer comes with a signed receipt; no answer, no charge.**
 
-![client](https://img.shields.io/badge/client-0.4.3-blue)
+![client](https://img.shields.io/badge/client-0.4.4-blue)
 ![go](https://img.shields.io/badge/go-1.26.7-00ADD8)
 ![receipts](https://img.shields.io/badge/receipts-Ed25519%20%C2%B7%20RFC%208785-success)
 ![chains](https://img.shields.io/badge/pays%20on-Base%20%C2%B7%20Arc%20%C2%B7%20Robinhood%20Chain-informational)
@@ -15,7 +15,7 @@
 
 > See [Status](#status) for the published release, tool counts and measured live availability.
 > Standard checks require agreement; Degen can also return a chargeable signed
-> `models_disagree` answer. See [the release notes](docs/guide/client-0.4.3.md)
+> `models_disagree` answer. See [the release notes](docs/guide/client-0.4.4.md)
 > and [billing policy](docs/guide/how-it-works.md#billing-policy).
 
 **Verify a receipt**<br>
@@ -39,11 +39,11 @@ Use the [Go verifier](examples/verify-receipt/) with Go 1.26.6+ from the reposit
 
 ### 1. Install the MCP client
 
-Install `@seconded/mcp` via npm or download prebuilt binaries from the releases repository:
+Client 0.4.4 is published on npm and GitHub. Install the pinned package or matching signed binaries; verify `SHA-256SUMS.sig` with `allowed_signers`, then check the artifact hashes as described in the [release verification guide](docs/guide/release-verification.md):
 
 - **npm:**
   ```sh
-  npx @seconded/mcp --version
+  npx @seconded/mcp@0.4.4 --version
   ```
 - **Releases repository:** Precompiled binaries and signed release manifests are available at [SecondedOracle/seconded-mcp-releases](https://github.com/SecondedOracle/seconded-mcp-releases).
 
@@ -98,10 +98,10 @@ This repository contains the buildable public surface: the Go MCP client, the st
 | Component | State on 2026-10-19 | Evidence |
 | --- | --- | --- |
 | Public API (`api.secondedoracle.xyz`) | Products and keys endpoints reachable; 3 mainnet payment networks advertised | Header-aware GETs in [CLAIMS](docs/CLAIMS.md#current-measurements) |
-| Client source | Public source reporting 0.4.3; released runtime preserved with a public module rename and selected tests | `client/api.go`, [source provenance](docs/guide/client-0.4.3.md#source-provenance) |
+| Client source | Released 0.4.4 runtime with the public module rename and selected tests | `client/api.go`, [source provenance](docs/guide/client-0.4.4.md#source-provenance) |
 | Receipt verifier | Builds; verifies public fixtures; parser and tamper controls | `verifier/receipt_test.go` |
-| Catalog and tools | 19 MCP tools: 13 check interfaces and 6 utilities. Bundle: 12 available checks plus Degen `unavailable`. Live: all 13 available to client 0.4.3. Six other products remain in testing. | [Measured counts](docs/CLAIMS.md#catalog-facts), [bundled versus live catalog](docs/guide/pricing-and-coverage.md#catalog-versions-and-availability) |
-| Distribution | npm `@seconded/mcp` latest is 0.4.3; signed GitHub release v0.4.3; both published 2026-10-18 | [npm](https://www.npmjs.com/package/@seconded/mcp/v/0.4.3), [v0.4.3 release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.3), [release verification](docs/guide/release-verification.md) |
+| Catalog and tools | 18 MCP tools: 12 check interfaces and 6 utilities for 13 products. Asset Check selects token or stock_token. All 13 are available in the labelled offline snapshot; current availability requires a quote. Six other products remain in testing. | [Measured counts](docs/CLAIMS.md#catalog-facts), [bundled versus live catalog](docs/guide/pricing-and-coverage.md#catalog-versions-and-availability) |
+| Distribution | npm `@seconded/mcp@0.4.4` is published and latest; GitHub v0.4.4 assets are signed | [npm metadata](https://registry.npmjs.org/@seconded%2Fmcp/0.4.4), [GitHub release](https://github.com/SecondedOracle/seconded-mcp-releases/releases/tag/v0.4.4), [release verification](docs/guide/release-verification.md) |
 | Licence | Apache-2.0 | [LICENSE](LICENSE), [NOTICE](NOTICE) |
 
 Release tags and downloads live in [seconded-mcp-releases](https://github.com/SecondedOracle/seconded-mcp-releases), separately from this source repository.

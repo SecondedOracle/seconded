@@ -15,6 +15,10 @@ func (e *localInputError) Unwrap() error     { return ErrInvalid }
 func inputError(field, message string) error { return &localInputError{field, message} }
 
 func validateToolInput(name string, args json.RawMessage) error {
+	if name == assetCheckTool {
+		_, _, err := resolveAssetCheck(args)
+		return err
+	}
 	if isPrivacyName(name) {
 		return nil
 	}
@@ -24,6 +28,9 @@ func validateToolInput(name string, args json.RawMessage) error {
 	var fields map[string]json.RawMessage
 	if DecodeStrict(args, &fields, MessageLimit) != nil || fields == nil {
 		return inputError("arguments", "Supply a JSON object matching the tool schema.")
+	}
+	if err := validateUtilityInput(name, args, fields); err != nil {
+		return err
 	}
 	product := toolProduct(name)
 	if name == "seconded_receipt" {
@@ -77,6 +84,53 @@ func validateToolInput(name string, args json.RawMessage) error {
 		return inputError("signing", "Supply signing only with seconded_x402_payment_check.")
 	}
 	return validateProductInput(product, a.Input)
+}
+
+// Validate utility arguments before enrollment, state changes or recovery.
+// Only local argument errors get no-charge semantics, never remote failures.
+func validateUtilityInput(name string, args json.RawMessage, fields map[string]json.RawMessage) error {
+	invalid := func() error {
+		return inputError("arguments", "Use the field names and types shown in the tool schema.")
+	}
+	switch name {
+	case "seconded_products", "seconded_get_limits":
+		var empty struct{}
+		if DecodeStrict(args, &empty, MessageLimit) != nil {
+			return invalid()
+		}
+	case "seconded_set_limits":
+		var patch limitUpdate
+		if DecodeStrict(args, &patch, MessageLimit) != nil {
+			return invalid()
+		}
+		for _, field := range []string{"value_gate", "dedupe", "loop_brake", "alerts", "frozen"} {
+			if raw, ok := fields[field]; ok && string(raw) != "true" && string(raw) != "false" {
+				return inputError(field, "Supply a boolean, or omit the field to leave it unchanged.")
+			}
+		}
+		if _, err := patchSettings(DefaultSettings(), patch); err != nil {
+			return invalid()
+		}
+	case "seconded_receipt":
+		var a struct {
+			ID string `json:"check_id,omitempty"`
+		}
+		if DecodeStrict(args, &a, MessageLimit) != nil {
+			return invalid()
+		}
+	case "seconded_wallet":
+		var a struct {
+			Action string `json:"action,omitempty"`
+		}
+		if DecodeStrict(args, &a, MessageLimit) != nil {
+			return invalid()
+		}
+		if _, supplied := fields["action"]; supplied && !oneOf(a.Action, "status", "freeze", "switch_back", "switch_newer", "unfreeze") {
+			return inputError("action", "Choose status or freeze, or omit action for status.")
+		}
+		// Historical owner actions retain their explicit terminal-only refusal.
+	}
+	return nil
 }
 
 // Enforce required/nonempty fields from the compiled catalog, including nested

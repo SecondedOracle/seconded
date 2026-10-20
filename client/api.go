@@ -93,7 +93,7 @@ type Requirement struct {
 
 // QuoteBinding is the "seconded" object server/payments/quotes.py mint_quote() returns;
 // tests/contract/client-fixtures.json pins it to the server's output.
-const ClientVersion = "0.4.3"
+const ClientVersion = "0.4.4"
 
 var semanticVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$`)
 

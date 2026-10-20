@@ -11,7 +11,7 @@
 | [Release verification](release-verification.md) | Verify a published release and understand its source provenance. |
 
 [Current status](../../README.md#status) records the release and measured counts.
-[Release notes](client-0.4.3.md) explain Degen support and source provenance.
+[Release notes](client-0.4.4.md) describe the published 0.4.4 changes and source provenance.
 
 The catalogs define this checkout: `client/products.json` for products and prices,
 `client/tools-list.json` for MCP tools, and `client/privacy-tools.json` for privacy tools.

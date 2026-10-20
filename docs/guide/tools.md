@@ -12,7 +12,7 @@ schemas from the compiled catalog without creating a profile.
 for the frozen bundle versus live status; the server must offer a quote before purchase.
 Signed `models_disagree` answers can be charged. Review the facts, both opinions
 and freshness; disagreement and stale results do not authorize an action.
-See the [release notes](client-0.4.3.md) for source provenance and verification boundaries.
+See the [release notes](client-0.4.4.md) for source provenance and verification boundaries.
 
 ## Utility tools (free, local or public API)
 
@@ -46,8 +46,8 @@ fields exactly.
 | Product | Tool | Use when |
 | --- | --- | --- |
 | Trade Check | `seconded_trade_check` | Before signing a trade, approval, transfer or permit. |
-| Stock Token Check | `seconded_stock_token_check` | Before trading a Robinhood or Coinbase Base stock token. |
-| Token Check | `seconded_token_check` | Before interacting with a token. |
+| Stock Token Check | `seconded_asset_check` (`kind=stock_token`) | Before trading a Robinhood or Coinbase Base stock token. |
+| Token Check | `seconded_asset_check` (`kind=token`) | Before interacting with a token. |
 | Agent Registry Check | `seconded_agent_registry_check` | Before paying or trusting another agent that claims an ERC-8004 identity. |
 | Address Screening Check | `seconded_counterparty_check` | Before relying on an address. |
 | Cross-Chain Compare | `seconded_cross_chain_compare` | Before selecting a chain for a USDC -> EURC swap. |
@@ -80,3 +80,11 @@ For Degen, `outcome=models_disagree` can instead carry a chargeable answer with
 Seven free tools in `client/privacy-tools.json` are compiled into the binary but have
 status `in_testing` and are not in the published list above. See
 [Pricing and coverage](pricing-and-coverage.md#free-local-privacy-tools-in-testing).
+
+## Asset Check and quote networks in 0.4.4
+
+The 13 raw product contracts use 12 check tools plus six utilities. Asset Check combines token and stock-token inputs: select `input.kind=token` or `stock_token`. Existing direct-call aliases remain accepted, but discovery advertises `seconded_asset_check`. Quotes use `product=token_check` or `stock_token_check` and omit `kind` from `input`.
+
+`seconded_quote.network` selects the payment rail: `base` (default), `arc`, `robinhood`, `base_sepolia`, `arc_testnet` or `robinhood_testnet`. The subject network stays in `input`. Bad utility arguments return `invalid_input` with `charged=no` before wallet access.
+
+Standard disagreement is signed and free. Degen costs $0.10 for a saved signed answer, including `models_disagree`; no answer means no charge. Unsigned 503 diagnostics describe service availability, not authenticated payment state. After independently certified nonpayment, a new purchase can proceed; unresolved payment still requires receipt recovery.

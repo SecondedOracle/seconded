@@ -16,13 +16,13 @@ Run the block from a clone of this repository; subsequent wallet examples assume
 remain in `client/`. For signed binaries or npm, use the distribution links in
 [README Status](../../README.md#status) and follow [Release verification](release-verification.md).
 The public source uses a renamed module and selected tests; see
-[source provenance](client-0.4.3.md#source-provenance).
+[source provenance](client-0.4.4.md#source-provenance).
 
 The Makefile requires an explicit version for this snapshot. From `client/`:
 
 ```sh
-make VERSION=0.4.3 build
-./dist/seconded-mcp --version  # seconded-mcp 0.4.3
+make VERSION=0.4.4 build
+./dist/seconded-mcp --version  # seconded-mcp 0.4.4
 ```
 
 Plain `make build` retains the historical `0.1.0-test2` default. Use the command above
@@ -113,8 +113,8 @@ after 90 days from last activity. Keep receipts you need to verify later.
 
 `seconded-mcp --help` prints: `setup, host-snippet, serve, self-check, prove, recover,
 limits, wallet, rollback, export-key, link coinbase, help, version`.
-Use this top-level help. In this release `prove --help` and `recover --help` return
-`operation_failed`; they do not provide subcommand help.
+Use top-level help for the command list. `prove --help` and `recover --help` now print
+subcommand usage without opening a profile; malformed input returns a specific reason.
 For receipt files, use **`seconded-verify`**, the [standalone verifier](../../examples/verify-receipt/).
 The client has no `verify` subcommand. Recovery and input proofs serve different purposes:
 `prove CHECK_ID INPUT_FILE` checks a stored receipt against supplied input when the

@@ -10,15 +10,15 @@ for the release and measured counts. Prices below are USD; "—" means the tier 
 | Product | MCP tool | Small | Medium | Large | Subject chains | Live availability on 2026-10-19 ² |
 | --- | --- | ---: | ---: | ---: | --- | --- |
 | Trade Check | `seconded_trade_check` | 0.25 | 1.50 | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
-| Stock Token Check | `seconded_stock_token_check` | 0.10 ¹ | — | — | Robinhood 4663, Base 8453 | yes |
-| Token Check | `seconded_token_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663, Base Sepolia 84532 | yes |
+| Stock Token Check | `seconded_asset_check` (`kind=stock_token`) | 0.10 ¹ | — | — | Robinhood 4663, Base 8453 | yes |
+| Token Check | `seconded_asset_check` (`kind=token`) | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663, Base Sepolia 84532 | yes |
 | Agent Registry Check | `seconded_agent_registry_check` | 0.25 | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
 | Address Screening Check | `seconded_counterparty_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
 | Cross-Chain Compare | `seconded_cross_chain_compare` | 0.10 ¹ | — | — | Base (Uniswap V3) and Arc (Uniswap V4), fixed USDC to EURC | yes |
 | Scam Check | `seconded_scam_check` | 0.10 ¹ | 1.50 | 2.50 | chain-independent | yes |
 | Lending Check | `seconded_lending_check` | 0.25 | — | — | Base 8453, Arc 5042 (Morpho Blue) | yes |
 | Agent Work Payout Check | `seconded_job_escrow_check` | 0.25 | — | — | Base 8453 | yes |
-| Degen Check | `seconded_degen_check` | 0.10 | — | — | Robinhood 4663 (Pons V2 tokens) | yes; bundled `unavailable` |
+| Degen Check | `seconded_degen_check` | 0.10 | — | — | Robinhood 4663 (Pons V2 tokens) | yes in that historical measurement |
 | x402 Payment Check | `seconded_x402_payment_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
 | Shielded Route Check | `seconded_shielded_route_check` | 0.25 | — | — | Base 8453, Arc 5042, Robinhood 4663 | yes |
 | Bridge Route Check | `seconded_route_check` | 0.10 ¹ | — | — | Base 8453, Arc 5042 and Robinhood 4663; typed connected routes of 1–4 hops | yes |
@@ -27,7 +27,7 @@ for the release and measured counts. Prices below are USD; "—" means the tier 
 `price_usd_by_network` in the catalog. Scam Check's medium and large tiers are the same
 on every network.
 
-² Live availability was measured with `SECONDED-CLIENT-VERSION: 0.4.3`.
+² Historical live availability was measured on 2026-10-19 with `SECONDED-CLIENT-VERSION: 0.4.3`; it has not been remeasured for this 0.4.4 preparation.
 Degen stays $0.10 on every payment network; it has no Robinhood surcharge.
 The table records advertisement, not successful paid execution on every network.
 
@@ -37,8 +37,9 @@ The table records advertisement, not successful paid execution on every network.
 price inferred from its date/name. The frozen bundle uses `pt-2026-09-29-small-025`;
 the live versioned response measured on 2026-10-19 uses `pt-2026-10-05-v040-network`.
 Their product price maps and network overrides match despite those different labels.
-Degen is `unavailable` in the bundle and `available` in that live response. The server
-must offer a quote before purchase; a bundled tool alone does not guarantee a sale.
+In 0.4.4, all 13 products including Degen are `available` in the labelled bundled
+offline snapshot. This is not a new live measurement. A quote or check evaluates
+current server availability; a bundled tool alone does not guarantee a sale.
 
 Live text can also change separately from the bundle. The measured descriptions differ
 for Stock Token, Token, Agent Registry, Shielded Route and Degen checks. Live schemas add
@@ -110,3 +111,11 @@ Their status is `in_testing` and they are not in the published tools list:
 `seconded_privacy_pool_check`, `seconded_private_receive_prepare`,
 `seconded_private_purchase_prepare`, `seconded_private_swap_quote`,
 `seconded_private_fact_prove`. Nothing in them signs or broadcasts a transaction.
+
+## Asset Check and quote networks in 0.4.4
+
+The 13 raw product contracts use 12 check tools plus six utilities. Asset Check combines token and stock-token inputs: select `input.kind=token` or `stock_token`. Existing direct-call aliases remain accepted, but discovery advertises `seconded_asset_check`. Quotes use `product=token_check` or `stock_token_check` and omit `kind` from `input`.
+
+`seconded_quote.network` selects the payment rail: `base` (default), `arc`, `robinhood`, `base_sepolia`, `arc_testnet` or `robinhood_testnet`. The subject network stays in `input`. Bad utility arguments return `invalid_input` with `charged=no` before wallet access.
+
+Standard disagreement is signed and free. Degen costs $0.10 for a saved signed answer, including `models_disagree`; no answer means no charge. Unsigned 503 diagnostics describe service availability, not authenticated payment state. After independently certified nonpayment, a new purchase can proceed; unresolved payment still requires receipt recovery.

@@ -7,7 +7,7 @@ The release contains five native binaries, an MCPB bundle, build information,
 `SHA-256SUMS` and its OpenSSH signature. Verify the signed manifest and the selected
 artifact before running it. Release binaries are built from private release source
 and verified by the signed manifest. This public tree uses a renamed module path
-and a selected test subset. See the exact [source provenance](client-0.4.3.md#source-provenance);
+and a selected test subset. See the exact [source provenance](client-0.4.4.md#source-provenance);
 building the public source does not reproduce release binary hashes.
 
 ## What a release contains
@@ -26,6 +26,8 @@ not bypass operating-system security prompts. Follow the platform's review flow 
 it blocks execution.
 
 ## Verify before running
+
+The v0.4.4 release repository publishes an [`allowed_signers` file](https://github.com/SecondedOracle/seconded-mcp-releases/blob/8f9b4a3120c64ddd31689a9dd31f828eb12ff3b4/allowed_signers) for `release@seconded`, namespace `seconded-release`. Its Ed25519 key has fingerprint `SHA256:qciU/JIVSCg1Ry+7Jbl0xoEhyLFgd8NBnqBj+mr40Ss`. Authenticate that signer independently before using the file, or create an equivalent file from an independently authenticated key as below.
 
 ```sh
 # 1. Put the announced publisher key into an allowed_signers file.
@@ -62,8 +64,8 @@ cd client && go build -o seconded-mcp ./cmd/seconded-mcp
 ## Distribution boundaries
 
 Publication and latest-version facts live in [README Status](../../README.md#status).
-The npm launcher requires Node 20 or newer. For this release, a version-pinned
-invocation is `npx --yes @seconded/mcp@0.4.3 serve --host generic`.
+The npm launcher requires Node 20 or newer. Client 0.4.4 is signed and published; a version-pinned
+invocation is `npx --yes @seconded/mcp@0.4.4 serve --host generic`.
 Use top-level `--help` for command discovery and the
 [standalone verifier](../../examples/verify-receipt/) for receipt files.
 
