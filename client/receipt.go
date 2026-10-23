@@ -53,7 +53,7 @@ type Billing struct {
 	Asset      string  `json:"asset"`
 	Amount     string  `json:"amount_atomic"`
 	Payer      string  `json:"payer"`
-	PayTo      string  `json:"pay_to"`
+	PayTo      string  `json:"pay_to" seconded:"nullable"`
 	Tx         *string `json:"tx"`
 	Settlement string  `json:"settlement"`
 	// Refund names the refund state ("refund_owed" or "refunded") and is null otherwise. The server has always
@@ -61,24 +61,25 @@ type Billing struct {
 	Refund *string `json:"refund"`
 }
 type ReceiptEnvelope struct {
+	NotAdmitted             bool                 `json:"not_admitted,omitempty"`
 	PurchaseAssociation     *PurchaseAssociation `json:"purchase_association,omitempty"`
 	CheckedBy               []string             `json:"checked_by"`
 	ModelConfigFingerprint  string               `json:"model_config_fingerprint"`
 	ModelConfigFingerprints map[string]string    `json:"model_config_fingerprints"`
 	Version                 int                  `json:"v"`
 	Kind                    string               `json:"kind"`
-	CheckID                 string               `json:"check_id"`
+	CheckID                 string               `json:"check_id" seconded:"nullable"`
 	Seq                     int64                `json:"seq"`
 	IssuedAt                string               `json:"issued_at"`
 	OutcomeAt               *string              `json:"outcome_at"`
 	Product                 string               `json:"product"`
-	SchemaVersion           string               `json:"product_schema_version"`
-	PredicateVersion        string               `json:"predicate_version"`
-	TemplateVersion         string               `json:"template_version"`
-	ModelPairID             string               `json:"model_pair_id"`
-	Tier                    string               `json:"tier"`
+	SchemaVersion           string               `json:"product_schema_version" seconded:"nullable"`
+	PredicateVersion        string               `json:"predicate_version" seconded:"nullable"`
+	TemplateVersion         string               `json:"template_version" seconded:"nullable"`
+	ModelPairID             string               `json:"model_pair_id" seconded:"nullable"`
+	Tier                    string               `json:"tier" seconded:"nullable"`
 	Digest                  string               `json:"request_digest" seconded:"nullable"`
-	Commitment              string               `json:"request_commitment"`
+	Commitment              string               `json:"request_commitment" seconded:"nullable"`
 	State                   string               `json:"state"`
 	Outcome                 string               `json:"outcome" seconded:"nullable"`
 	Status                  string               `json:"status,omitempty"`
@@ -87,7 +88,7 @@ type ReceiptEnvelope struct {
 	Answer                  *Answer              `json:"answer,omitempty"`
 	Disclaimer              string               `json:"disclaimer,omitempty" seconded:"nullable"`
 	Billing                 Billing              `json:"billing"`
-	Lane                    string               `json:"lane"`
+	Lane                    string               `json:"lane" seconded:"nullable"`
 	UnfreezeAt              *string              `json:"unfreeze_at"`
 	KeyID                   string               `json:"key_id"`
 	Verification            *Verification        `json:"verification,omitempty"`
@@ -516,6 +517,19 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 	if !ed25519.Verify(key, msg, sig) {
 		return ErrInvalid
 	}
+	if s.NotAdmitted {
+		return verifyCreditRefusal(r, e, now)
+	}
+	if e.Credit != nil {
+		c := e.Credit
+		if c.validate(e) != nil || b.Mode != creditPreference || s.PurchaseAssociation == nil || *s.PurchaseAssociation != c.Association || !hexID.MatchString(s.CheckID) {
+			return ErrInvalid
+		}
+		if c.ServerCheckID != "" && (s.CheckID != c.ServerCheckID || s.Commitment != e.Commitment) {
+			return ErrInvalid
+		}
+		e.CheckID, e.Commitment = s.CheckID, s.Commitment
+	}
 	if e.Recovery != nil {
 		if oneOf(s.State, "service_failed", "refused") && e.State == "SPENT" {
 			return ErrInvalid
@@ -583,8 +597,14 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 			return ErrInvalid
 		}
 	}
-	if !oneOf(b.Mode, "paid", "free-trial") || b.Network != normalizedNetwork(e.Network) || strings.ToLower(b.Asset) != normalizedNetwork(e.Network)+"/erc20:"+pins(e.Network).Asset || strings.ToLower(b.Payer) != e.Payer || strings.ToLower(b.PayTo) != PayTo || b.Amount != strconv.FormatInt(e.Amount, 10) || !oneOf(b.Charged, "yes", "no", "pending", "refund_owed", "refunded") || !oneOf(b.Settlement, "none", "unknown", "included", "final", "nonpayment_certified") {
-		return ErrInvalid
+	if e.Credit != nil {
+		if b.Mode != creditPreference || b.Network != "eip155:4663" || b.Asset != "usd_credit" || b.Payer != e.Payer || b.PayTo != "" || b.Tx != nil || b.Refund != nil || b.Amount != strconv.FormatInt(e.Amount, 10) || !oneOf(b.Charged, "yes", "no", "pending") || !oneOf(b.Settlement, "none", "credit_consumed") {
+			return ErrInvalid
+		}
+	} else {
+		if !oneOf(b.Mode, "paid", "free-trial") || b.Network != normalizedNetwork(e.Network) || strings.ToLower(b.Asset) != normalizedNetwork(e.Network)+"/erc20:"+pins(e.Network).Asset || strings.ToLower(b.Payer) != e.Payer || strings.ToLower(b.PayTo) != PayTo || b.Amount != strconv.FormatInt(e.Amount, 10) || !oneOf(b.Charged, "yes", "no", "pending", "refund_owed", "refunded") || !oneOf(b.Settlement, "none", "unknown", "included", "final", "nonpayment_certified") {
+			return ErrInvalid
+		}
 	}
 	if b.Tx != nil && !hexWord.MatchString(*b.Tx) {
 		return ErrInvalid
@@ -594,7 +614,7 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 	if refund != (b.Refund != nil) || (refund && *b.Refund != s.State) {
 		return ErrInvalid
 	}
-	if s.State != "trial_delivered" && b.Mode != "paid" {
+	if e.Credit == nil && s.State != "trial_delivered" && b.Mode != "paid" {
 		return ErrInvalid
 	}
 	if s.Answer != nil && !v.knownAnswer(s.Product, *s.Answer, stored) {
@@ -641,6 +661,12 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 			return ErrInvalid
 		}
 	case "included", "final":
+		if e.Credit != nil {
+			if s.State != "final" || (s.Outcome != "agreed" && !degenDisagreement) || s.Answer == nil || s.OutcomeAt == nil || b.Charged != "yes" || b.Settlement != "credit_consumed" {
+				return ErrInvalid
+			}
+			break
+		}
 		if (s.Outcome != "agreed" && !degenDisagreement) || s.Answer == nil || s.OutcomeAt == nil || b.Charged != "yes" || b.Tx == nil || b.Settlement != s.State {
 			return ErrInvalid
 		}
@@ -650,7 +676,7 @@ func (v ReceiptVerifier) verify(r SignedReceipt, e Entry, now time.Time, stored 
 		if s.Status != "not_verified" || !(legacy || current) {
 			return ErrInvalid
 		}
-		if s.Answer != nil || s.Outcome != "no_agreement" || s.OutcomeAt == nil || b.Charged != "pending" || b.Tx != nil || b.Settlement != "none" {
+		if s.Answer != nil || s.Outcome != "no_agreement" || s.OutcomeAt == nil || ((e.Credit == nil && b.Charged != "pending") || (e.Credit != nil && b.Charged != "no")) || b.Tx != nil || b.Settlement != "none" {
 			return ErrInvalid
 		}
 	case "trial_delivered":

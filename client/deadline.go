@@ -22,8 +22,10 @@ func checkContext(ctx context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(ctx, toolSoftDeadline())
 }
 
+// A credit quote includes identity verification and guarded server pricing,
+// after any startup/profile contention, so it needs the network-work budget.
 func toolTimeout(name string) time.Duration {
-	if name == "seconded_receipt" || toolProduct(name) != "" {
+	if name == "seconded_receipt" || name == "seconded_credits_quote" || toolProduct(name) != "" {
 		return toolSoftDeadline()
 	}
 	return 10 * time.Second

@@ -17,6 +17,7 @@ func TestReleaseVersionMatchesServerStableGate(t *testing.T) {
 		"0.3.2": true, "0.3.3": true, "0.3.3+build-test.1": true,
 		"0.3.3-candidate.1": false, "0.3.3-rc.1+build": false,
 		"0.03.3": false, "0.3.3\n": false,
+		"0.4.5": true, "0.4.5+build.1": true, "0.4.5-rc.1": false,
 		"0.4.4": true, "0.4.4+build.1": true, "0.4.4-rc.1": false,
 		"0.4.3": true, "0.4.3+build.1": true, "0.4.3-rc.1": false,
 		"0.4.1": true, "0.4.1+build.1": true, "0.4.1-rc.1": false,

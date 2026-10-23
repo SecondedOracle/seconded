@@ -5,6 +5,10 @@ import "errors"
 // Policy accounting is profile-wide even after an owner selects a retained
 // wallet. Balance reservations and reconciliation remain wallet-specific.
 func (g *Engine) policyLedger(active Ledger) (Ledger, error) {
+	active.Entries = append([]Entry{}, active.Entries...)
+	if err := addBurnPackBudgets(g.Files, &active); err != nil {
+		return Ledger{}, err
+	}
 	i, err := readInstallation(g.Files)
 	if errors.Is(err, ErrNotFound) {
 		return active, nil

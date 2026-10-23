@@ -21,7 +21,7 @@ var Version = ClientVersion
 
 const billingGuarantee = "Standard checks charge only after both models agree and the answer is saved; a disagreement is signed and free. Degen Check costs $0.10 for a saved signed answer, including a signed disagreement (models_disagree). If delivery fails, fetch the saved answer with seconded_receipt; no answer → no charge."
 
-const instructions = "SECONDED runs paid two-model checks and returns a verdict label. The verdict binds only to the input you sent, not to any action. Each purchase is signed once; recovery re-posts the identical durable credential and body through the standard door. A 202 or timeout stays pending. For invalid_input with next=correct_input, correct the named field before retrying. After other check tool errors or timeouts, call seconded_receipt with no arguments before checking again: a paid check may still be running. Never ask the user for a private key or seed phrase. Checks pay on Base mainnet (USDC) unless a check names another network; they pay on Arc or Robinhood mainnet, or on a testnet (base_sepolia, arc_testnet, robinhood_testnet), only when the check names it. When you have the unsigned transaction, send it as structured transaction data, not prose. Unconfigured network identities refuse payment."
+const instructions = "SECONDED runs paid two-model checks and returns a verdict label. The verdict binds only to the input you sent, not to any action. Each purchase is signed once; recovery re-posts the identical durable credential and body through the standard door. A 202 or timeout stays pending. For invalid_input with next=correct_input, correct the named field before retrying. After other check tool errors or timeouts, call seconded_receipt with no arguments before checking again: a paid check may still be running. Never ask the user for a private key or seed phrase. Checks pay on Base mainnet (USDC) unless a check names another network; they pay on Arc or Robinhood mainnet, or on a testnet (base_sepolia, arc_testnet, robinhood_testnet), only when the check names it. When you have the unsigned transaction, send it as structured transaction data, not prose. Unconfigured network identities refuse payment. Burn-credit packs use seconded_credits_buy: repeat the same pack_id and arguments while pending; never start a new pack to recover an uncertain transaction."
 
 type Tool struct {
 	Name        string          `json:"name"`
@@ -78,7 +78,7 @@ func Tools() []Tool {
 		{"seconded_set_limits", "Change spending limits at the user's request, without a password. For 'set my daily limit to $20', pass {\"daily_usd\":20}. Chat can only tighten limits or freeze. Any increase, removal, safety-switch weakening or unfreeze requires the human terminal. These changes require the owner to run the terminal command returned on refusal. On Macs with Touch ID, owner changes also require biometrics. Otherwise an installed administrator approval key requires an offline signature. Without either, the six-character TTY confirmation does not stop an agent with shell access. There is an absolute $25/day chat ceiling, even when the owner has authorized a higher daily limit in the terminal. Omitted fields stay unchanged. The hard $2.50 per-authorization cap always applies, even if per_check_usd is higher or none. Also changes value_gate, dedupe, loop_brake, alerts and frozen switches.", limitToolSchema(), map[string]bool{"readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}},
 		{"seconded_products", "Use when tool descriptions do not identify the needed check or input shape. With complete input for a matching check, call it directly. Lists prices, examples and answer meanings.", schema(map[string]any{}), ro()},
 		{"seconded_quote", "Use when a price preview is requested or needed to decide affordability. Quotes price only; does not assess the action. A fully specified bounded check can be called directly. For Asset Check use raw product token_check or stock_token_check, with input excluding kind.", schema(map[string]any{"product": product, "input": input, "network": map[string]any{"type": "string", "enum": []string{"base_sepolia", "arc_testnet", "robinhood_testnet", "base", "arc", "robinhood"}, "description": "Payment network to quote; omitted uses the default."}}, "product", "input"), ro()},
-		{"seconded_receipt", "Recover a check or recent checks by fetching status only. With no check_id, lists the " + strconv.Itoa(recentReceipts) + " newest checks and any older check still awaiting its receipt, newest first. A result's verification holds the receipt's signed findings and coverage. Never creates a new payment authorization; standard recovery may re-post the identical credential, while legacy recovery signs a read-only ownership proof. After any check error or timeout, call this before checking again. The answer wait can end while payment is pending: continue receipt-only recovery separately until final payment, certified nonpayment, or manual review. Certified nonpayment says not charged and permits retrying the check.", schema(map[string]any{"check_id": map[string]any{"type": "string", "pattern": "^[0-9a-f]{32}$"}}), ro()},
+		{"seconded_receipt", "Recover a check or recent checks by fetching status only. With no check_id, lists the " + strconv.Itoa(recentReceipts) + " newest checks and any older check still awaiting its receipt, newest first. A result's verification holds the receipt's signed findings and coverage. Never creates a new payment authorization; standard recovery may re-post the identical credential, while legacy recovery signs a read-only ownership proof. After any check error or timeout, call this before checking again. The answer wait can end while payment is pending: continue receipt-only recovery separately until final payment, certified nonpayment, or manual review. Certified nonpayment says not charged and permits retrying the check. With export=true and check_id, instead export only the locally saved signed envelope, sig and key_id for independent verification; no recovery or network call. Signed billing includes public wallet addresses and is not independent chain-finality proof.", schema(map[string]any{"check_id": map[string]any{"type": "string", "pattern": "^[0-9a-f]{32}$"}, "export": map[string]any{"type": "boolean", "description": "Export the saved signed receipt locally; requires check_id."}}), ro()},
 		{"seconded_wallet", "Show the dedicated check wallet address, balances per network and how to fund it, or freeze new authorizations. Wallet switching is terminal-only: seconded-mcp wallet --human --switch back (or newer). Both keys are preserved. Base funding normally becomes available after about a minute, when both readers agree on recent state; Robinhood also uses recent agreement. Final payment confirmation is separate. Pending amounts cannot fund checks yet. Unavailable balances are null, never assumed zero. Never returns a private key; export is a separate human-run CLI command.", schema(map[string]any{"action": map[string]any{"type": "string", "enum": []string{"status", "freeze"}}}), map[string]bool{"readOnlyHint": false, "destructiveHint": false, "openWorldHint": true}},
 	}
 	for _, p := range productGuides() {
@@ -92,7 +92,9 @@ func Tools() []Tool {
 			p.Tool, p.Description, p.InputSchema = assetCheckTool, assetCheckDescription, assetCheckSchema()
 		}
 		properties := map[string]any{
-			"input": p.InputSchema, "max_price_usd": map[string]any{"type": "string", "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing."},
+			"payment_preference": map[string]any{"type": "string", "enum": []string{creditPreference}, "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id."},
+			"agent_id":           map[string]any{"type": "string", "minLength": 1},
+			"input":              p.InputSchema, "max_price_usd": map[string]any{"type": "string", "description": "Optional price ceiling in USD; required only when value gate is on (off for new setups). Cannot raise the owner-configured per-check limit (default $2.50), enforced before signing."},
 			"network":      map[string]any{"type": "string", "enum": []string{"base_sepolia", "arc_testnet", "robinhood_testnet", "base", "arc", "robinhood"}, "description": "Chain you pay on. Omitted means base (Base mainnet). Other networks only when named: arc, robinhood, or testnets base_sepolia, arc_testnet, robinhood_testnet."},
 			"wait_seconds": map[string]any{"type": "integer", "minimum": 0, "maximum": 25},
 		}
@@ -111,6 +113,7 @@ func Tools() []Tool {
 		tools = append(tools, Tool{p.Tool, p.Description + " New setups: $2.50 max per check, $25 a day; chat only tightens or freezes.", schema(properties, "input"),
 			map[string]bool{"readOnlyHint": false, "destructiveHint": false, "idempotentHint": false, "openWorldHint": true}})
 	}
+	tools = append(tools, creditTools()...)
 	return describeTools(append(tools, privacyTools()...))
 }
 func catalogue() any {
@@ -153,6 +156,10 @@ func (g *Engine) attachUpdateNotice(result any, now time.Time) any {
 }
 
 func (g *Engine) Call(ctx context.Context, name string, args json.RawMessage) (result any, err error) {
+	if name == "seconded_credits_buy" && !deploymentPaymentNetwork("eip155:4663") {
+		err := errors.New("burn_buy_unavailable_in_staging")
+		return toolFailure(nil, err), err
+	}
 	if name == assetCheckTool {
 		name, args, err = resolveAssetCheck(args)
 		if err != nil {
@@ -162,7 +169,7 @@ func (g *Engine) Call(ctx context.Context, name string, args json.RawMessage) (r
 	if err := validateToolInput(name, args); err != nil {
 		return toolFailure(nil, err), err
 	}
-	if name == "seconded_receipt" || toolProduct(name) != "" {
+	if name == "seconded_receipt" || name == "seconded_credits_quote" || toolProduct(name) != "" {
 		var cancel context.CancelFunc
 		ctx, cancel = checkContext(ctx)
 		defer cancel()
@@ -242,6 +249,9 @@ func (g *Engine) Call(ctx context.Context, name string, args json.RawMessage) (r
 }
 
 func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (any, error) {
+	if name == "seconded_credits_buy" && !deploymentPaymentNetwork("eip155:4663") {
+		return nil, errors.New("burn_buy_unavailable_in_staging")
+	}
 	if g == nil && name != "seconded_products" {
 		return nil, ErrSetupRequired
 	}
@@ -255,6 +265,18 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 	}
 	checkTool := toolProduct(name) != ""
 	switch {
+	case name == "seconded_credits_buy":
+		var spec BurnPackSpec
+		if DecodeStrict(args, &spec, MessageLimit) != nil {
+			return nil, ErrInvalid
+		}
+		chain, err := newBurnPackChain()
+		if err != nil {
+			return nil, err
+		}
+		return g.BuyCreditPack(ctx, spec, chain)
+	case name == "seconded_credits_quote" || name == "seconded_credits_redeem":
+		return g.creditTool(ctx, name, args)
 	case name == "seconded_get_limits" || name == "seconded_set_limits":
 		return g.Limits(args, name == "seconded_set_limits")
 	case name == "seconded_products":
@@ -265,12 +287,14 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 		return catalogue(), nil
 	case name == "seconded_quote" || checkTool:
 		var a struct {
-			Product string              `json:"product,omitempty"`
-			Input   json.RawMessage     `json:"input"`
-			Max     string              `json:"max_price_usd,omitempty"`
-			Network string              `json:"network,omitempty"`
-			Wait    *int                `json:"wait_seconds,omitempty"`
-			Signing *X402SigningRequest `json:"signing,omitempty"`
+			PaymentPreference string              `json:"payment_preference,omitempty"`
+			AgentID           string              `json:"agent_id,omitempty"`
+			Product           string              `json:"product,omitempty"`
+			Input             json.RawMessage     `json:"input"`
+			Max               string              `json:"max_price_usd,omitempty"`
+			Network           string              `json:"network,omitempty"`
+			Wait              *int                `json:"wait_seconds,omitempty"`
+			Signing           *X402SigningRequest `json:"signing,omitempty"`
 		}
 		if e := DecodeStrict(args, &a, MessageLimit); e != nil {
 			return nil, e
@@ -305,7 +329,7 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 				return nil, err
 			}
 		}
-		req := Request{a.Product, a.Input, Options{Network: network}}
+		req := Request{a.Product, a.Input, Options{Network: network, PaymentPreference: a.PaymentPreference, AgentID: a.AgentID}}
 		var normalizeErr error
 		req, normalizeErr = normalizePortfolioRequest(req)
 		if normalizeErr != nil {
@@ -315,7 +339,7 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 			return nil, inputError("input", "Use valid input matching the product schema from seconded_products.")
 		}
 		if name == "seconded_quote" {
-			if a.Max != "" || a.Wait != nil {
+			if a.Max != "" || a.Wait != nil || a.PaymentPreference != "" || a.AgentID != "" {
 				return nil, ErrInvalid
 			}
 			return g.Quote(ctx, req)
@@ -336,10 +360,15 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 		return g.check(ctx, req, a.Max, wait, a.Signing)
 	case name == "seconded_receipt":
 		var a struct {
-			ID string `json:"check_id,omitempty"`
+			ID     string `json:"check_id,omitempty"`
+			Export bool   `json:"export,omitempty"`
 		}
 		if e := DecodeStrict(args, &a, MessageLimit); e != nil {
 			return nil, e
+		}
+		if a.Export {
+			debugRecovery("receipt_export_local", nil)
+			return ExportLocalReceipt(g.Files, a.ID)
 		}
 		out, e := g.Receipts(ctx, a.ID)
 		if e != nil {
@@ -364,6 +393,18 @@ func (g *Engine) call(ctx context.Context, name string, args json.RawMessage) (a
 
 // Only fixed public codes and locally authored guidance may cross the error boundary.
 var publicErrorMessages = map[string]string{
+	"receipt_unavailable":                                  "No signed receipt is saved for this check yet. Recover it with seconded_receipt before exporting.",
+	"receipt_verification_failed":                          "The saved receipt failed verification. No receipt was exported.",
+	"burn_buy_unavailable_in_staging":                      "Burn-credit buying uses mainnet and is unavailable in this testnet-only staging client.",
+	"burn_pack_nonce_changed":                              "The wallet nonce changed since this pack stage was saved. Retain the pack and reconcile wallet activity before continuing.",
+	"burn_pack_pending":                                    "Recover the existing pack using the same pack_id and arguments before starting or abandoning a purchase.",
+	"burn_quote_expired":                                   "The burn quote expired. Recover the same pack or redeem the existing burn with a fresh quote.",
+	"burn_slippage_exceeds_bound":                          "The pinned route cannot satisfy the quote minimum within your slippage bound. No new transaction was sent.",
+	"burn_gas_cap_exceeded":                                "The cumulative transaction gas caps, including any approval renewal, exceed max_total_gas_wei. A proven unbroadcast stage may be abandoned; any swapped tokens remain in the wallet.",
+	"burn_transaction_reverted":                            "A pack transaction reverted. Inspect its hash and stage; any successful prior swap remains in the wallet.",
+	"burn_router_code_mismatch":                            "The router code differs from the compiled deployment pin. No transaction was sent.",
+	"burn_receipt_disagreement":                            "The readers disagree on the pack receipt. Keep the pack pending and retry it later.",
+	"burn_receipt_reorg":                                   "The transaction block changed. Keep the pack pending and retry it later.",
 	"degen_not_available":                                  "Degen Check is not available yet on this server.",
 	"nonpayment_limited":                                   "This wallet has a certified unpaid check in the last 24 hours. Wait for the returned retry interval and recover the receipt before trying again.",
 	"first_paid_small_required":                            "Complete one paid check at this product's small tier before buying a larger tier. Recover the receipt before trying again.",
@@ -438,6 +479,7 @@ var publicErrorMessages = map[string]string{
 	"keystore_unavailable":                      "Restore access to the operating system credential store and retry. Do not paste a private key into chat.",
 	"keystore_data_invalid":                     "The stored credential is invalid. Use owner-managed wallet recovery; do not overwrite or share the key.",
 	"setup_required":                            SetupRequiredMessage,
+	"fingerprint_mismatch":                      FingerprintMismatchHint,
 	"client_upgrade_required":                   "Install a reviewed newer client release before checking again.",
 	"signing_failed":                            "Local signing failed. Check the wallet installation with self-check; do not share the key.",
 	"evidence_identity_not_configured":          "Install a reviewed client with independent chain readers configured.",
@@ -471,11 +513,19 @@ var publicErrorMessages = map[string]string{
 	"closed_no_charge":                          "Not charged. Retry the check when ready.",
 }
 
+func init() {
+	for code, guidance := range burnErrorMessages {
+		if _, exists := publicErrorMessages[code]; !exists {
+			publicErrorMessages[code] = guidance.Message
+		}
+	}
+}
+
 func safeError(e error) string {
 	if e == nil {
 		return ""
 	}
-	for _, known := range []error{ErrKeystoreData, ErrStorage, ErrSetupRequired, ErrTerminalPolicyRequired} {
+	for _, known := range []error{ErrKeystoreData, ErrStorage, ErrSetupRequired, ErrTerminalPolicyRequired, errFingerprintMismatch} {
 		if errors.Is(e, known) {
 			return known.Error()
 		}
@@ -494,12 +544,18 @@ func failedResult(r Result, err error) Result {
 		r.Message = message
 	}
 	r.Next = "call_receipt_after"
+	if guidance, known := burnErrorMessages[r.Reason]; known {
+		r.Next = guidance.Next
+	}
 	var inputErr *localInputError
 	if errors.As(err, &inputErr) {
 		r.Message, r.Next, r.Charged = inputErr.message, "correct_input", "no"
 	}
 	if r.Reason == "setup_required" {
 		r.Next = "run_setup"
+	}
+	if message := FingerprintMismatchMessage(err); message != "" {
+		r.Message, r.Next = message, "human_verification_required"
 	}
 	if r.Charged == "" {
 		r.Charged = "not_yet_known"
@@ -797,6 +853,9 @@ func ServeWithSetup(ctx context.Context, in io.Reader, out io.Writer, g *Engine,
 				result := map[string]any{"status": "funding_required", "address": install.Address, "message": WalletCreatedMessage(install.Address), "funding_instructions": FundingInstructions, "next": "fund_wallet", "default_network": DefaultPaymentNetwork}
 				if err != nil {
 					result = map[string]any{"status": "failed", "reason": safeSetupError(err), "next": "run_setup", "message": SetupRequiredMessage, "charged": "no", "receipt": "none"}
+					if message := FingerprintMismatchMessage(err); message != "" {
+						result["message"], result["next"] = message, "human_verification_required"
+					}
 					if errors.Is(err, ErrStorage) || errors.Is(err, ErrKeystoreData) {
 						result["message"] = StorageErrorMessage(err)
 					}
@@ -835,7 +894,7 @@ func ServeWithSetup(ctx context.Context, in io.Reader, out io.Writer, g *Engine,
 			cancelMu.Unlock()
 			wg.Add(1)
 			notice := ""
-			if firstTool && g != nil && !isPrivacyName(p.Name) {
+			if firstTool && g != nil && !isPrivacyName(p.Name) && !receiptExportRequested(p.Name, p.Arguments) {
 				if raw, err := g.Files.Read("install.json"); err == nil {
 					var install Installation
 					if DecodeStrict(raw, &install, ResponseLimit) == nil && addressPattern.MatchString(install.Address) {

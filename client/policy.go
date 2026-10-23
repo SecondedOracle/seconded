@@ -18,6 +18,9 @@ const (
 	TokenName              = "USDC"
 	TokenVersion           = "2"
 	MaxAuthorization int64 = 2500000
+	MaxBurnPackInput int64 = 10000000
+	MinBurnPackFace  int64 = 5000000
+	MaxBurnPackFace  int64 = 10000000
 	ChatDailyCeiling int64 = 25000000
 	ValiditySeconds  int64 = 300
 )
@@ -238,9 +241,12 @@ type Request struct {
 	Options Options         `json:"options"`
 }
 type Options struct {
-	Network  string `json:"network"`
-	Payer    string `json:"payer,omitempty"`
-	MaxPrice string `json:"max_price,omitempty"`
+	PaymentPreference   string               `json:"payment_preference,omitempty"`
+	AgentID             string               `json:"agent_id,omitempty"`
+	CreditAuthorization *CreditAuthorization `json:"credit_authorization,omitempty"`
+	Network             string               `json:"network"`
+	Payer               string               `json:"payer,omitempty"`
+	MaxPrice            string               `json:"max_price,omitempty"`
 }
 
 func (r Request) Size() (int, error) {

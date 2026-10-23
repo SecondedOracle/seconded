@@ -7,6 +7,24 @@ import (
 	"time"
 )
 
+// PublicNode's Robinhood mainnet reader rejects even a single finalized event
+// block as archive history. Prefer the other pinned operators for history so a
+// refused scan/receipt fallback cannot consume their foreground read budget.
+// Keep PublicNode available as a fallback and leave snapshot selection intact.
+func (q *Quorum) historyReaders() *Quorum {
+	ordered := &Quorum{rpcs: make([]*RPC, 0, len(q.rpcs))}
+	deferred := []*RPC{}
+	for _, r := range q.rpcs {
+		if r.network == "eip155:4663" && r.url == "https://robinhood-rpc.publicnode.com" {
+			deferred = append(deferred, r)
+		} else {
+			ordered.rpcs = append(ordered.rpcs, r)
+		}
+	}
+	ordered.rpcs = append(ordered.rpcs, deferred...)
+	return ordered
+}
+
 // A certificate always comes from a whole pair. Availability failures may
 // select another independent pair; malformed or conflicting evidence may not.
 // A server reader is useful only alongside a compiled public reader.
@@ -112,5 +130,24 @@ func (l *Ledger) PreparePayment(ctx context.Context, chain ChainReader, snap Cha
 		}
 		return nil
 	}
-	return l.Reconcile(ctx, chain, snap)
+	err := l.Reconcile(ctx, chain, snap)
+	if err == nil || !robinhoodNetwork(snap.Network) || !errors.Is(err, ErrReaderHistoryUnavailable) {
+		return err
+	}
+	// Archive refusal cannot certify an outcome, but need not stop admission:
+	// the unchanged reservation is still debited from balance and every budget.
+	// Recheck both readers after the failed scan; never age or release this entry
+	// or advance the ledger anchor using a single reader's historical result.
+	q, ok := chain.(*Quorum)
+	if !ok {
+		return err
+	}
+	anchor := snap
+	if a := l.anchor(snap.Network); a != nil {
+		anchor = *a
+	}
+	if err := q.VerifyPaymentAnchor(ctx, anchor, snap); err != nil {
+		return &budgetEvidenceError{stage: "reconciliation", cause: err}
+	}
+	return nil
 }

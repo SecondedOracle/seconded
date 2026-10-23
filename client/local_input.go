@@ -113,10 +113,17 @@ func validateUtilityInput(name string, args json.RawMessage, fields map[string]j
 		}
 	case "seconded_receipt":
 		var a struct {
-			ID string `json:"check_id,omitempty"`
+			ID     string `json:"check_id,omitempty"`
+			Export bool   `json:"export,omitempty"`
 		}
 		if DecodeStrict(args, &a, MessageLimit) != nil {
 			return invalid()
+		}
+		if value, ok := fields["export"]; ok && string(value) != "true" && string(value) != "false" {
+			return inputError("export", "Supply a boolean; export=true requires check_id.")
+		}
+		if a.Export && !hexID.MatchString(a.ID) {
+			return inputError("check_id", "Export requires a check_id of 32 lowercase hexadecimal characters.")
 		}
 	case "seconded_wallet":
 		var a struct {

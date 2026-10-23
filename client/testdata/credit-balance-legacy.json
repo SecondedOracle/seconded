@@ -1,0 +1,168 @@
+{
+  "receipt": {
+    "envelope": {
+      "v": 3,
+      "kind": "seconded-receipt",
+      "check_id": "11111111111111111111111111111111",
+      "seq": 3,
+      "issued_at": "2026-09-21T14:13:20Z",
+      "outcome_at": "2026-09-21T14:13:20Z",
+      "product": "trade_check",
+      "product_schema_version": "1",
+      "predicate_version": "1",
+      "template_version": "tpl-v1",
+      "model_pair_id": "pair-e996f318d586895f3b1847b2d406ef56",
+      "tier": "small",
+      "checked_by": [
+        "OpenAI",
+        "Anthropic"
+      ],
+      "model_config_fingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "model_config_fingerprints": {
+        "check": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "request_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "request_commitment": "3333333333333333333333333333333333333333333333333333333333333333",
+      "state": "final",
+      "outcome": "agreed",
+      "disclaimer": "not_financial_advice_ai_generated",
+      "billing": {
+        "mode": "paid",
+        "charged": "yes",
+        "network": "eip155:84532",
+        "asset": "eip155:84532/erc20:0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+        "amount_atomic": "750000",
+        "payer": "0xbd3ab6ffda8cfd53d04b83eab860fdd5481e70a5",
+        "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a",
+        "tx": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "settlement": "final",
+        "refund": null
+      },
+      "lane": "new",
+      "unfreeze_at": null,
+      "verification": {
+        "schema": "seconded-verification/v1",
+        "evidence_sha256": "e4ba15784f74740e199774d533bb5ab7e6c2e967b976eee0405077daa28e8754",
+        "block": {
+          "chain_id": 8453,
+          "number": 51752963,
+          "hash": "0xb2c54475ec90876aa50895d4d6e330516753be17891f175ecf7ec0f3e6b91247"
+        },
+        "findings": [
+          {
+            "code": "priority_fee_over_40x_median",
+            "severity": "hard",
+            "values": {
+              "tip_multiple": "57.2",
+              "excess_usd": "0.81"
+            }
+          },
+          {
+            "code": "recipient_lookalike",
+            "severity": "hard",
+            "values": {
+              "address": "0xbad0000000000000000000000000000000000bad",
+              "matches": [
+                "0xbad0cccccccccccccccccccccccccccccccc0bad"
+              ],
+              "match_count": 1
+            }
+          },
+          {
+            "code": "unlimited_approval",
+            "severity": "hard",
+            "values": {
+              "at": "$",
+              "standard": "erc20",
+              "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+              "spender": "0xbad0000000000000000000000000000000000bad",
+              "amount_base_units": "115792089237316195423570985008687907853269984665640564039457584007913129639934",
+              "exact_max": false
+            }
+          },
+          {
+            "code": "recipient_first_seen",
+            "severity": "soft",
+            "values": {
+              "address": "0xbad0000000000000000000000000000000000bad"
+            }
+          },
+          {
+            "code": "unknown_spender",
+            "severity": "soft",
+            "values": {
+              "at": "$",
+              "standard": "erc20",
+              "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+              "spender": "0xbad0000000000000000000000000000000000bad"
+            }
+          }
+        ],
+        "coverage": [
+          {
+            "fact": "block",
+            "status": "checked",
+            "reason": null
+          },
+          {
+            "fact": "deadline",
+            "status": "checked",
+            "reason": null
+          },
+          {
+            "fact": "decode",
+            "status": "checked",
+            "reason": null
+          },
+          {
+            "fact": "fee",
+            "status": "checked",
+            "reason": null
+          },
+          {
+            "fact": "recipient_history.erc20_incoming",
+            "status": "partial",
+            "reason": "bounded_history"
+          },
+          {
+            "fact": "recipient_history.erc20_outgoing",
+            "status": "partial",
+            "reason": "bounded_history"
+          },
+          {
+            "fact": "recipient_history.native_incoming",
+            "status": "not_checked",
+            "reason": "incoming_native_source_unmeasured"
+          },
+          {
+            "fact": "recipient_history.native_outgoing",
+            "status": "not_checked",
+            "reason": "source_unavailable_or_unmeasured"
+          },
+          {
+            "fact": "slippage",
+            "status": "not_checked",
+            "reason": "no_swap_in_call"
+          },
+          {
+            "fact": "spender",
+            "status": "checked",
+            "reason": null
+          }
+        ]
+      },
+      "answer": {
+        "option": 2,
+        "label_id": "do_not_proceed"
+      },
+      "key_id": "rk-2026-09-a"
+    },
+    "sig": "7sAWF_raceD3YRoobHMHOoFSElmxm-h-qUIcGSXHcYXjBbMC2eWbJv2zdlh2AAaoOIdKT0Hu7kVHjsc0t5TmCQ",
+    "key_id": "rk-2026-09-a"
+  },
+  "hints": {
+    "do_not_resign": true,
+    "poll_after_s": null,
+    "new_quote_allowed": false
+  }
+}

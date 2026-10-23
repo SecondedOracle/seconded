@@ -312,7 +312,7 @@ func (r RecoveryRecord) Validate(e Entry) error {
 }
 func (l Ledger) requireRecovery() error {
 	for _, e := range l.Entries {
-		// RELEASED is set only by independent chain nonpayment evidence. Keep
+		// RELEASED follows chain nonpayment or a verified credit closure. Keep
 		// receipt recovery available, but it no longer reserves a purchase.
 		if e.State == "RELEASED" {
 			continue
@@ -416,6 +416,29 @@ func (r *RecoveryRecord) recoveryReply(status int, b []byte, h http.Header, err 
 func (e *Entry) acceptReply(reply CheckReply) {
 	e.Receipt = &reply.Receipt
 	e.RecoveryRequired = false
+	if e.Credit != nil {
+		c := *e.Credit
+		c.ServiceError = ""
+		if reply.CreditBalanceMicros != nil && reply.validCreditBalance() {
+			balance := *reply.CreditBalanceMicros
+			c.Balance = &balance
+			c.BalanceBasis = reply.CreditBalanceBasis
+			c.BalanceObservedAt = reply.CreditBalanceObservedAt
+		}
+		c.ServerCheckID = reply.Receipt.Envelope.CheckID
+		e.Commitment = reply.Receipt.Envelope.Commitment
+		e.RecoveryRequired = receiptNeedsCollection(e.Receipt)
+		if !e.RecoveryRequired {
+			c.Body = nil
+			e.State = "RELEASED"
+			if reply.Receipt.Envelope.Billing.Charged == "yes" {
+				e.State = "SPENT"
+				e.SpentAt = time.Now().Unix()
+			}
+		}
+		e.Credit = &c
+		return
+	}
 	if e.Recovery == nil {
 		return
 	}

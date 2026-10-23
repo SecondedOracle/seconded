@@ -21,6 +21,13 @@ type Engine struct {
 	Chain ChainReader
 }
 type Result struct {
+	CreditBalanceUSD        string            `json:"credit_balance_usd,omitempty"`
+	CreditBalanceBasis      string            `json:"credit_balance_basis,omitempty"`
+	CreditBalanceTrust      string            `json:"credit_balance_trust,omitempty"`
+	CreditBalanceMessage    string            `json:"credit_balance_message,omitempty"`
+	CreditBalanceObservedAt int64             `json:"credit_balance_observed_at,omitempty"`
+	PaymentPreference       string            `json:"payment_preference,omitempty"`
+	CreditBalanceMicros     *int64            `json:"credit_balance_usd_micros,omitempty"`
 	ServiceError            string            `json:"service_error,omitempty"`
 	ServiceReason           string            `json:"service_reason,omitempty"`
 	DiagnosticTrust         string            `json:"diagnostic_trust,omitempty"`
@@ -65,6 +72,24 @@ func pending(e Entry) Result {
 }
 func resultFor(e Entry) Result {
 	r := pending(e)
+	if e.Credit != nil {
+		r.PaymentPreference = creditPreference
+		if e.Credit.ServiceError != "" {
+			r.ServiceError, r.DiagnosticTrust = e.Credit.ServiceError, "unsigned"
+		}
+		r.CreditBalanceMicros = e.Credit.Balance
+		r.CreditBalanceObservedAt = e.Credit.BalanceObservedAt
+		if r.CreditBalanceMicros != nil {
+			r.CreditBalanceUSD = Dollars(*r.CreditBalanceMicros)
+			r.CreditBalanceBasis = e.Credit.BalanceBasis
+			r.CreditBalanceTrust = "unsigned"
+			basis := "at status lookup"
+			if r.CreditBalanceBasis == "after_reservation" {
+				basis = "after this check"
+			}
+			r.CreditBalanceMessage = fmt.Sprintf("Credit balance %s: $%s; observed %s (unsigned account snapshot, outside the signed receipt).", basis, r.CreditBalanceUSD, time.Unix(r.CreditBalanceObservedAt, 0).UTC().Format(time.RFC3339))
+		}
+	}
 	if e.Recovery != nil && e.Recovery.ServiceError != "" {
 		r.ServiceError, r.ServiceReason = e.Recovery.ServiceError, e.Recovery.ServiceReason
 		r.DiagnosticTrust = "unsigned"
@@ -159,6 +184,9 @@ func resultFor(e Entry) Result {
 		}
 		r.Message = publicErrorMessages[r.Reason]
 		r.Next = "call_receipt_after"
+		if guidance, ok := burnErrorMessages[r.Reason]; ok {
+			r.Next = guidance.Next
+		}
 	}
 	if e.Recovery != nil && s.State == "refused" && e.State != "SPENT" && s.Billing.Charged == "no" {
 		r.Charged = "no"
@@ -222,6 +250,9 @@ func (g *Engine) check(ctx context.Context, req Request, maxPrice string, wait i
 			result = failedResult(result, err)
 		}
 	}()
+	if !oneOf(req.Options.PaymentPreference, "", creditPreference) || (req.Options.PaymentPreference == creditPreference && (req.Options.Network != "eip155:4663" || !validCreditAgent(req.Options.AgentID))) {
+		return Result{}, ErrInvalid
+	}
 	if !supportedNetwork(req.Options.Network) || req.Options.Network == "" || !deploymentPaymentNetwork(req.Options.Network) {
 		return Result{}, inputError("network", "Choose a supported payment network.")
 	}
@@ -305,6 +336,16 @@ func (g *Engine) check(ctx context.Context, req Request, maxPrice string, wait i
 	}
 	if g.API == nil {
 		return Result{}, errors.New("release_identity_not_configured")
+	}
+	if req.Options.PaymentPreference == creditPreference {
+		if e = policyLedger.Budget(vault.Settings, amount, time.Now().Unix()); e != nil {
+			return Result{}, e
+		}
+		result, handled, creditErr := g.tryCredit(ctx, req, vault, &l, tier, amount, wait)
+		if handled {
+			return result, creditErr
+		}
+		req.Options.PaymentPreference, req.Options.AgentID, req.Options.CreditAuthorization = "", "", nil
 	}
 	if g.Chain == nil {
 		return Result{}, errors.New("budget_blocked_on_chain_evidence")
@@ -572,22 +613,35 @@ const (
 func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 	ctx, cancel := checkContext(ctx)
 	defer cancel()
+	debugRecovery("receipts_begin", nil)
+	defer func() {
+		if ctx.Err() != nil {
+			debugRecovery("receipts_context_done", ctx.Err())
+		}
+	}()
 	if id != "" && !hexID.MatchString(id) {
+		debugRecovery("invalid_check_id", nil)
 		return nil, inputError("check_id", "Use 32 lowercase hexadecimal characters, or omit check_id to list recent checks.")
 	}
+	debugRecovery("lock_wait", nil)
 	unlock, e := g.Files.Lock()
 	if e != nil {
+		debugRecovery("lock_failed", e)
 		return nil, e
 	}
+	debugRecovery("lock_acquired", nil)
 	defer unlock()
 	l, e := ReadLedger(g.Files)
 	if e != nil {
+		debugRecovery("ledger_read_failed", e)
 		return nil, e
 	}
 	if id != "" && l.Find(id) == nil {
+		debugRecovery("unknown_check", nil)
 		return nil, errors.New("unknown_check")
 	}
 	if g.API == nil {
+		debugRecovery("api_unconfigured", nil)
 		return nil, errors.New("release_identity_not_configured")
 	}
 	var s *LocalSigner
@@ -596,6 +650,9 @@ func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 			s.Close()
 		}
 	}()
+	if id == "" && g.Chain == nil {
+		debugRecovery("chain_unconfigured", nil)
+	}
 	if id == "" && g.Chain != nil && len(l.Entries) > 0 {
 		g.reconcileNetworks(ctx, &l, l.Entries[0].Payer)
 	}
@@ -605,53 +662,75 @@ func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 	for i := len(l.Entries) - 1; i >= 0; i-- {
 		entry := &l.Entries[i]
 		if id != "" && entry.CheckID != id {
+			debugRecovery("entry_not_selected", nil)
 			continue
 		}
 		awaiting := entry.RecoveryRequired || receiptNeedsCollection(entry.Receipt)
 		if id == "" && i < len(l.Entries)-recentReceipts && !awaiting {
+			debugRecovery("entry_outside_listing", nil)
 			continue
 		}
 		if entry.Receipt != nil {
 			if g.API.verifier.VerifyStored(*entry.Receipt, *entry, time.Now()) != nil {
+				debugRecovery("receipt_identity_invalid", nil)
 				return nil, errors.New("api_identity_mismatch")
 			}
 		}
 		if entry.Recovery != nil && entry.Recovery.State == "unresolved" && entry.Receipt != nil && time.Now().Unix() > entry.ValidBefore && oneOf(entry.Receipt.Envelope.State, "refused", "content_refused", "frozen_unsettled") {
 			entry.acceptReply(CheckReply{Receipt: *entry.Receipt, Hints: Hints{NewQuoteAllowed: entry.Recovery.NewPurchaseAllowed}})
 		}
+		if !receiptNeedsCollection(entry.Receipt) {
+			debugRecovery("collection_not_needed", nil)
+		} else if time.Now().Unix() < entry.retryAt() {
+			debugRecovery("collection_backoff", nil)
+		}
 		// An owed refund is collected until the operator records it as refunded (docs/runbooks/refunds.md).
 		if receiptNeedsCollection(entry.Receipt) && time.Now().Unix() >= entry.retryAt() {
 			if s == nil {
 				s, e = g.recoverySigner(*entry)
 				if e != nil {
+					debugRecovery("recovery_signer_failed", e)
 					return nil, e
 				}
 			}
+			debugRecovery("collection_begin", nil)
 			reply, err := g.API.Collect(ctx, *entry, s)
+			if err != nil {
+				debugRecovery("collection_failed", err)
+			}
 			// Persist the scheduled retry even on transport or identity failure.
 			// Collect has not accepted any receipt or released a reservation.
 			if id != "" || identityFailure(err) {
 				if e = l.Save(g.Files); e != nil {
+					debugRecovery("ledger_save_failed", e)
 					return nil, e
 				}
 			}
 			if identityFailure(err) {
 				return nil, err
 			}
-			if err == nil && !g.unchangedPending(reply, *entry) {
+			unchanged := err == nil && g.unchangedPending(reply, *entry)
+			if unchanged {
+				debugRecovery("collection_same_revision", nil)
+			}
+			if err == nil && !unchanged {
 				if g.API.verifier.Verify(reply.Receipt, *entry, time.Now()) != nil || validateReplyState(reply) != nil {
 					if id == "" {
 						if e = l.Save(g.Files); e != nil {
+							debugRecovery("ledger_save_failed", e)
 							return nil, e
 						}
 					}
+					debugRecovery("receipt_identity_invalid", nil)
 					return nil, errors.New("api_identity_mismatch")
 				}
 				entry.acceptReply(reply)
+				debugRecovery("collection_accepted", nil)
 				// A verified requested receipt must survive any subsequent slow
 				// or failed chain read, including process interruption.
 				if id != "" {
 					if e = l.Save(g.Files); e != nil {
+						debugRecovery("ledger_save_failed", e)
 						return nil, e
 					}
 				}
@@ -669,14 +748,18 @@ func (g *Engine) Receipts(ctx context.Context, id string) ([]Result, error) {
 		}
 		// Also minimize records resolved by earlier client versions, after re-verification.
 		entry.archiveRecovery()
+		debugRecovery("result_projected", nil)
 		out = append(out, resultFor(*entry))
 		if len(out) >= maxListedReceipts {
+			debugRecovery("listing_limit", nil)
 			break
 		}
 	}
 	if e = l.Save(g.Files); e != nil {
+		debugRecovery("ledger_save_failed", e)
 		return nil, e
 	}
+	debugRecovery("receipts_saved", nil)
 	return out, nil
 }
 
@@ -765,7 +848,12 @@ func (g *Engine) chainFor(network string) (ChainReader, error) {
 // independent certificate preserves the reservation; the signed receipt alone
 // never marks it spent. Listing commits this evidence with its final ledger save.
 func (g *Engine) reconcileFinalReceipt(ctx context.Context, ledger *Ledger, entry *Entry) {
-	if g.Chain == nil || entry.State != "OUTSTANDING" || !robinhoodNetwork(normalizedNetwork(entry.Network)) || entry.Receipt == nil || entry.Receipt.Envelope.State != "final" {
+	if !robinhoodNetwork(normalizedNetwork(entry.Network)) {
+		debugRecovery("final_network_ineligible", nil)
+		return
+	}
+	if entry.Receipt == nil || entry.Receipt.Envelope.State != "final" {
+		debugRecovery("final_receipt_unavailable", nil)
 		return
 	}
 	g.reconcileReceiptEntry(ctx, ledger, entry)
@@ -774,23 +862,55 @@ func (g *Engine) reconcileFinalReceipt(ctx context.Context, ledger *Ledger, entr
 // Receipt retrieval never waits on unrelated networks or entries. The same
 // independent evidence and anchor guards still decide this reservation.
 func (g *Engine) reconcileReceiptEntry(ctx context.Context, ledger *Ledger, entry *Entry) {
-	if g.Chain == nil || entry.State != "OUTSTANDING" {
+	if entry.Credit != nil {
+		debugRecovery("entry_credit", nil)
 		return
 	}
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	if g.Chain == nil {
+		debugRecovery("chain_unconfigured", nil)
+		return
+	}
+	if entry.State != "OUTSTANDING" {
+		debugRecovery("entry_not_outstanding", nil)
+		return
+	}
+	if err := ctx.Err(); err != nil {
+		debugRecovery("reconcile_context_done", err)
+		return
+	}
+	debugRecovery("reconcile_begin", nil)
+	budget := 2 * time.Second
+	if robinhoodNetwork(normalizedNetwork(entry.Network)) && entry.Receipt != nil && entry.Receipt.Envelope.State == "final" {
+		// Snapshot and the receipt certificate require several dependent RPC
+		// rounds. Leave room for both within a bounded foreground pass, including
+		// a reader retry; the caller's earlier deadline still takes precedence.
+		budget = 8 * time.Second
+	}
+	ctx, cancel := context.WithTimeout(ctx, budget)
 	defer cancel()
 	chain, err := g.chainFor(entry.Network)
 	if err != nil {
+		debugRecovery("network_reader_failed", err)
 		return
 	}
 	snap, err := chain.Snapshot(ctx, entry.Payer)
-	if err != nil || normalizedNetwork(snap.Network) != normalizedNetwork(entry.Network) {
+	if err == nil && normalizedNetwork(snap.Network) != normalizedNetwork(entry.Network) {
+		err = ErrInvalid
+		debugRecovery("snapshot_network_mismatch", nil)
+	}
+	if err != nil {
+		debugRecovery("snapshot_failed", err)
+		debugSettlement(nil, "snapshot", err, "retain")
 		return
 	}
 	candidate := Ledger{Version: ledger.Version, Entries: []Entry{*entry}, Anchor: ledger.Anchor, Anchors: maps.Clone(ledger.Anchors)}
-	if candidate.Reconcile(ctx, chain, snap) != nil {
+	if err := candidate.Reconcile(ctx, chain, snap); err != nil {
+		debugRecovery("certificate_retained", err)
+		debugSettlement(nil, "reconcile", err, "retain")
 		return
 	}
+	debugRecovery("reconcile_applied", nil)
+	debugSettlement(nil, "reconcile", nil, "accept")
 	*entry = candidate.Entries[0]
 	ledger.Anchor, ledger.Anchors = candidate.Anchor, candidate.Anchors
 }
@@ -803,15 +923,24 @@ func (g *Engine) reconcileNetworks(ctx context.Context, ledger *Ledger, payer st
 	for network := range networks {
 		chain, err := g.chainFor(network)
 		if err != nil {
+			debugRecovery("network_reader_failed", err)
 			continue
 		}
 		snap, err := chain.Snapshot(ctx, payer)
 		if err == nil && normalizedNetwork(snap.Network) == network {
 			if network == "eip155:5042" || network == "eip155:5042002" {
-				_ = ledger.reconcileEntries(ctx, chain, snap, g.Files)
+				err = ledger.reconcileEntries(ctx, chain, snap, g.Files)
 			} else {
-				_ = ledger.Reconcile(ctx, chain, snap)
+				err = ledger.Reconcile(ctx, chain, snap)
 			}
+			if err != nil {
+				debugRecovery("certificate_retained", err)
+			}
+		} else {
+			if err == nil {
+				err = ErrInvalid
+			}
+			debugRecovery("snapshot_failed", err)
 		}
 	}
 }

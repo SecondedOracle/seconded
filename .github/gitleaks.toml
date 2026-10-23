@@ -58,3 +58,8 @@ regexes = [
   '''^438d9301c477c27fecc3f56da0a7d5a6b3894cef69815bae63b5349dc2cddf0b$''',
   '''^d7286d06faa48df27315f5ae576581b8fef08626574342f6c478433f0ec9ef30$''',
 ]
+
+[[allowlists]]
+description = "Exact public SECONDED burn-token contract"
+regexTarget = "secret"
+regexes = ["^0x833a7fa750628b391c35bf384d7706652c7e8202$"]

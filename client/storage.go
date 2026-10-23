@@ -424,7 +424,8 @@ func Fingerprint(path string) (string, error) {
 	}
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
-func CheckFingerprint(files *Files, store SecretStore, exe string) error {
+func CheckFingerprint(files *Files, store SecretStore, exe string) (err error) {
+	defer func() { err = actionableFingerprintError(err, files.Dir, exe) }()
 	unlock, err := files.Lock()
 	if err != nil {
 		return err

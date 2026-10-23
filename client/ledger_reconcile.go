@@ -17,7 +17,7 @@ func (l *Ledger) reconcileRecentEntry(ctx context.Context, chain ChainReader, sn
 	}
 	selected := -1
 	for i, entry := range l.Entries {
-		if entry.State == "OUTSTANDING" && normalizedNetwork(entry.Network) == network {
+		if entry.Credit == nil && entry.State == "OUTSTANDING" && normalizedNetwork(entry.Network) == network {
 			selected = i
 			break
 		}
@@ -63,7 +63,7 @@ func (l *Ledger) reconcileEntries(ctx context.Context, chain ChainReader, snap C
 	}
 	var evidenceErr error
 	for i, entry := range l.Entries {
-		if entry.State != "OUTSTANDING" || normalizedNetwork(entry.Network) != normalizedNetwork(snap.Network) {
+		if entry.Credit != nil || entry.State != "OUTSTANDING" || normalizedNetwork(entry.Network) != normalizedNetwork(snap.Network) {
 			continue
 		}
 		if err := ctx.Err(); err != nil {

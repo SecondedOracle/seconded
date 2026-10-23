@@ -1,5 +1,50 @@
 <div align="center">
 
+## 0.4.5 wallet re-enrollment
+
+Use `setup --reenroll --release-sha256 SHA256` with an independently verified
+build and the same profile to recover from `fingerprint_mismatch`. See
+[upgrade instructions](docs/public/upgrades.md) for trust checks and rollback.
+
+## Client 0.4.5 — PREPARED
+
+Credit refusals explain the specific cause and whether to wait and retry or
+correct the request or service configuration. Some transient reader/service
+failures permit one retry of the same request before escalation. Existing
+burns, quotes and recovery steps are preserved; unknown codes use the safe
+fallback. Signed refusals carry the same next-step guidance.
+
+This local candidate adds burn-credit buying, quoting and redemption to the MCP
+catalog (21 tools). Repeat the same `pack_id` and arguments to recover a buy;
+`seconded_receipt` recovers a check, and authenticated credit status is queried
+when an older server omits a balance snapshot. There is no separate credit-status
+MCP tool. Use `payment_preference: "seconded_discount"`, `network: "robinhood"`
+and `agent_id` to opt in.
+
+Credit-paid check results and CLI `recover` output show the dollar balance
+**after this check**, its observation time, and `credit_balance_trust: "unsigned"`.
+The spendable balance excludes reserved, expired and frozen credits. It is a
+transport-authenticated account snapshot outside the signed receipt; it cannot
+prove a balance later or change signed billing. Older replies without the new
+fields remain supported; a separate status lookup is labelled accordingly.
+
+Saved receipt export is available through `export-receipt CHECK_ID` and MCP
+`seconded_receipt` with `export: true`. Export preserves only the original signed
+receipt. The release carries forward 0.4.4 Asset Check, quote-network selection,
+billing guidance, unsigned service diagnostics and certified-nonpayment recovery
+fixes, plus the receipt-export and paid-run regression fixes.
+
+Version 0.4.5 is PREPARED locally only, not published. Publication, publisher signatures and paid
+candidate end-to-end qualification remain separate steps. This source
+preparation does not measure live availability.
+
+Finalized Robinhood receipt recovery now budgets eight seconds for the combined
+snapshot and certificate reads. `SECONDED_DEBUG_SETTLEMENT=1` enables sanitized
+stderr diagnostics for reader methods, error classes and decisions. Independent
+receipt, log, canonical-block and finality requirements are unchanged.
+
+## Published 0.4.4 documentation (historical)
+
 <img src="assets/repo-banner-1600x500.png" alt="SECONDED. The oracle for agents." width="800">
 
 **The oracle for agents: before an AI agent acts, two AI models from rival labs check the input, and every answer comes with a signed receipt; no answer, no charge.**
@@ -135,3 +180,8 @@ This repository is SECONDED's public showcase and trust surface. The full develo
 - **Licence:** Code in this repository is licensed under [Apache-2.0](LICENSE); see [NOTICE](NOTICE). Vendored dependencies retain their own licences, listed in [THIRD_PARTY.md](THIRD_PARTY.md).
 - **Trademarks:** SECONDED and the glass-S mark are trademarks of the maintainers; the licence covers the code, not the name or logo.
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md) records changes across client releases.
+
+Re-enrollment now requires a human terminal, the exact displayed phrase and
+rollback-equivalent owner presence. Verify the build against published SHA-256SUMS;
+MCP never supplies its own digest or a finished recovery command. See
+[upgrade instructions](docs/public/upgrades.md).

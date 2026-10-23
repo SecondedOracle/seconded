@@ -3,7 +3,9 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"io"
 	"os"
@@ -151,11 +153,40 @@ func verifyAutomaticReleaseDigest(exe string, requireVersion bool) (string, erro
 	return want, nil
 }
 
-// Enrollment authenticates the running image. On Linux the proc descriptor
-// remains bound to that image even when its pathname is renamed or replaced.
-var enrollmentFingerprint = func(exe string) (string, error) {
-	if runtime.GOOS == "linux" {
-		return Fingerprint("/proc/self/exe")
+// Pin the executable before handling commands. Renaming or replacing its path
+// later cannot change the descriptor used for enrollment checks and commits.
+// Retain this descriptor for the lifetime of the process; never reopen on error.
+var runningImage, runningImageError = openRunningImage()
+
+func openRunningImage() (*os.File, error) {
+	exe, err := os.Executable()
+	if err != nil {
+		return nil, err
 	}
-	return Fingerprint(exe)
+	if runtime.GOOS == "linux" {
+		exe = "/proc/self/exe"
+	}
+	return os.Open(exe)
+}
+
+func fingerprintImage(image *os.File) (string, error) {
+	info, err := image.Stat()
+	if err != nil || !info.Mode().IsRegular() {
+		return "", ErrStorage
+	}
+	hash := sha256.New()
+	// ReadAt through SectionReader avoids a shared seek offset across callers.
+	if _, err = io.Copy(hash, io.NewSectionReader(image, 0, info.Size())); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+var enrollmentFingerprint = runningImageFingerprint
+
+func runningImageFingerprint(_ string) (string, error) {
+	if runningImageError != nil {
+		return "", runningImageError
+	}
+	return fingerprintImage(runningImage)
 }

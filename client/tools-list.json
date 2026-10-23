@@ -177,13 +177,17 @@
   },
   {
     "name": "seconded_receipt",
-    "description": "Recover a check or recent checks by fetching status only. With no check_id, lists the 20 newest checks and any older check still awaiting its receipt, newest first. A result's verification holds the receipt's signed findings and coverage. Never creates a new payment authorization; standard recovery may re-post the identical credential, while legacy recovery signs a read-only ownership proof. After any check error or timeout, call this before checking again. The answer wait can end while payment is pending: continue receipt-only recovery separately until final payment, certified nonpayment, or manual review. Certified nonpayment says not charged and permits retrying the check.",
+    "description": "Recover a check or recent checks by fetching status only. With no check_id, lists the 20 newest checks and any older check still awaiting its receipt, newest first. A result's verification holds the receipt's signed findings and coverage. Never creates a new payment authorization; standard recovery may re-post the identical credential, while legacy recovery signs a read-only ownership proof. After any check error or timeout, call this before checking again. The answer wait can end while payment is pending: continue receipt-only recovery separately until final payment, certified nonpayment, or manual review. Certified nonpayment says not charged and permits retrying the check. With export=true and check_id, instead export only the locally saved signed envelope, sig and key_id for independent verification; no recovery or network call. Signed billing includes public wallet addresses and is not independent chain-finality proof.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
         "check_id": {
           "pattern": "^[0-9a-f]{32}$",
           "type": "string"
+        },
+        "export": {
+          "description": "Export the saved signed receipt locally; requires check_id.",
+          "type": "boolean"
         }
       },
       "type": "object"
@@ -221,6 +225,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "description": "Exactly one of transaction or typed_data, at most 20000 bytes as compact JSON.",
@@ -440,6 +448,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -464,6 +479,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "oneOf": [
             {
@@ -560,6 +579,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -584,6 +610,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -644,6 +674,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -668,6 +705,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -706,6 +747,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -730,6 +778,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -821,6 +873,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -845,6 +904,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -891,6 +954,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -915,6 +985,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -957,6 +1031,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -981,6 +1062,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -1038,6 +1123,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -1062,6 +1154,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "description": "One input object with network and accepts; preserve supplied chosen_index and budget. Never input.input. Preserve offer fields and values. Client derives signing_context from top-level signing; never invent it.",
@@ -1446,6 +1542,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "signing": {
           "additionalProperties": false,
           "properties": {
@@ -1492,6 +1595,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -1550,6 +1657,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -1574,6 +1688,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -1730,6 +1848,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -1754,6 +1879,10 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "agent_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "input": {
           "additionalProperties": false,
           "properties": {
@@ -1790,6 +1919,13 @@
           ],
           "type": "string"
         },
+        "payment_preference": {
+          "description": "Opt in to prepaid burn credits, falling back to x402 if insufficient. Requires network robinhood and agent_id.",
+          "enum": [
+            "seconded_discount"
+          ],
+          "type": "string"
+        },
         "wait_seconds": {
           "maximum": 25,
           "minimum": 0,
@@ -1804,6 +1940,129 @@
     "annotations": {
       "destructiveHint": false,
       "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_credits_buy",
+    "description": "Buy a burn-credit pack through the pinned Robinhood USDG to native ETH to SECONDED route, burn only its swap output, then redeem. Sends up to four initial chain transactions; safe requotes may renew approval within the original total gas cap. Face value $5–$10; USDG input capped at $10 per pack. Supply explicit USDG, slippage and gas caps. Repeat identical arguments and pack_id while pending; safe unbroadcast stages requote after expiry. Optional recovery_action=requote refreshes a safe stage; recovery_action=abandon closes it and retains any swapped tokens. Uncertain transactions cannot be abandoned; never choose a new ID to retry.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "face_usd_micros": {
+          "maximum": 10000000,
+          "minimum": 5000000,
+          "type": "integer"
+        },
+        "gas_limit": {
+          "maximum": 2000000,
+          "minimum": 21000,
+          "type": "integer"
+        },
+        "input_usdg_micros": {
+          "maximum": 10000000,
+          "minimum": 4000000,
+          "type": "integer"
+        },
+        "max_fee_per_gas_wei": {
+          "type": "string"
+        },
+        "max_priority_fee_per_gas_wei": {
+          "type": "string"
+        },
+        "max_total_gas_wei": {
+          "type": "string"
+        },
+        "pack_id": {
+          "pattern": "^[0-9a-f]{32}$",
+          "type": "string"
+        },
+        "recovery_action": {
+          "enum": [
+            "requote",
+            "abandon"
+          ],
+          "type": "string"
+        },
+        "slippage_bps": {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "pack_id",
+        "agent_id",
+        "face_usd_micros",
+        "input_usdg_micros",
+        "slippage_bps",
+        "gas_limit",
+        "max_fee_per_gas_wei",
+        "max_priority_fee_per_gas_wei",
+        "max_total_gas_wei"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "seconded_credits_quote",
+    "description": "Get a fresh quote for a SECONDED burn-credit pack on Robinhood. Minimum face value $5; quotes expire in 300 seconds. Does not buy or burn tokens.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "face_usd_micros": {
+          "maximum": 10000000,
+          "minimum": 5000000,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "agent_id",
+        "face_usd_micros"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "seconded_credits_redeem",
+    "description": "Redeem an existing finalized burn transaction using its fresh quote. Signs a BurnRedeem proof with the check wallet; sends no chain transaction. Returns the credit lot and remaining face value.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "quote": {
+          "description": "The entire unchanged quote object returned by seconded_credits_quote.",
+          "type": "object"
+        },
+        "tx_hash": {
+          "pattern": "^0x[0-9a-fA-F]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tx_hash",
+        "quote"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "idempotentHint": true,
       "openWorldHint": true,
       "readOnlyHint": false
     }

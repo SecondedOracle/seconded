@@ -143,7 +143,8 @@ func commitEnrollment(files *Files, store SecretStore, i Installation, v Vault, 
 
 // RollbackEnrollment is a terminal-only entry point, never exposed as an MCP tool.
 // The profile lock binds the confirmation to the exact address and versions.
-func RollbackEnrollment(dir, exe string) error {
+func RollbackEnrollment(dir, exe string) (err error) {
+	defer func() { err = actionableFingerprintError(err, dir, exe) }()
 	files, err := OpenFiles(dir)
 	if err != nil {
 		return err

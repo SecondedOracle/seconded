@@ -99,8 +99,11 @@ func WalletFundingMessage(install Installation, dir string) string {
 const EarlierWalletWarning = "Couldn't check for an earlier SECONDED wallet on this computer. If you had one, don't fund this address yet - ask me to check again once your computer is unlocked."
 
 func WalletExistingMessage(install Installation, dir string) string {
-	return strings.Replace(WalletFundingMessage(install, dir), "SECONDED created a check wallet:", "SECONDED check wallet:", 1)
+	message := strings.Replace(WalletFundingMessage(install, dir), "SECONDED created a check wallet:", "SECONDED check wallet:", 1)
+	return strings.Replace(message, EarlierWalletWarning, EarlierEnrolledWalletNotice, 1)
 }
+
+const EarlierEnrolledWalletNotice = "Keep using this enrolled address. An earlier SECONDED wallet in the OS store could not be checked; ask me to check again once your computer is unlocked."
 
 func InstalledEngine(dir, exe string) (*Engine, error) {
 	files, e := OpenFiles(dir)

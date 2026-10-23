@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"math/big"
 	"strings"
 	"time"
@@ -17,16 +17,28 @@ func robinhoodNetwork(network string) bool {
 // A signed FINAL receipt supplies only a transaction locator. It never supplies
 // the independent chain certificate that changes a reservation to SPENT.
 func receiptTransactionLocator(e Entry) (string, error) {
-	if !robinhoodNetwork(normalizedNetwork(e.Network)) || e.Receipt == nil || e.Receipt.Envelope.State != "final" {
+	if !robinhoodNetwork(normalizedNetwork(e.Network)) {
+		debugRecovery("locator_network_ineligible", nil)
+		return "", nil
+	}
+	if e.Receipt == nil {
+		debugRecovery("locator_receipt_missing", nil)
+		return "", nil
+	}
+	if e.Receipt != nil && e.Receipt.Envelope.State != "final" {
+		debugRecovery("locator_receipt_not_final", nil)
 		return "", nil
 	}
 	if err := (ReceiptVerifier{labels: releaseLabels}).VerifyStored(*e.Receipt, e, time.Now()); err != nil {
+		debugRecovery("locator_verification_failed", err)
 		return "", err
 	}
 	b := e.Receipt.Envelope.Billing
 	if b.Tx == nil || !hexWord.MatchString(*b.Tx) || b.Charged != "yes" || b.Settlement != "final" {
+		debugRecovery("locator_billing_invalid", nil)
 		return "", ErrInvalid
 	}
+	debugRecovery("locator_verified", nil)
 	return *b.Tx, nil
 }
 
@@ -37,47 +49,53 @@ type receiptCertificate struct {
 	BlockHash                     string
 }
 
-// Only an explicit archive-policy rejection permits this alternative proof.
-// Every other history error, and any disagreement with a successful history
-// certificate, remains a failure. The original history path is unchanged.
-func (q *Quorum) receiptFallback(ctx context.Context, e Entry, s ChainSnapshot, prior []ChainEvidence, failures []error) (ChainEvidence, error) {
-	for i, err := range failures {
-		if err == nil {
-			continue
-		}
-		var read *rpcReadError
-		if !errors.Is(err, ErrReaderHistoryUnavailable) || !errors.As(err, &read) || read.method != "eth_getLogs" || !prior[i].authorizationUsed {
-			return ChainEvidence{}, err
-		}
-	}
-	tx, err := receiptTransactionLocator(e)
-	if err != nil {
-		return ChainEvidence{}, err
-	}
-	if tx == "" {
-		return ChainEvidence{}, ErrReaderHistoryUnavailable
+// Each independent reader must prove the exact token transfer and nonce use
+// inside the same successful, canonical transaction covered by finality.
+// No server statement or unavailable archive query supplies chain evidence.
+func (q *Quorum) receiptEvidence(ctx context.Context, e Entry, s ChainSnapshot, tx string) (ChainEvidence, error) {
+	if !q.publicPair() {
+		debugRecovery("receipt_pair_unconfigured", nil)
+		return ChainEvidence{}, errEvidenceNotConfigured
 	}
 	certificates := make([]receiptCertificate, len(q.rpcs))
 	if err := q.readRecentReaders(func(i int, r *RPC) (err error) {
 		certificates[i], err = r.receiptCertificate(ctx, e, s, tx)
 		return
 	}); err != nil {
+		debugRecovery("receipt_reader_failed", err)
 		return ChainEvidence{}, err
 	}
 	first := certificates[0]
-	for i, certificate := range certificates {
-		if certificate != first || (failures[i] == nil && prior[i] != certificate.Evidence) {
+	for _, certificate := range certificates[1:] {
+		if certificate != first {
+			debugRecovery("receipt_pair_disagreement", nil)
 			return ChainEvidence{}, errEvidenceDisagreement
 		}
 	}
 	if err := q.recheckRecentSnapshot(ctx, s); err != nil {
+		debugRecovery("receipt_snapshot_changed", err)
 		return ChainEvidence{}, err
 	}
+	// Recheck the payment block after both proofs, closing a reorg during reads.
+	if err := q.readRecentReaders(func(_ int, r *RPC) error {
+		block, err := r.block(ctx, fmt.Sprintf("0x%x", first.BlockNumber))
+		if err != nil {
+			return err
+		}
+		if block.Number != first.BlockNumber || block.Hash != first.BlockHash || block.Timestamp != first.Evidence.SpentAt {
+			return errEvidenceDisagreement
+		}
+		return nil
+	}); err != nil {
+		debugRecovery("receipt_block_recheck_failed", err)
+		return ChainEvidence{}, err
+	}
+	debugRecovery("receipt_pair_verified", nil)
 	return first.Evidence, nil
 }
 
-func (r *RPC) receiptCertificate(ctx context.Context, e Entry, s ChainSnapshot, tx string) (receiptCertificate, error) {
-	var out receiptCertificate
+func (r *RPC) receiptCertificate(ctx context.Context, e Entry, s ChainSnapshot, tx string) (out receiptCertificate, err error) {
+	defer func() { debugSettlement(r, "eth_getTransactionReceipt", err, "certificate") }()
 	if !robinhoodNetwork(r.network) || normalizedNetwork(e.Network) != r.network || normalizedNetwork(s.Network) != r.network {
 		return out, ErrInvalid
 	}
@@ -106,12 +124,19 @@ func (r *RPC) receiptCertificate(ctx context.Context, e Entry, s ChainSnapshot, 
 	if err != nil {
 		return out, ErrInvalid
 	}
-	block, err := r.block(ctx, number)
-	if err != nil {
+	var block, finalized ChainSnapshot
+	if err := parallelReads(
+		func() (err error) { block, err = r.block(ctx, number); return },
+		func() (err error) { finalized, err = r.block(ctx, "finalized"); return },
+	); err != nil {
 		return out, err
 	}
 	if block.Number != blockNumber || block.Hash != blockHash || block.Timestamp <= 0 || block.Timestamp > s.Timestamp {
 		return out, ErrInvalid
+	}
+	if finalized.Number < s.Number || finalized.Timestamp < s.Timestamp ||
+		(finalized.Number == s.Number && (finalized.Hash != s.Hash || finalized.Timestamp != s.Timestamp)) {
+		return out, errEvidenceDisagreement
 	}
 	var logs []chainLog
 	if DecodeStrict(raw["logs"], &logs, ResponseLimit) != nil || len(logs) == 0 {

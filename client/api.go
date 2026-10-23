@@ -93,7 +93,7 @@ type Requirement struct {
 
 // QuoteBinding is the "seconded" object server/payments/quotes.py mint_quote() returns;
 // tests/contract/client-fixtures.json pins it to the server's output.
-const ClientVersion = "0.4.4"
+const ClientVersion = "0.4.5"
 
 var semanticVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$`)
 
@@ -277,15 +277,19 @@ type Hints struct {
 	NewQuoteAllowed bool `json:"new_quote_allowed,omitempty"`
 }
 type CheckReply struct {
-	Error      string        `json:"error,omitempty"`
-	RetryAfter int           `json:"retry_after,omitempty"`
-	ServerTime int64         `json:"server_time,omitempty"`
-	Receipt    SignedReceipt `json:"receipt"`
-	Hints      Hints         `json:"hints"`
-	Status     string        `json:"status,omitempty"`
-	Message    string        `json:"message,omitempty"`
-	Reason     string        `json:"reason,omitempty"`
-	httpStatus int
+	// Transport-authenticated account snapshot, never part of the signed receipt.
+	CreditBalanceMicros     *int64        `json:"credit_balance_usd_micros,omitempty"`
+	CreditBalanceBasis      string        `json:"credit_balance_basis,omitempty"`
+	CreditBalanceObservedAt int64         `json:"credit_balance_observed_at,omitempty"`
+	Error                   string        `json:"error,omitempty"`
+	RetryAfter              int           `json:"retry_after,omitempty"`
+	ServerTime              int64         `json:"server_time,omitempty"`
+	Receipt                 SignedReceipt `json:"receipt"`
+	Hints                   Hints         `json:"hints"`
+	Status                  string        `json:"status,omitempty"`
+	Message                 string        `json:"message,omitempty"`
+	Reason                  string        `json:"reason,omitempty"`
+	httpStatus              int
 }
 type API struct {
 	url            string
@@ -360,7 +364,9 @@ func (a *API) request(ctx context.Context, method, path string, body any, header
 	minimums := resp.Header.Values("SECONDED-MIN-CLIENT-VERSION")
 	if resp.StatusCode == http.StatusUpgradeRequired || len(minimums) > 1 ||
 		(len(minimums) == 1 && !minimumVersionOK(Version, minimums[0])) {
-		return 0, nil, nil, errors.New("client_upgrade_required")
+		// Keep the bounded response available for authenticated credit closure.
+		// Callers still receive the upgrade error before any new authorization.
+		return resp.StatusCode, b, resp.Header, errors.New("client_upgrade_required")
 	}
 	return resp.StatusCode, b, resp.Header, nil
 }
@@ -427,13 +433,13 @@ func parseChallenge(status int, b []byte, paymentRequired string, r Request, now
 }
 func parseReply(status int, b []byte) (CheckReply, error) {
 	var r CheckReply
-	if DecodeStrict(b, &r, ResponseLimit) != nil || r.Hints.PollAfter < 0 || r.Hints.PollAfter > 30 ||
+	if DecodeStrict(b, &r, ResponseLimit) != nil || r.Hints.PollAfter < 0 || r.Hints.PollAfter > 30 || !r.validCreditBalance() ||
 		(r.Receipt.Envelope.Product == portfolioProduct && len(b) >= ResponseLimit) {
 		return r, ErrInvalid
 	}
 	// An authenticated terminal service failure is authoritative on any HTTP
 	// status; the verifier still enforces its signature, association and billing.
-	if status < 100 || status > 599 || (!oneOf(strconv.Itoa(status), "200", "202", "400", "403", "409", "413", "422", "423", "429", "503") && r.Receipt.Envelope.State != "service_failed") {
+	if status < 100 || status > 599 || (!oneOf(strconv.Itoa(status), "200", "202", "400", "403", "409", "413", "422", "423", "429", "503") && r.Receipt.Envelope.State != "service_failed" && !r.Receipt.Envelope.NotAdmitted) {
 		return r, ErrInvalid
 	}
 	if status == 202 && r.Receipt.Envelope.State != "service_failed" && (!r.Hints.DoNotResign || r.Hints.PollAfter == 0) {
@@ -459,6 +465,9 @@ func (a *API) Present(ctx context.Context, r Request, payload string, wait int) 
 	return parseReply(status, b)
 }
 func (a *API) Collect(ctx context.Context, e Entry, signer Signer) (CheckReply, error) {
+	if e.Credit != nil {
+		return a.collectCredit(ctx, e, signer)
+	}
 	var archived *RecoveryRecord
 	if e.Recovery != nil {
 		if e.Recovery.Format != "seconded-door-archive/v1" {
@@ -544,6 +553,11 @@ func publicAPIError(status int, body []byte) error {
 			return errors.New(wire.Reason)
 		}
 		return errors.New("invalid_input")
+	}
+	// Credits status can replay refusals at their original admission status.
+	// Preserve the closed code/status pairs; unsigned diagnostics never settle a spend.
+	if knownBurnErrorStatus(wire.Error, status) {
+		return &BurnCreditError{Code: wire.Error}
 	}
 	if oneOf(wire.Error, "store_unavailable", "rate_limited", "input_too_large", "client_upgrade_required", "product_in_testing", "unsupported_network", "price_exceeds_max") {
 		return errors.New(wire.Error)

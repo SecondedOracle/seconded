@@ -22,7 +22,17 @@ func (v ReceiptVerifier) ProveInput(e Entry, req Request, now time.Time) error {
 	}
 	if e.Recovery != nil {
 		canonical, err := standardCanonical(req, e.Recovery.Accepted)
-		if err != nil || string(canonical) != e.Recovery.CanonicalRequest {
+		if err != nil {
+			return ErrInvalid
+		}
+		if e.Recovery.Format == "seconded-door-archive/v1" {
+			// Final recovery erases request bytes, retaining their hash. The
+			// verified receipt above still authenticates the purchase association.
+			hash := sha256.Sum256(canonical)
+			if hex.EncodeToString(hash[:]) != e.Recovery.CanonicalRequestSHA256 {
+				return ErrInvalid
+			}
+		} else if string(canonical) != e.Recovery.CanonicalRequest {
 			return ErrInvalid
 		}
 		return nil

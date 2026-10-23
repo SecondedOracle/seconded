@@ -182,11 +182,25 @@ func (q *Quorum) Snapshot(ctx context.Context, payer string) (ChainSnapshot, err
 }
 
 func (q *Quorum) Evidence(ctx context.Context, e Entry, s ChainSnapshot) (ChainEvidence, error) {
-	if len(q.rpcs) > 2 {
-		return quorumPair(q, func(pair *Quorum) (ChainEvidence, error) { return pair.Evidence(ctx, e, s) })
-	}
 	if !q.publicPair() {
 		return ChainEvidence{}, errEvidenceNotConfigured
+	}
+	// A verified FINAL receipt locates a complete payment proof. Read that
+	// bounded proof before history: archive scans can exhaust recovery's budget
+	// and an authorization-state root can be pruned while the receipt survives.
+	tx, err := receiptTransactionLocator(e)
+	if err != nil {
+		return ChainEvidence{}, err
+	}
+	if len(q.rpcs) > 2 {
+		readers := q
+		if tx == "" {
+			readers = q.historyReaders()
+		}
+		return quorumPair(readers, func(pair *Quorum) (ChainEvidence, error) { return pair.Evidence(ctx, e, s) })
+	}
+	if tx != "" {
+		return q.receiptEvidence(ctx, e, s, tx)
 	}
 	evidence := make([]ChainEvidence, len(q.rpcs))
 	errs := make([]error, len(q.rpcs))
@@ -202,11 +216,6 @@ func (q *Quorum) Evidence(ctx context.Context, e Entry, s ChainSnapshot) (ChainE
 	readers.Wait()
 	if err := evidenceReadFailure(errs); err != nil && !errors.Is(err, ErrChainUnavailable) {
 		return ChainEvidence{}, err
-	}
-	for _, err := range errs {
-		if errors.Is(err, ErrReaderHistoryUnavailable) {
-			return q.receiptFallback(ctx, e, s, evidence, errs)
-		}
 	}
 	for _, err := range errs {
 		if err != nil {
@@ -235,6 +244,7 @@ func (r *RPC) call(ctx context.Context, method string, params any, dst any) (err
 			}
 			err = &rpcReadError{reader: r, method: method, cause: err}
 		}
+		debugSettlement(r, method, err, "rpc")
 	}()
 	limited := false
 	last := ErrChainUnavailable
@@ -334,9 +344,15 @@ func (r *RPC) callOnce(ctx context.Context, method string, params any, dst any) 
 			if rpcError.Code == -32005 || (rpcError.Code == -32016 && strings.EqualFold(strings.TrimSpace(rpcError.Message), "over rate limit")) {
 				return retryAfter(resp.Header.Get("Retry-After"), time.Now()), ErrReaderRateLimited
 			}
-			if resp.StatusCode == http.StatusForbidden && rpcError.Code == -32602 &&
+			if (resp.StatusCode == http.StatusForbidden || resp.StatusCode == http.StatusOK) && rpcError.Code == -32602 &&
 				strings.HasPrefix(strings.ToLower(rpcError.Message), "archive requests require a personal token") {
 				// Retrying the identical request cannot change an archive policy.
+				return 0, ErrReaderHistoryUnavailable
+			}
+			// Robinhood readers can prune even a recently certified state root.
+			// This exact response supplies no evidence about authorization use.
+			if resp.StatusCode == http.StatusOK && method == "eth_call" && rpcError.Code == -32000 &&
+				prunedStateMessage.MatchString(rpcError.Message) {
 				return 0, ErrReaderHistoryUnavailable
 			}
 		}
@@ -349,6 +365,7 @@ func (r *RPC) callOnce(ctx context.Context, method string, params any, dst any) 
 }
 
 var quantityPattern = regexp.MustCompile(`^0x(0|[1-9a-f][0-9a-f]*)$`)
+var prunedStateMessage = regexp.MustCompile(`^historical state [0-9a-f]{64} is not available$`)
 
 func quantity(s string) (uint64, error) {
 	if !quantityPattern.MatchString(s) {

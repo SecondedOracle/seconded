@@ -1586,6 +1586,7 @@
     "Only an agreed signed receipt authorizes the listed next step for the exact supplied input. Pending, failed or NOT VERIFIED results mean pause.",
     "Never treat a verdict as financial advice, an investment recommendation or a guarantee.",
     "seconded_wallet shows status or freezes new authorizations.",
+    "Burn-credit packs on Robinhood: use seconded_credits_quote for a free fresh quote, seconded_credits_buy to buy, or seconded_credits_redeem for an existing burn. Bundled terms are not live availability; a quote checks current terms and capacity.",
     "Standard checks charge only after both models agree and the answer is saved; a disagreement is signed and free. Degen Check costs $0.10 for a saved signed answer, including a signed disagreement (models_disagree). If delivery fails, fetch the saved answer with seconded_receipt; no answer → no charge.",
     "Availability is from the bundled offline snapshot, not a live server probe. A quote or check evaluates current server availability. Degen Check covers Robinhood Chain only."
   ],
@@ -1612,5 +1613,31 @@
       "pay_to": "0x010ab46d566cde25cca0ee55eb105e781c7bcf3a"
     }
   ],
-  "availability_source": "bundled_snapshot"
+  "availability_source": "bundled_snapshot",
+  "burn_credits": {
+    "enabled": true,
+    "payment_preference": "seconded_discount",
+    "network": "eip155:4663",
+    "chain_id": 4663,
+    "token_address": "0x833a7fa750628b391c35bf384d7706652c7e8202",
+    "discount_bps": 2000,
+    "minimum_face_usd_micros": 5000000,
+    "maximum_face_usd_micros": 10000000,
+    "global_monthly_face_usd_micros": 50000000,
+    "payer_agent_monthly_face_usd_micros": 10000000,
+    "cap_period": "UTC calendar month",
+    "credit_ttl_s": 2592000,
+    "quote_ttl_s": 300,
+    "quote_reserves_capacity": false,
+    "guide_url": "https://secondedoracle.xyz/docs/credits",
+    "routes": {
+      "quote": "/v1/credits/quote",
+      "redeem": "/v1/credits/redeem",
+      "status": "/v1/credits/status",
+      "spend": [
+        "/v1/checks",
+        "/v1/x402/checks"
+      ]
+    }
+  }
 }

@@ -13,6 +13,7 @@ import (
 )
 
 type Entry struct {
+	Credit                  *CreditRecovery `json:"credit,omitempty"`
 	CheckedSubject          *CheckedSubject `json:"checked_subject,omitempty"`
 	PortfolioScopeSHA256    string          `json:"portfolio_scope_sha256,omitempty"`
 	ComparisonRequestSHA256 string          `json:"comparison_request_sha256,omitempty"`
@@ -120,7 +121,10 @@ func readLedgerFile(f *Files, name string) (Ledger, error) {
 		default:
 			return l, ErrStorage
 		}
-		if x.State == "SPENT" && (x.SpentAt <= 0 || !hexWord.MatchString(x.Tx)) {
+		if x.Credit != nil && x.Credit.validate(x) != nil {
+			return l, ErrStorage
+		}
+		if x.State == "SPENT" && (x.SpentAt <= 0 || (x.Credit == nil && !hexWord.MatchString(x.Tx))) {
 			return l, ErrStorage
 		}
 	}
@@ -151,7 +155,7 @@ func (l *Ledger) Duplicate(product, digest string, now int64, dedupe bool) *Entr
 		if e.Product != product || e.InputDigest != digest {
 			continue
 		}
-		if e.State == "RELEASED" && e.Receipt == nil {
+		if e.State == "RELEASED" && (e.Receipt == nil || (e.Credit != nil && e.Receipt.Envelope.NotAdmitted)) {
 			continue
 		}
 		if e.RecoveryRequired || e.State == "RESERVED" || e.State == "OUTSTANDING" {
@@ -169,7 +173,7 @@ func (l *Ledger) Duplicate(product, digest string, now int64, dedupe bool) *Entr
 func (l *Ledger) ReservedForNetwork(network string) (reserved int64) {
 	network = normalizedNetwork(network)
 	for _, e := range l.Entries {
-		if normalizedNetwork(e.Network) == network && (e.State == "RESERVED" || e.State == "OUTSTANDING") {
+		if e.Credit == nil && normalizedNetwork(e.Network) == network && (e.State == "RESERVED" || e.State == "OUTSTANDING") {
 			reserved += e.Amount
 		}
 	}
@@ -207,10 +211,19 @@ func (l *Ledger) Totals(now int64) (hour, day, open int64) {
 	return
 }
 func (l *Ledger) Budget(s Settings, amount, now int64) error {
+	return l.budget(s, amount, now, MaxAuthorization, s.Limits.PerCheck)
+}
+
+// Packs have their own per-purchase cap; aggregate owner budgets still apply.
+func (l *Ledger) burnPackBudget(s Settings, amount, now int64) error {
+	return l.budget(s, amount, now, MaxBurnPackInput, nil)
+}
+
+func (l *Ledger) budget(s Settings, amount, now, maximum int64, perCheck *int64) error {
 	if s.Frozen {
 		return errors.New("frozen_local")
 	}
-	if amount <= 0 || amount > MaxAuthorization {
+	if amount <= 0 || amount > maximum {
 		return errors.New("policy_mismatch")
 	}
 	hour, day, open := l.Totals(now)
@@ -218,7 +231,7 @@ func (l *Ledger) Budget(s Settings, amount, now int64) error {
 		limit  *int64
 		used   int64
 		reason string
-	}{{s.Limits.PerCheck, 0, "limit_per_check"}, {s.Limits.Hour, hour, "limit_hour"}, {s.Limits.Day, day, "limit_day"}, {s.Limits.Outstanding, open, "limit_outstanding"}} {
+	}{{perCheck, 0, "limit_per_check"}, {s.Limits.Hour, hour, "limit_hour"}, {s.Limits.Day, day, "limit_day"}, {s.Limits.Outstanding, open, "limit_outstanding"}} {
 		if v.limit != nil && (v.used > *v.limit || amount > *v.limit-v.used) {
 			return errors.New(v.reason)
 		}
@@ -290,9 +303,11 @@ func (l *Ledger) Reconcile(ctx context.Context, chain ChainReader, snap ChainSna
 
 func (l *Ledger) reconcileAll(ctx context.Context, chain ChainReader, snap ChainSnapshot) error {
 	if snap.Timestamp <= 0 || !hexWord.MatchString(snap.Hash) || snap.Timestamp > time.Now().Unix()+30 || snap.Timestamp < time.Now().Unix()-pins(snap.Network).FinalizedMaxAge {
+		debugRecovery("snapshot_invalid", nil)
 		return errors.New("budget_blocked_on_chain_evidence")
 	}
 	if a := l.anchor(snap.Network); a != nil && (snap.Number < a.Number || snap.Timestamp < a.Timestamp || (snap.Number == a.Number && (snap.Hash != a.Hash || snap.Timestamp != a.Timestamp)) || (snap.Number > a.Number && snap.Timestamp < a.Timestamp)) {
+		debugRecovery("anchor_regression", nil)
 		return errors.New("budget_blocked_on_chain_evidence")
 	}
 	// Stage all evidence so a later RPC failure cannot partially advance the ledger.
@@ -308,16 +323,19 @@ func (l *Ledger) reconcileAll(ctx context.Context, chain ChainReader, snap Chain
 	}()
 	for i := range l.Entries {
 		e := &l.Entries[i]
-		if e.State != "OUTSTANDING" || normalizedNetwork(e.Network) != normalizedNetwork(snap.Network) {
+		if e.Credit != nil || e.State != "OUTSTANDING" || normalizedNetwork(e.Network) != normalizedNetwork(snap.Network) {
+			debugRecovery("ledger_entry_ineligible", nil)
 			continue
 		}
 		proof, err := chain.Evidence(ctx, *e, snap)
 		if err != nil {
+			debugRecovery("evidence_failed", err)
 			return &budgetEvidenceError{stage: "reconciliation", cause: err}
 		}
 		switch proof.State {
 		case "SPENT":
 			if proof.SpentAt <= 0 || proof.SpentAt > snap.Timestamp || !hexWord.MatchString(proof.Tx) {
+				debugRecovery("evidence_invalid", nil)
 				return ErrInvalid
 			}
 			e.State = "SPENT"
@@ -328,7 +346,9 @@ func (l *Ledger) reconcileAll(ctx context.Context, chain ChainReader, snap Chain
 			e.State = "RELEASED"
 			e.Payload = ""
 		case "OUTSTANDING":
+			debugRecovery("evidence_outstanding", nil)
 		default:
+			debugRecovery("evidence_invalid", nil)
 			return ErrInvalid
 		}
 	}
